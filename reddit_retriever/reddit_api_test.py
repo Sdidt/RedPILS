@@ -13,5 +13,5 @@ reddit = praw.Reddit(
     user_agent = user_agent
 )
 
-for submission in reddit.subreddit("test").controversial(limit=10):
+for submission in reddit.subreddit("india").top():
     print(submission.title)

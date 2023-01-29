@@ -1,2 +1,4 @@
 IR
 .env
+__pycache__
+outputs/
