@@ -1,2 +1,5 @@
 python-dotenv
 praw
+indic-nlp-library
+git+https://github.com/siddharth17196/english-hindi-transliteration
+googletrans==4.0.0-rc1
