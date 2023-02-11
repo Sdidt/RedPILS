@@ -4,7 +4,7 @@ import sys
 import praw
 import pickle
 load_dotenv()
-sys.path.append(r"C:\Users\Siddharth\Desktop\NTU COURSE STUFF\Y4S2\CE4034\Project")
+sys.path.append(os.environ.get("SYS_PATH"))
 
 from constants import subreddits, keywords
 
@@ -26,8 +26,9 @@ class Crawler:
             print("==========SUBREDDIT {}==========".format(subreddit))
             sub_data[subreddit] = []
             sub = self.reddit.subreddit(subreddit)
-            for keyword in keywords:
-                for submission in sub.search(keyword, limit=5):
+            for keyword in keywords[:2]:
+                print("==========Extracting for keyword {}==========".format(keyword))
+                for submission in sub.search(keyword, limit=2):
                     print("==========SUBMISSION {}==========".format(submission.id))
                     print("TITLE: {}".format(submission.title.encode('utf-8')))
                     submission.comments.replace_more(limit=5)
@@ -49,6 +50,10 @@ class Crawler:
         return filtered_comments
 
     def store_data(self, sub_data):
+        isExist = os.path.exists('./outputs')
+        if not isExist:
+            os.makedirs('./outputs')
+
         with open("outputs/sub_filtered_output.txt", "wb") as f:
             pickle.dump(sub_data, f)
 
