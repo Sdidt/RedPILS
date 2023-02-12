@@ -3,10 +3,12 @@ import os
 import sys
 import praw
 import pickle
+from pprint import pprint
+from collections import defaultdict
 load_dotenv()
 sys.path.append(r"C:\Users\Siddharth\Desktop\NTU COURSE STUFF\Y4S2\CE4034\Project")
 
-from constants import subreddits, keywords
+from constants import subreddits
 
 class Crawler:
     def __init__(self) -> None:
@@ -21,32 +23,33 @@ class Crawler:
         )
     
     def crawl_data(self):
-        sub_data = {}
+        sub_data = defaultdict(lambda: {})
         for subreddit in subreddits.keys():
             print("==========SUBREDDIT {}==========".format(subreddit))
             sub_data[subreddit] = []
             sub = self.reddit.subreddit(subreddit)
-            for keyword in keywords:
-                for submission in sub.search(keyword, limit=5):
-                    print("==========SUBMISSION {}==========".format(submission.id))
-                    print("TITLE: {}".format(submission.title.encode('utf-8')))
-                    submission.comments.replace_more(limit=5)
-                    comments = [comment.body.encode('utf-8') for comment in submission.comments.list()]
-                    comments = self.filter_comments(comments)
-                    sub_data[subreddit].extend(comments)
-        self.store_data(sub_data)
-                    # for comment in submission.comments.list(): # list function of CommentForest gets all comments as well as replies
-                    #     print(comment.body.encode('utf-8'))
-            # for submission in self.reddit.subreddit(subreddit).controversial(limit=5):
-            #     print("==========SUBMISSION {}==========".format(submission.id))
-            #     print("TITLE: {}".format(submission.title.encode('utf-8')))
-            #     submission.comments.replace_more(limit=5)
-            #     for comment in submission.comments.list(): # list function of CommentForest gets all comments as well as replies
-            #         print(comment.body.encode('utf-8'))
+            for submission in sub.controversial(limit=10):
+                print("==========SUBMISSION {}==========".format(submission.id))
+                print("TITLE: {}".format(submission.title.encode('utf-8')))
+                submission.comments.replace_more(limit=3)
+                # print(vars(submission.comments))
+                comments = [comment.body.encode('utf-8') for comment in submission.comments.list()]
+                comments = self.filter_comments(comments)
+                sub_data[sub.id][submission.id] = {
+                    "title": submission.title,
+                    "comments": submission.comments # the RHS in this list can later be traversed in a BFS manner to retrieve all the comments preserving tree structure
+                }
+                self.store_raw_data(dict(sub_data))
+                self.store_data(dict(sub_data))
     
+
     def filter_comments(self, comments):
-        filtered_comments = [comment for comment in comments if (comment != b'[removed]' and (len(comment.split(b" ")) >= 15))]
+        filtered_comments = [comment for comment in comments if (comment != b'[removed]' and comment != b'[deleted]' and (len(comment.split(b" ")) >= 15))]
         return filtered_comments
+
+    def store_raw_data(self, sub_data):
+        with open("outputs/raw_output.txt", "w", encoding='utf-8') as f:
+            pprint(sub_data, f)
 
     def store_data(self, sub_data):
         with open("outputs/sub_filtered_output.txt", "wb") as f:

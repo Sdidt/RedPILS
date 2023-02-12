@@ -11,5 +11,7 @@ keywords = [
     "INC",
     "Hindutva",
     "Muslim",
-    "Hindu"
+    "Hindu", 
+    "Riots",
+    "Gujarat"
 ]

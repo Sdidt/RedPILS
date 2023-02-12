@@ -25,11 +25,11 @@ class Translitlator:
 
 if __name__ == "__main__":
     translitlator = Translitlator()
-    transliterated = translitlator.transliterate([
-        "Me gyan chod raha hu? Lmao. Tune khud bola ki kuch logo ke basis par judge nahi kar sakte. Phir tu khud judge kar raha. Jab maine yahi cheez boli to tujhe lag raha ki me gyan chod raha hu? Kamal karte ho bhai",
+    transliterated = [
+        "Me gyan chod raha hu? Lmao. Tune khud bola ki kuch logo ke basis par judge nahi kar sakte. Phir tu khud judge kar raha. Jab maine yahi cheez boli to tujhe lag raha ki me gyan chod raha hu? Kamaal karte ho bhai",
         "Bosdk dang se pada kar tere jaisa internet se nai padai ki mere actual sc /st dost hai i live in a small town which is not that developed but not that backward either tere jaisa ghar me nai baitha rehta hun bhar ja k actual reality ko experience karta hun chutiya",
         '"Internet pe dekh ke opinion nahi deta". Proceeds to call me BJP hater, leftist, caste bhi puch liya.... Ha bhai tu internet pe dekh ke hi opinion deta hai. Khud ko chutiya banana hai to banate reh.'
-    ])
+    ]
     print(transliterated)
     translated = []
     for text in transliterated:
