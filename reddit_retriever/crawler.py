@@ -6,7 +6,7 @@ import pickle
 from pprint import pprint
 from collections import defaultdict
 load_dotenv()
-sys.path.append(r"C:\Users\Siddharth\Desktop\NTU COURSE STUFF\Y4S2\CE4034\Project")
+sys.path.append(os.environ.get("SYS_PATH"))
 
 from constants import subreddits
 
@@ -52,6 +52,10 @@ class Crawler:
             pprint(sub_data, f)
 
     def store_data(self, sub_data):
+        isExist = os.path.exists('./outputs')
+        if not isExist:
+            os.makedirs('./outputs')
+
         with open("outputs/sub_filtered_output.txt", "wb") as f:
             pickle.dump(sub_data, f)
 
