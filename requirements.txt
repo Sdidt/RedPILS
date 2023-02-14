@@ -5,3 +5,4 @@ git+https://github.com/siddharth17196/english-hindi-transliteration
 googletrans==4.0.0-rc1
 transformers
 nltk
+pysolr

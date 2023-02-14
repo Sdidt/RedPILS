@@ -9,7 +9,7 @@ def main():
 
     print("extracting entities.....")
     nlp = pipeline("ner", model=model, tokenizer=tokenizer)
-    example = "My name is Wolfgang and I live in Berlin"
+    example = "People don't have their priorities right, our priority should be to get rid of BJP from power. But what our people are focusing on is 'if not Modi then who', Modi is a fucking clown, anyone is better than MODI. But don't vote for anyone vote for the party that's has the best chance to defeat BJP.\n\nIt's common sense."
 
     ner_results = nlp(example)
     print(ner_results)

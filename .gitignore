@@ -2,3 +2,4 @@ IR
 .env
 __pycache__
 outputs/
+solr-9.1.1/
