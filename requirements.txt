@@ -6,3 +6,5 @@ googletrans==4.0.0-rc1
 transformers
 nltk
 pysolr
+spacy
+# python -m spacy download en_core_web_sm
