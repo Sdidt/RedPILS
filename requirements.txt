@@ -7,4 +7,4 @@ transformers
 nltk
 pysolr
 spacy
-# python -m spacy download en_core_web_sm
+# python -m spacy download en_core_web_sm; to get the corpus for spacy NER
