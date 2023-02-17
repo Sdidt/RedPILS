@@ -1,8 +1,8 @@
 from political_wing import PoliticalWing
 
 subreddits = {
-    "india": PoliticalWing.LEFT,
-    "indiaspeaks": PoliticalWing.RIGHT
+    "indiaspeaks": PoliticalWing.RIGHT,
+    "india": PoliticalWing.LEFT
 }
 
 keywords = [

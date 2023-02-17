@@ -6,11 +6,15 @@ import math
 stop_words = set(stopwords.words('english'))
 
 class TFIDF_tokenizer():
-    def __init__(self,docs) -> None:
+    def __init__(self, docs, search_space=None) -> None:
         self.docs = docs
         self.total_docs_len = len(self.docs)
-        self.total_word_length = 0
-        self.total_words = []
+        if search_space is not None:
+            self.total_words = search_space
+            self.total_word_length = len(self.total_words)
+        else:
+            self.total_words = []
+            self.total_word_length = 0
         self.total_sentences = 0
         self.total_sent_len = 0
         self.tf_score = {}
@@ -74,7 +78,8 @@ class TFIDF_tokenizer():
     def get_tf_idf_score(self):
 
         # process text
-        word_len = self.get_words()
+        if self.total_words == []:
+            word_len = self.get_words()
         # sent_len = self.tokenize_sent()
 
         # create tf_score dict

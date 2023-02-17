@@ -13,7 +13,8 @@ from constants import subreddits
 from models.comment import Comment
 
 class Crawler:
-    def __init__(self) -> None:
+    def __init__(self, output_filename) -> None:
+        self.output_filename = output_filename
         self.client_id = os.environ.get("CLIENT_ID")
         self.client_secret = os.environ.get("CLIENT_SECRET")
         self.user_agent = os.environ.get("USER_AGENT")
@@ -38,41 +39,56 @@ class Crawler:
     # def solr_add_document(self, doc):
     #     self.solr.add([doc])
 
+    def process_submission(self, submission):
+        print("==========SUBMISSION {}==========".format(submission.id))
+        print("TITLE: {}".format(submission.title.encode('utf-8')))
+        submission.comments.replace_more(limit=10)
+        comments = submission.comments.list()
+        # comments = [comment.body.encode('utf-8') for comment in submission.comments.list()]
+        comments = self.filter_comments(comments)
+        dict_data = {
+            "title": submission.title.encode('utf-8'),
+            "comments": [Comment(
+                id=comment.id, 
+                comment=comment.body.encode('utf-8'),
+                timestamp=comment.created_utc,
+                url=comment.permalink,
+                score=comment.score,
+                redditor_id=comment.author.id if hasattr(comment.author, 'id') else -1
+                ) for comment in comments] # the RHS in this list can later be traversed in a BFS manner to retrieve all the comments preserving tree structure
+        }
+        return dict_data
+
     def crawl_data(self):
         sub_data = defaultdict(lambda: {})
         for subreddit in subreddits.keys():
             print("==========SUBREDDIT {}==========".format(subreddit))
             sub_data[subreddit] = []
             sub = self.reddit.subreddit(subreddit)
-            for submission in sub.controversial(limit=3):
-                print("==========SUBMISSION {}==========".format(submission.id))
-                print("TITLE: {}".format(submission.title.encode('utf-8')))
-                submission.comments.replace_more(limit=3)
-                print(vars(submission.comments))
-                comments = submission.comments.list()
-                # comments = [comment.body.encode('utf-8') for comment in submission.comments.list()]
-                comments = self.filter_comments(comments)
-                sub_data[sub.id][submission.id] = {
-                    "title": submission.title,
-                    "comments": [Comment(
-                        id=comment.id, 
-                        comment=comment.body.encode('utf-8'),
-                        timestamp=comment.created_utc,
-                        url=comment.permalink,
-                        score=comment.score,
-                        redditor_id=comment.author.id
-                     ) for comment in comments] # the RHS in this list can later be traversed in a BFS manner to retrieve all the comments preserving tree structure
-                }
+            for submission in sub.controversial(limit=10):
+                sub_data[subreddit][submission.id] = self.process_submission(submission)
                 # self.store_raw_data(dict(sub_data))
-                # self.store_data(dict(sub_data))
+                self.store_data(dict(sub_data))
     
+    def keyword_crawl(self, dynamic_keywords):
+        sub_data = self.read_data()
+        for subreddit in subreddits.keys():
+            print("==========SUBREDDIT {}==========".format(subreddit))
+            sub_data[subreddit] = []
+            sub = self.reddit.subreddit(subreddit)
+            for keyword in dynamic_keywords:
+                for submission in sub.search(keyword, limit=3):
+                    if submission.id not in sub_data[subreddit][submission.id]:
+                        sub_data[subreddit][submission.id] = self.process_submission(submission)
+                        # self.store_raw_data(dict(sub_data))
+                        self.store_data(dict(sub_data))
 
     def filter_comments(self, comments):
-        filtered_comments = [comment for comment in comments if (comment != b'[removed]' and comment != b'[deleted]' and (len(comment.split(b" ")) >= 15))]
+        filtered_comments = [comment for comment in comments if (comment.body.encode('utf-8') != b'[removed]' and comment.body.encode('utf-8') != b'[deleted]' and (len(comment.body.encode('utf-8').split(b" ")) >= 15))]
         return filtered_comments
 
     def store_raw_data(self, sub_data):
-        with open("outputs/raw_output.txt", "w", encoding='utf-8') as f:
+        with open("outputs/{}_raw.txt".format(self.output_filename), "w", encoding='utf-8') as f:
             pprint(sub_data, f)
 
     def store_data(self, sub_data):
@@ -80,12 +96,29 @@ class Crawler:
         if not isExist:
             os.makedirs('./outputs')
 
-        with open("outputs/sub_filtered_output.txt", "wb") as f:
+        with open("outputs/{}.txt".format(self.output_filename), "wb") as f:
             pickle.dump(sub_data, f)
 
+    def read_data(self):
+        with open("outputs/{}.txt".format(self.output_filename), "rb") as f:
+            sub_data = pickle.load(f)
+        return sub_data
+
     def append_data(self, comments):
-        with open("outputs/filtered_output.txt", "ab") as f:
+        with open("outputs/{}.txt".format(self.output_filename), "ab") as f:
             pickle.dump(comments, f)
+        
+    def get_all_docs(self):
+        sub_data = self.read_data()
+        docs = {}
+        for key in sub_data.keys():
+            data = sub_data[key]
+            if (data == []): # this exists due to my poor coding; should be removed later
+                continue
+            for value in data.values():
+                # print({comment.id: comment.comment for comment in value["comments"]})
+                docs |= {comment.id: comment.comment.decode("utf-8") for comment in value["comments"]}
+        return docs
 
 if __name__ == "__main__":
     crawler = Crawler()
