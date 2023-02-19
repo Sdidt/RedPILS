@@ -13,13 +13,18 @@ class NER:
         ent_toks = set([tok.text for tok in text.ents if tok.label_ in ["ORG", "NORP"]])
         sub_toks = set([tok.text for tok in text if tok.pos_ != "PROPN"])
         imp_toks = ent_toks.difference(sub_toks)
+        # imp_toks = set(tok.replace("\n", " ") for tok in imp_toks)
         useless_toks = set()
         for tok in imp_toks:
             if ("https://" in tok) or ("http://" in tok): # ignore URLs; they are not keywords
                 useless_toks.add(tok)
             elif ("web" in tok) or ("wiki" in tok):
                 useless_toks.add(tok)
+            elif "&#" in tok:
+                useless_toks.add(tok)
             elif not any(c.isalnum() for c in tok):
+                useless_toks.add(tok)
+            elif len(tok) <= 2:
                 useless_toks.add(tok)
         imp_toks = imp_toks.difference(useless_toks)
         return imp_toks
@@ -31,9 +36,15 @@ if __name__ == "__main__":
 
     example = "Everyone knows it already. Hindu People of Gujarat loved those riots as well. Thats why they have kept bjp in power for so many decades. Try to get close to any of ur hindu Gujarati friends, u ll see how brainwashed they all are. \n\nIt's a very tragic affair."
 
-    example = """Tbh, this is nothing new. Whatever this documentary revealed was common acceptance in India, even in BJP, up until 2012.\n\nABV almost sacked Modi as Gujarat CM for his role in the riots. Everyone knows this.', b"Bhakts voted Modi not because they think he's innocent but because they know he's not and they admire his actions as that of a 21st century hindu warrior king. They're all as unethical as he is. Lying, dishonesty, dissembling are their core characteristics."""
+    example = """Tbh, this is nothing new. Whatever this documentary revealed was common acceptance in India, even in BJP, up until 2012.\n\nABV almost sacked Modi as Gujarat CM for his role in the riots. Everyone knows this."""
 
-    example = """The important thing is most of the Hindu middle class supports communalism against Muslims. It began with Babri Masjid and continues. Before anyone points finger at me, I have seen enough of anti-muslim bigotry by well-educated Hindu youths who themselves won't engage in violence but fully support Modi precisely because of his anti-Muslim stance.", b'The mistake is the assumption that bhakts are ignorant regarding his role. They are not. They know he was involved and they love him because he was involved.', b"India's entire system is now a slave to Mr. Narendra Modi, All government institutions, judiciary have succumbed to death thanks to his muscleman Mr. Amit Shah."""
+    example = """Bhakts voted Modi not because they think he's innocent but because they know he's not and they admire his actions as that of a 21st century hindu warrior king. They're all as unethical as he is. Lying, dishonesty, dissembling are their core characteristics."""
+
+    example = """The important thing is most of the Hindu middle class supports communalism against Muslims. It began with Babri Masjid and continues. Before anyone points finger at me, I have seen enough of anti-muslim bigotry by well-educated Hindu youths who themselves won't engage in violence but fully support Modi precisely because of his anti-Muslim stance."""
+
+    example = """The mistake is the assumption that bhakts are ignorant regarding his role. They are not. They know he was involved and they love him because he was involved."""
+
+    example = """India's entire system is now a slave to Mr. Narendra Modi, All government institutions, judiciary have succumbed to death thanks to his muscleman Mr. Amit Shah."""
 
     # example = """Why digging old evidence.. its not something hidden by BJP anymore. Recently amit shah on stage said something like "yaad hai na 2002 me kaise sabak sikahya"""
 

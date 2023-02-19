@@ -14,6 +14,6 @@ def true_casing(text):
     return truecased_sentence
 
 if __name__ == '__main__':
-    example = "Why digging old evidence.. its not something hidden by BJP anymore. Recently amit shah on stage said something like yaad hai na 2002 me kaise sabak sikahya"
+    example = "The important thing is most of the Hindu middle class supports communalism against Muslims. It began with Babri Masjid and continues. Before anyone points finger at me, I have seen enough of anti-muslim bigotry by well-educated Hindu youths who themselves won't engage in violence but fully support Modi precisely because of his anti-Muslim stance."
     truecased_sent = true_casing(example)
     print(truecased_sent)

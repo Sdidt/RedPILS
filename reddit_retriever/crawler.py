@@ -42,7 +42,7 @@ class Crawler:
     def process_submission(self, submission):
         print("==========SUBMISSION {}==========".format(submission.id))
         print("TITLE: {}".format(submission.title.encode('utf-8')))
-        submission.comments.replace_more(limit=10)
+        submission.comments.replace_more(limit=3)
         comments = submission.comments.list()
         # comments = [comment.body.encode('utf-8') for comment in submission.comments.list()]
         comments = self.filter_comments(comments)
@@ -54,7 +54,7 @@ class Crawler:
                 timestamp=comment.created_utc,
                 url=comment.permalink,
                 score=comment.score,
-                redditor_id=comment.author.id if hasattr(comment.author, 'id') else -1
+                redditor_id=comment.author.id if hasattr(comment, 'author') and hasattr(comment.author, 'id') else -1
                 ) for comment in comments] # the RHS in this list can later be traversed in a BFS manner to retrieve all the comments preserving tree structure
         }
         return dict_data
@@ -63,7 +63,7 @@ class Crawler:
         sub_data = defaultdict(lambda: {})
         for subreddit in subreddits.keys():
             print("==========SUBREDDIT {}==========".format(subreddit))
-            sub_data[subreddit] = []
+            sub_data[subreddit] = {}
             sub = self.reddit.subreddit(subreddit)
             for submission in sub.controversial(limit=10):
                 sub_data[subreddit][submission.id] = self.process_submission(submission)
@@ -72,13 +72,15 @@ class Crawler:
     
     def keyword_crawl(self, dynamic_keywords):
         sub_data = self.read_data()
+        if sub_data == {}:
+            print("Initializing sub data")
+            sub_data = {subreddit: {} for subreddit in subreddits.keys()}
         for subreddit in subreddits.keys():
             print("==========SUBREDDIT {}==========".format(subreddit))
-            sub_data[subreddit] = []
             sub = self.reddit.subreddit(subreddit)
             for keyword in dynamic_keywords:
                 for submission in sub.search(keyword, limit=3):
-                    if submission.id not in sub_data[subreddit][submission.id]:
+                    if submission.id not in sub_data[subreddit]:
                         sub_data[subreddit][submission.id] = self.process_submission(submission)
                         # self.store_raw_data(dict(sub_data))
                         self.store_data(dict(sub_data))
@@ -100,8 +102,12 @@ class Crawler:
             pickle.dump(sub_data, f)
 
     def read_data(self):
-        with open("outputs/{}.txt".format(self.output_filename), "rb") as f:
-            sub_data = pickle.load(f)
+        try:
+            print("File exists!")
+            with open("outputs/{}.txt".format(self.output_filename), "rb") as f:
+                sub_data = pickle.load(f)
+        except: 
+            sub_data = {}
         return sub_data
 
     def append_data(self, comments):

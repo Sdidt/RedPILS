@@ -9,12 +9,9 @@ class TFIDF_tokenizer():
     def __init__(self, docs, search_space=None) -> None:
         self.docs = docs
         self.total_docs_len = len(self.docs)
-        if search_space is not None:
-            self.total_words = search_space
-            self.total_word_length = len(self.total_words)
-        else:
-            self.total_words = []
-            self.total_word_length = 0
+        self.total_words = []
+        self.total_word_length = 0
+        self.search_space = search_space
         self.total_sentences = 0
         self.total_sent_len = 0
         self.tf_score = {}
@@ -38,48 +35,56 @@ class TFIDF_tokenizer():
         sent_len = [sentences[i] for i in range(0, len(final)) if final[i]]
         return int(len(sent_len))
     
-    def check_doc(self, word, doc_words):
-        final = [all([w in x for w in word]) for x in doc_words]
-        doc_len = [doc_words[i] for i in range(0, len(final)) if final[i]]
-        return int(len(doc_len))
+    def check_doc(self, word, docs):
+        final = [(x.count(word) > 0) for x in docs]
+        doc_len = sum(final)
+        return doc_len
+
+    def count_doc(self, word, docs):
+        final = [x.count(word) for x in docs]
+        doc_len = sum(final)
+        return doc_len
 
     def lemmatize_word(self, word):
         return self.lemmatizer.lemmatize(word)
 
     def get_tf_score(self):
-        for each_word in self.total_words:
-            each_word = each_word.replace('.','')
+        for each_word in self.search_space:
+            # each_word = each_word.replace('.','')
 
             if each_word not in stop_words:
-                if each_word in self.tf_score:
-                    self.tf_score[each_word] += 1
-                else:
-                    self.tf_score[each_word] = 1
-
+                self.tf_score[each_word] = self.count_doc(each_word, list(self.docs.values()))
+                # if each_word in self.tf_score:
+                #     self.tf_score[each_word] += 1
+                # else:
+                #     self.tf_score[each_word] = 1
+        # print(dict(sorted(self.tf_score.items(), key=lambda x: x[1], reverse=True)))
         # Dividing by total_word_length for each dictionary element
         self.tf_score.update((x, y/int(self.total_word_length)) for x, y in self.tf_score.items())
+        # print(self.tf_score)
         return self.tf_score
 
     def get_idf_score(self):
         self.idf_score = {}
-        for each_word in self.total_words:
-            each_word = each_word.replace('.','')
+        for each_word in self.search_space:
+            # each_word = each_word.replace('.','')
             if each_word not in stop_words:
-                if each_word in self.idf_score:
-                    self.idf_score[each_word] = self.check_doc(each_word, list(self.docs.values()))
-                else:
-                    self.idf_score[each_word] = 1
-
+                self.idf_score[each_word] = self.check_doc(each_word, list(self.docs.values()))
+                # if each_word in self.idf_score:
+                #     self.idf_score[each_word] = self.check_doc(each_word, list(self.docs.values()))
+                # else:
+                #     self.idf_score[each_word] = 1
+        # print(dict(sorted(self.idf_score.items(), key=lambda x: x[1], reverse=True)))
         # Performing a log and divide
         self.idf_score.update((x, math.log(int(self.total_docs_len)/y)) for x, y in self.idf_score.items())
+        # print(self.idf_score)
 
         return self.idf_score
 
     def get_tf_idf_score(self):
 
         # process text
-        if self.total_words == []:
-            word_len = self.get_words()
+        word_len = self.get_words()
         # sent_len = self.tokenize_sent()
 
         # create tf_score dict
@@ -89,7 +94,7 @@ class TFIDF_tokenizer():
         idf_score_dict = self.get_idf_score()
 
         self.tf_idf_score = {key: self.tf_score[key] * self.idf_score.get(key, 0) for key in self.tf_score.keys()}
-        return self.tf_idf_score
+        return self.tf_idf_score, tf_score_dict, idf_score_dict
 
     def get_top_n(self, dict_elem, n):
         result = dict(sorted(dict_elem.items(), key = itemgetter(1), reverse = True)[:n]) 
