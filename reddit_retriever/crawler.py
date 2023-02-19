@@ -42,22 +42,35 @@ class Crawler:
     def process_submission(self, submission):
         print("==========SUBMISSION {}==========".format(submission.id))
         print("TITLE: {}".format(submission.title.encode('utf-8')))
-        submission.comments.replace_more(limit=3)
+        submission.comments.replace_more(limit=1)
         comments = submission.comments.list()
+        submission_id = submission.id
         # comments = [comment.body.encode('utf-8') for comment in submission.comments.list()]
         comments = self.filter_comments(comments)
-        dict_data = {
-            "title": submission.title.encode('utf-8'),
-            "comments": [Comment(
+        list_data = [
+            Comment(
+                submission_id=submission_id,
+                submission_title=submission.title.encode('utf-8'), 
                 id=comment.id, 
                 comment=comment.body.encode('utf-8'),
                 timestamp=comment.created_utc,
                 url=comment.permalink,
                 score=comment.score,
                 redditor_id=comment.author.id if hasattr(comment, 'author') and hasattr(comment.author, 'id') else -1
-                ) for comment in comments] # the RHS in this list can later be traversed in a BFS manner to retrieve all the comments preserving tree structure
-        }
-        return dict_data
+                ) for comment in comments # the RHS in this list can later be traversed in a BFS manner to retrieve all the comments preserving tree structure
+        ]
+        # dict_data = {
+        #     "title": submission.title.encode('utf-8'),
+        #     "comments": [Comment(
+        #         id=comment.id, 
+        #         comment=comment.body.encode('utf-8'),
+        #         timestamp=comment.created_utc,
+        #         url=comment.permalink,
+        #         score=comment.score,
+        #         redditor_id=comment.author.id if hasattr(comment, 'author') and hasattr(comment.author, 'id') else -1
+        #         ) for comment in comments] # the RHS in this list can later be traversed in a BFS manner to retrieve all the comments preserving tree structure
+        # }
+        return list_data
 
     def crawl_data(self):
         sub_data = defaultdict(lambda: {})
@@ -86,7 +99,7 @@ class Crawler:
                         self.store_data(dict(sub_data))
 
     def filter_comments(self, comments):
-        filtered_comments = [comment for comment in comments if (comment.body.encode('utf-8') != b'[removed]' and comment.body.encode('utf-8') != b'[deleted]' and (len(comment.body.encode('utf-8').split(b" ")) >= 15))]
+        filtered_comments = [comment for comment in comments if (comment.body.encode('utf-8') != b'[removed]' and comment.body.encode('utf-8') != b'[deleted]' and (len(comment.body.encode('utf-8').split(b" ")) >= 30))]
         return filtered_comments
 
     def store_raw_data(self, sub_data):

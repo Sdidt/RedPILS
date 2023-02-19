@@ -10,9 +10,12 @@ class NER:
     def get_useful_keywords(self, text) -> list[str]:
         # print(text)
         text = self.NER(text)
-        ent_toks = set([tok.text for tok in text.ents if tok.label_ in ["ORG", "NORP"]])
-        sub_toks = set([tok.text for tok in text if tok.pos_ != "PROPN"])
-        imp_toks = ent_toks.difference(sub_toks)
+        ent_toks = set([tok.text for tok in text.ents if tok.label_ in ["ORG"]])
+        non_propn_toks = set([tok.text for tok in text if tok.pos_ == "PROPN"])
+        imp_toks = ent_toks.intersection(non_propn_toks)
+        non_sub_toks = set([tok.text for tok in text if tok.dep_ in ["nsubj", "dobj"]])
+        # print(non_sub_toks)
+        imp_toks = imp_toks.intersection(non_sub_toks)
         # imp_toks = set(tok.replace("\n", " ") for tok in imp_toks)
         useless_toks = set()
         for tok in imp_toks:
@@ -24,7 +27,7 @@ class NER:
                 useless_toks.add(tok)
             elif not any(c.isalnum() for c in tok):
                 useless_toks.add(tok)
-            elif len(tok) <= 2:
+            elif len(tok) <= 5:
                 useless_toks.add(tok)
         imp_toks = imp_toks.difference(useless_toks)
         return imp_toks

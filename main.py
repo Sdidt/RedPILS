@@ -21,11 +21,11 @@ for comment in docs.values():
     keywords = keywords.union(new_keywords)
     # print("Keywords: {}".format(new_keywords))
 
-# print("ALL Keywords: {}".format(keywords))
+print("ALL Keywords: {}".format(keywords))
 
 tokenizer = TFIDF_tokenizer(docs, search_space=keywords.difference(old_keywords))
 tf_idf_score_dict, tf_score_dict, idf_score_dict = tokenizer.get_tf_idf_score()
-print(dict(sorted(tf_idf_score_dict.items(), key = lambda x: x[1], reverse=True)))
+# print(dict(sorted(tf_idf_score_dict.items(), key = lambda x: x[1], reverse=True)))
 
 result = tokenizer.get_top_n(tf_idf_score_dict,5)
 
