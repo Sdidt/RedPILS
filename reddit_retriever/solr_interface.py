@@ -1,12 +1,18 @@
 import requests
 import json
+import sys
+import os
+from dotenv import load_dotenv
+load_dotenv()
+sys.path.append(os.environ.get("SYS_PATH"))
+
+from utils import helpers,constants
 
 class solr_ingest():
-    def __init__(self,solr_url,collection_name,headers,data) -> None:
+    def __init__(self,solr_url,collection_name,headers) -> None:
         self.solr_url = solr_url
         self.collection_name = collection_name
         self.headers = headers
-        self.data = data
 
     def check_collection_exists(self,collection_name):
         request_data = {
@@ -105,11 +111,10 @@ class solr_ingest():
         else:
             print(f'Error updating schema in Solr: {response.text}')
 
-
-    def push_data(self,collection_name):
+    def push_data(self,collection_name,data):
         url = self.solr_url+'/'+collection_name
 
-        doc_json = json.dumps(self.data)
+        doc_json = json.dumps(data)
         response = requests.post(f'{url}/update/json/docs', headers=self.headers, data=doc_json)
         requests.get(f'{url}/update?commit=true')
 
@@ -177,39 +182,33 @@ if __name__ == '__main__':
     collection_name = 'new_collection'
     # global headers definition
     headers = {'Content-type': 'application/json'}
-    # dummy data to be ingested into solr database
-    data = [
-            {'id': '1', 'title': 'Document 1', 'text': 'This is the first document'},
-            {'id': '2', 'title': 'Document 2', 'text': 'This is the second document'},
-            {'id': '3', 'title': 'Document 3', 'text': 'This is the third document'}
-        ]
+
     # query params
     # q - query
     # fl - fields to query
     # rows - max rows to query
     params = {
-            'q': 'text:document',
-            'fl': 'id,title',
+            'q': 'comment_id:j1vkv1r',
+            'fl': 'comment_id,comment,score',
             'rows': 10
         }
-    fields = [
-            {"name": "id", "type": "string"},
-            {"name": "title", "type": "text_en"},
-            {"name": "content", "type": "text_en"},
-            ]
-
     # define solr_ingest object
-    data_ingest = solr_ingest(solr_url,collection_name,headers,data)
+    data_ingest = solr_ingest(solr_url,collection_name,headers)
     # delete collection defined above
-    data_ingest.delete_collection('my_collection')
+    data_ingest.delete_collection(collection_name)
     # create new collection using same name
-    data_ingest.create_collection(collection_name,fields)
+    data_ingest.create_collection(collection_name,constants.schema)
     # delete all data in the collection
     data_ingest.delete_data(collection_name)
+    # read and process to save as json data
+    data_dict = helpers.read_data("test3")
+    data = helpers.process_json(data_dict)
+    helpers.store_json(data,"text3_json")
+    data = helpers.read_json("test3_json")
     # push data to the collection
-    data_ingest.push_data(collection_name)
+    data_ingest.push_data(collection_name,data)
     # query data based on paramaters defined above
     search_data = data_ingest.query_data(params,collection_name)
     print(search_data)
     # update data based on rules defined inside the function
-    data_ingest.update_data(collection_name)
+    # data_ingest.update_data(collection_name)

@@ -9,7 +9,7 @@ import pysolr
 load_dotenv()
 sys.path.append(os.environ.get("SYS_PATH"))
 
-from constants import subreddits
+from utils.constants import subreddits
 from models.comment import Comment
 
 class Crawler:
@@ -39,10 +39,10 @@ class Crawler:
     # def solr_add_document(self, doc):
     #     self.solr.add([doc])
 
-    def process_submission(self, submission):
+    def process_submission(self, submission,submission_limit):
         print("==========SUBMISSION {}==========".format(submission.id))
         print("TITLE: {}".format(submission.title.encode('utf-8')))
-        submission.comments.replace_more(limit=3)
+        submission.comments.replace_more(limit=submission_limit)
         comments = submission.comments.list()
         # comments = [comment.body.encode('utf-8') for comment in submission.comments.list()]
         comments = self.filter_comments(comments)
@@ -59,18 +59,18 @@ class Crawler:
         }
         return dict_data
 
-    def crawl_data(self):
+    def crawl_data(self,crawl_limit,submission_limit):
         sub_data = defaultdict(lambda: {})
         for subreddit in subreddits.keys():
             print("==========SUBREDDIT {}==========".format(subreddit))
             sub_data[subreddit] = {}
             sub = self.reddit.subreddit(subreddit)
-            for submission in sub.controversial(limit=10):
-                sub_data[subreddit][submission.id] = self.process_submission(submission)
+            for submission in sub.controversial(limit=crawl_limit):
+                sub_data[subreddit][submission.id] = self.process_submission(submission,submission_limit)
                 # self.store_raw_data(dict(sub_data))
                 self.store_data(dict(sub_data))
     
-    def keyword_crawl(self, dynamic_keywords):
+    def keyword_crawl(self, dynamic_keywords,keyword_limit):
         sub_data = self.read_data()
         if sub_data == {}:
             print("Initializing sub data")
@@ -79,7 +79,7 @@ class Crawler:
             print("==========SUBREDDIT {}==========".format(subreddit))
             sub = self.reddit.subreddit(subreddit)
             for keyword in dynamic_keywords:
-                for submission in sub.search(keyword, limit=3):
+                for submission in sub.search(keyword, limit=keyword_limit):
                     if submission.id not in sub_data[subreddit]:
                         sub_data[subreddit][submission.id] = self.process_submission(submission)
                         # self.store_raw_data(dict(sub_data))
