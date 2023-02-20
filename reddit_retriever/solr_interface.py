@@ -210,5 +210,5 @@ if __name__ == '__main__':
     # query data based on paramaters defined above
     search_data = data_ingest.query_data(params,collection_name)
     print(search_data)
-    # update data based on rules defined inside the function
+    # update data based on rules defined
     # data_ingest.update_data(collection_name)
