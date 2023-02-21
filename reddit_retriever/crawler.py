@@ -9,7 +9,7 @@ import pysolr
 load_dotenv()
 sys.path.append(os.environ.get("SYS_PATH"))
 
-from utils.constants import subreddits
+from utils.constants import subreddits, solr_var
 from utils.helpers import *
 from models.comment import Comment
 
@@ -74,7 +74,7 @@ class Crawler:
                 # store_json(sub_data)
                 store_data(sub_data)
     
-    def keyword_crawl(self, dynamic_keywords, keyword_limit, submission_limit):
+    def keyword_crawl(self, dynamic_keywords, keyword_limit, submission_limit, data_ingest):
         sub_data: list[Comment] = read_data(self.output_filename)
         for subreddit in subreddits.keys():
             print("==========SUBREDDIT {}==========".format(subreddit))
@@ -84,10 +84,16 @@ class Crawler:
                     # relies on overloaded __eq__
                     if submission.id not in sub_data:
                         sub_data.extend(self.process_submission(submission, sub, submission_limit))
+                        print("extarcted data")
                         # self.store_raw_data(dict(sub_data))
                         # the following 2 lines are for testing purposes; in the future they will be replaced by a call to add the documents to solr directly
-                        # store_json(sub_data, self.output_filename)
+                        json_sub_data = process_json(sub_data)
+                        print("processed data as json")
+                        data_ingest.push_data(solr_var['collection_name'],json_sub_data)
+                        print("pushed data")
+                        store_json(json_sub_data,self.output_filename)
                         store_data(sub_data, self.output_filename)
+                        print("storing data")
 
     def filter_comments(self, comments):
         filtered_comments = [comment for comment in comments if (comment.body.encode('utf-8') != b'[removed]' and comment.body.encode('utf-8') != b'[deleted]' and (len(comment.body.encode('utf-8').split(b" ")) >= 30))]
