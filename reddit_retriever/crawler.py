@@ -70,7 +70,7 @@ class Crawler:
                 # self.store_raw_data(dict(sub_data))
                 self.store_data(dict(sub_data))
     
-    def keyword_crawl(self, dynamic_keywords,keyword_limit):
+    def keyword_crawl(self, dynamic_keywords,keyword_limit, submission_limit):
         sub_data = self.read_data()
         if sub_data == {}:
             print("Initializing sub data")
@@ -81,7 +81,7 @@ class Crawler:
             for keyword in dynamic_keywords:
                 for submission in sub.search(keyword, limit=keyword_limit):
                     if submission.id not in sub_data[subreddit]:
-                        sub_data[subreddit][submission.id] = self.process_submission(submission)
+                        sub_data[subreddit][submission.id] = self.process_submission(submission, submission_limit)
                         # self.store_raw_data(dict(sub_data))
                         self.store_data(dict(sub_data))
 
