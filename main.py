@@ -33,11 +33,12 @@ keyword_ingest.push_data(solr_var['keyword_collection_name'],keywords_dict)
 crawler = Crawler(output_filename="solr_integration_test")
 # Uncomment below to test
 crawler.keyword_crawl(keywords, 1, 1, data_ingest)
+# get all documents stored in solr database
 # search_data = data_ingest.query_data(solr_var['params'],solr_var['data_collection_name'])
 search_data = data_ingest.query_data({'q':'*:*','rows':1000000},solr_var['data_collection_name'])
 store_json(search_data,'search_data')
-docs = crawler.get_all_docs()
-print(len(docs))
+# docs = crawler.get_all_docs()
+# print(len(docs))
 ner = NER()
 # Uncomment to test translation; will not work at our scale since API request limit is hit
 # translitlator = Translitlator()
