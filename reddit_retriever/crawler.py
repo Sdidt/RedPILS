@@ -2,10 +2,7 @@ from dotenv import load_dotenv
 import os
 import sys
 import praw
-import pickle
-from pprint import pprint
 from collections import defaultdict
-import pysolr
 load_dotenv()
 sys.path.append(os.environ.get("SYS_PATH"))
 
@@ -48,18 +45,6 @@ class Crawler:
                 redditor_id=comment.author.id if hasattr(comment, 'author') and hasattr(comment.author, 'id') else -1
                 ) for comment in comments 
         ]
-        # Alternative:
-        # dict_data = {
-        #     "title": submission.title.encode('utf-8'),
-        #     "comments": [Comment(
-        #         id=comment.id, 
-        #         comment=comment.body.encode('utf-8'),
-        #         timestamp=comment.created_utc,
-        #         url=comment.permalink,
-        #         score=comment.score,
-        #         redditor_id=comment.author.id if hasattr(comment, 'author') and hasattr(comment.author, 'id') else -1
-        #         ) for comment in comments] 
-        # }
         return list_data
 
     def crawl_data(self,crawl_limit,submission_limit):

@@ -7,9 +7,9 @@ from utils.constants import keywords
 
 keywords = set(keywords)
 old_keywords = keywords.copy()
-crawler = Crawler(output_filename="test100")
+crawler = Crawler(output_filename="test99")
 # Uncomment below to test
-crawler.keyword_crawl(keywords, 2, 1)
+# crawler.keyword_crawl(keywords, 2, 1)
 docs = crawler.get_all_docs()
 print(len(docs))
 ner = NER()
@@ -38,4 +38,4 @@ for keyword, score in result.items():
     print("{}: {}".format(keyword, score))
 
 # Uncomment below to test dynamic crawling
-crawler.keyword_crawl(result, 2, 1)
+# crawler.keyword_crawl(result, 2, 1)

@@ -7,8 +7,8 @@ subreddits = {
 
 keywords = [
     "BJP",
-    # "Congress",
-    # "AAP",
+    "Congress",
+    "AAP",
     # "Hindutva",
     # "Muslim",
     # "Hindu", 

@@ -11,6 +11,7 @@ class NER:
         # print(text)
         text = self.NER(text)
         ent_toks = set([tok.lemma_ for tok in text.ents if tok.label_ in ["ORG"]])
+        # print(ent_toks)
         non_propn_toks = set([tok.lemma_ for tok in text if tok.pos_ == "PROPN"])
         imp_toks = ent_toks.intersection(non_propn_toks)
         non_sub_toks = set([tok.lemma_ for tok in text if tok.dep_ in ["nsubj", "dobj"]])

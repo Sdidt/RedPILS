@@ -6,7 +6,7 @@ import math
 stop_words = set(stopwords.words('english'))
 
 class TFIDF_tokenizer():
-    def __init__(self, docs, search_space=None) -> None:
+    def __init__(self, docs=[], search_space=None) -> None:
         self.docs = docs
         self.total_docs_len = len(self.docs)
         self.total_words = []
@@ -18,6 +18,11 @@ class TFIDF_tokenizer():
         self.idf_score = {}
         self.tf_idf_score = {}
         self.lemmatizer = WordNetLemmatizer()
+
+    def ingest(self, docs, search_space):
+        self.docs = docs
+        self.total_docs_len = len(self.docs)
+        self.search_space = search_space
 
     def get_words(self):
         for doc in self.docs.values():
@@ -96,8 +101,16 @@ class TFIDF_tokenizer():
         self.tf_idf_score = {key: self.tf_score[key] * self.idf_score.get(key, 0) for key in self.tf_score.keys()}
         return self.tf_idf_score, tf_score_dict, idf_score_dict
 
-    def get_top_n(self, dict_elem, n):
-        result = dict(sorted(dict_elem.items(), key = itemgetter(1), reverse = True)[:n]) 
+    def get_top_n(self, dict_elem, n, existing_keywords) -> dict:
+        sorted_dict = dict(sorted(dict_elem.items(), key = itemgetter(1), reverse = True)) 
+        result = {}
+        counter = 0
+        for k, v in sorted_dict.items():
+            if k not in existing_keywords:
+                result[k] = v
+                counter += 1
+                if counter == n:
+                    break
         return result
 
 if __name__ == '__main__':
