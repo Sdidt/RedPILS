@@ -1,4 +1,4 @@
-from political_wing import PoliticalWing
+from models.political_wing import PoliticalWing
 
 subreddits = {
     "indiaspeaks": PoliticalWing.RIGHT,
@@ -7,8 +7,8 @@ subreddits = {
 
 keywords = [
     "BJP",
-    "Congress",
-    "AAP",
+    # "Congress",
+    # "AAP",
     # "Hindutva",
     # "Muslim",
     # "Hindu", 

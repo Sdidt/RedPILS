@@ -9,7 +9,8 @@ import pysolr
 load_dotenv()
 sys.path.append(os.environ.get("SYS_PATH"))
 
-from constants import subreddits
+from utils.constants import subreddits
+from utils.helpers import *
 from models.comment import Comment
 
 class Crawler:
@@ -25,24 +26,10 @@ class Crawler:
             user_agent = self.user_agent
         )
 
-        # self.solr = pysolr.Solr('http://localhost:8983/solr/', always_commit=True)
-        # self.solr_health_check()
-        # self.solr_add_document({
-        #     "id": "doc_1",
-        #     "title": "A test document"
-        # })
-    
-    # def solr_health_check(self):
-    #     res = self.solr.ping()
-    #     print(res)
-    
-    # def solr_add_document(self, doc):
-    #     self.solr.add([doc])
-
-    def process_submission(self, submission):
+    def process_submission(self, submission, sub, comment_limit) -> list[Comment]:
         print("==========SUBMISSION {}==========".format(submission.id))
         print("TITLE: {}".format(submission.title.encode('utf-8')))
-        submission.comments.replace_more(limit=1)
+        submission.comments.replace_more(limit=comment_limit)
         comments = submission.comments.list()
         submission_id = submission.id
         # comments = [comment.body.encode('utf-8') for comment in submission.comments.list()]
@@ -51,14 +38,17 @@ class Crawler:
             Comment(
                 submission_id=submission_id,
                 submission_title=submission.title.encode('utf-8'), 
+                subreddit_id=sub.id,
+                subreddit_name=sub.name,
                 id=comment.id, 
                 comment=comment.body.encode('utf-8'),
                 timestamp=comment.created_utc,
                 url=comment.permalink,
                 score=comment.score,
                 redditor_id=comment.author.id if hasattr(comment, 'author') and hasattr(comment.author, 'id') else -1
-                ) for comment in comments # the RHS in this list can later be traversed in a BFS manner to retrieve all the comments preserving tree structure
+                ) for comment in comments 
         ]
+        # Alternative:
         # dict_data = {
         #     "title": submission.title.encode('utf-8'),
         #     "comments": [Comment(
@@ -68,75 +58,47 @@ class Crawler:
         #         url=comment.permalink,
         #         score=comment.score,
         #         redditor_id=comment.author.id if hasattr(comment, 'author') and hasattr(comment.author, 'id') else -1
-        #         ) for comment in comments] # the RHS in this list can later be traversed in a BFS manner to retrieve all the comments preserving tree structure
+        #         ) for comment in comments] 
         # }
         return list_data
 
-    def crawl_data(self):
-        sub_data = defaultdict(lambda: {})
+    def crawl_data(self, submission_limit):
+        sub_data: list[Comment] = []
         for subreddit in subreddits.keys():
             print("==========SUBREDDIT {}==========".format(subreddit))
-            sub_data[subreddit] = {}
             sub = self.reddit.subreddit(subreddit)
-            for submission in sub.controversial(limit=10):
-                sub_data[subreddit][submission.id] = self.process_submission(submission)
+            for submission in sub.controversial(limit=submission_limit):
+                sub_data.extend(self.process_submission(submission, sub, 1))
                 # self.store_raw_data(dict(sub_data))
-                self.store_data(dict(sub_data))
+                # the following 2 lines are for testing purposes; in the future they will be replaced by a call to add the documents to solr directly
+                # store_json(sub_data)
+                store_data(sub_data)
     
-    def keyword_crawl(self, dynamic_keywords):
-        sub_data = self.read_data()
-        if sub_data == {}:
-            print("Initializing sub data")
-            sub_data = {subreddit: {} for subreddit in subreddits.keys()}
+    def keyword_crawl(self, dynamic_keywords, submission_limit):
+        sub_data: list[Comment] = read_data(self.output_filename)
         for subreddit in subreddits.keys():
             print("==========SUBREDDIT {}==========".format(subreddit))
             sub = self.reddit.subreddit(subreddit)
             for keyword in dynamic_keywords:
-                for submission in sub.search('flair: "Politics"+{}'.format(keyword), limit=3):
-                    if submission.id not in sub_data[subreddit]:
-                        sub_data[subreddit][submission.id] = self.process_submission(submission)
+                for submission in sub.search('flair: "Politics"+{}'.format(keyword), limit=submission_limit):
+                    # relies on overloaded __eq__
+                    if submission.id not in sub_data:
+                        sub_data.extend(self.process_submission(submission, sub, 1))
                         # self.store_raw_data(dict(sub_data))
-                        self.store_data(dict(sub_data))
+                        # the following 2 lines are for testing purposes; in the future they will be replaced by a call to add the documents to solr directly
+                        # store_json(sub_data, self.output_filename)
+                        store_data(sub_data, self.output_filename)
 
     def filter_comments(self, comments):
         filtered_comments = [comment for comment in comments if (comment.body.encode('utf-8') != b'[removed]' and comment.body.encode('utf-8') != b'[deleted]' and (len(comment.body.encode('utf-8').split(b" ")) >= 30))]
         return filtered_comments
-
-    def store_raw_data(self, sub_data):
-        with open("outputs/{}_raw.txt".format(self.output_filename), "w", encoding='utf-8') as f:
-            pprint(sub_data, f)
-
-    def store_data(self, sub_data):
-        isExist = os.path.exists('./outputs')
-        if not isExist:
-            os.makedirs('./outputs')
-
-        with open("outputs/{}.txt".format(self.output_filename), "wb") as f:
-            pickle.dump(sub_data, f)
-
-    def read_data(self):
-        try:
-            print("File exists!")
-            with open("outputs/{}.txt".format(self.output_filename), "rb") as f:
-                sub_data = pickle.load(f)
-        except: 
-            sub_data = {}
-        return sub_data
-
-    def append_data(self, comments):
-        with open("outputs/{}.txt".format(self.output_filename), "ab") as f:
-            pickle.dump(comments, f)
-        
+    
     def get_all_docs(self):
-        sub_data = self.read_data()
+        # in the future; read from solr; ideally, this function should not even be here. When dynamic crawling begins, just need to call that function with keywords, and documents are added one by one into solr so no need to read data b4 writing
+        sub_data = read_data(self.output_filename)
         docs = {}
-        for key in sub_data.keys():
-            data = sub_data[key]
-            if (data == []): # this exists due to my poor coding; should be removed later
-                continue
-            for value in data.values():
-                # print({comment.id: comment.comment for comment in value["comments"]})
-                docs |= {comment.id: comment.comment.decode("utf-8") for comment in value["comments"]}
+        for comment in sub_data:
+            docs[comment.id] = comment.comment.decode("utf-8")
         return docs
 
 if __name__ == "__main__":

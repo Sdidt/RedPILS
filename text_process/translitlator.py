@@ -41,7 +41,7 @@ class Translitlator:
                     time.sleep(5)
                 split_sent.append(sent_trans)
                 # print(sent_trans)
-            res .append(" ".join(split_sent))
+            res.append(" ".join(split_sent))
         return res
 
 if __name__ == "__main__":
