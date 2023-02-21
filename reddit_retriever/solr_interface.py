@@ -31,7 +31,7 @@ class solr_ingest():
             print(f'Error checking collection: {response.text}')
             return True
 
-    def create_collection(self,collection_name,schema):
+    def create_collection(self,collection_name,schema,unique_key):
         collection_exists = self.check_collection_exists(collection_name)
         if(collection_exists):
             print(f'Collection "{collection_name}" exists')
@@ -48,7 +48,8 @@ class solr_ingest():
             'name': collection_name,
             'numShards': num_shards,
             'replicationFactor': replication_factor,
-            'configName': config_name
+            'configName': config_name,
+            'uniqueKey': unique_key
         }
 
         response = requests.get(f'{self.solr_url}/admin/collections', params=request_data)
@@ -198,7 +199,7 @@ if __name__ == '__main__':
     # delete collection defined above
     data_ingest.delete_collection(collection_name)
     # create new collection using same name
-    data_ingest.create_collection(collection_name,solr_var['schema'])
+    data_ingest.create_collection(collection_name,solr_var['data_schema'])
     # delete all data in the collection
     data_ingest.delete_data(collection_name)
     # read and process to save as json data

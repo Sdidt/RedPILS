@@ -22,9 +22,12 @@ keywords = [
 
 solr_var = {
     "solr_url" : 'http://localhost:8983/solr',
-    "collection_name" : 'new_collection',
+    "data_collection_name" : 'data_collection',
+    "data_unique_key": "comment_id",
+    "keyword_collection_name" : 'keyword_collection',
+    "keyword_unique_key" : 'keyword',
     "headers" : {'Content-type': 'application/json'},
-    "schema" : [
+    "data_schema" : [
     {"name": "submission_id", "type": "string",'indexed': "true", "stored": "true"},
     {"name": "submission_title", "type": "text_en",'indexed': "true", "stored": "true"},
     {"name": "subreddit_id", "type": "text_en",'indexed': "true", "stored": "true"},
@@ -37,8 +40,11 @@ solr_var = {
     {"name": "redditor_id", "type": "text_en",'indexed': "true", "stored": "true"}
     ],
     'params': {
-            'q': 'comment_id:j1vkv1r',
+            'q': 'comment_id:j0u6jwf',
             'fl': 'comment_id,comment,score',
             'rows': 10
-        }
+        },
+    'keyword_schema':[
+    {"name": "keyword", "type": "text_en",'indexed': "true", "stored": "true"},
+    ]
 }
