@@ -92,7 +92,7 @@ class Crawler:
             print("==========SUBREDDIT {}==========".format(subreddit))
             sub = self.reddit.subreddit(subreddit)
             for keyword in dynamic_keywords:
-                for submission in sub.search(keyword, limit=3):
+                for submission in sub.search('flair: "Politics"+{}'.format(keyword), limit=3):
                     if submission.id not in sub_data[subreddit]:
                         sub_data[subreddit][submission.id] = self.process_submission(submission)
                         # self.store_raw_data(dict(sub_data))

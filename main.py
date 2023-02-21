@@ -1,6 +1,7 @@
 from reddit_retriever.crawler import Crawler
 from text_process.spacy_ner import NER
 from text_process.tokenizer import TFIDF_tokenizer
+from text_process.translitlator import Translitlator
 
 from constants import keywords
 
@@ -14,9 +15,12 @@ docs = crawler.get_all_docs()
 print(len(docs))
 ner = NER()
 # keywords = set()
+translitlator = Translitlator()
+docs = translitlator.translate(list(docs.values()))
 
 for comment in docs.values():
     # print(comment)
+    
     new_keywords = ner.get_useful_keywords(comment)
     keywords = keywords.union(new_keywords)
     # print("Keywords: {}".format(new_keywords))

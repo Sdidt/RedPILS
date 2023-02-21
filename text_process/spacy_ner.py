@@ -5,15 +5,15 @@ from spacy import displacy
 class NER:
     def __init__(self) -> None:
         self.NER = spacy.load("en_core_web_sm") 
-        lemmatizer = self.NER.get_pipe("lemmatizer")
+        self.lemmatizer = self.NER.get_pipe("lemmatizer")
     
     def get_useful_keywords(self, text) -> list[str]:
         # print(text)
         text = self.NER(text)
-        ent_toks = set([tok.text for tok in text.ents if tok.label_ in ["ORG"]])
-        non_propn_toks = set([tok.text for tok in text if tok.pos_ == "PROPN"])
+        ent_toks = set([tok.lemma_ for tok in text.ents if tok.label_ in ["ORG"]])
+        non_propn_toks = set([tok.lemma_ for tok in text if tok.pos_ == "PROPN"])
         imp_toks = ent_toks.intersection(non_propn_toks)
-        non_sub_toks = set([tok.text for tok in text if tok.dep_ in ["nsubj", "dobj"]])
+        non_sub_toks = set([tok.lemma_ for tok in text if tok.dep_ in ["nsubj", "dobj"]])
         # print(non_sub_toks)
         imp_toks = imp_toks.intersection(non_sub_toks)
         # imp_toks = set(tok.replace("\n", " ") for tok in imp_toks)
@@ -30,6 +30,7 @@ class NER:
             elif len(tok) <= 5:
                 useless_toks.add(tok)
         imp_toks = imp_toks.difference(useless_toks)
+        # imp_toks = set(self.lemmatizer.lemmatize(tok) for tok in imp_toks)
         return imp_toks
         
 
@@ -88,4 +89,3 @@ if __name__ == "__main__":
 # QUANTITY:    Measurements, as of weight or distance.
 # ORDINAL:     “first”, “second”, etc.
 # CARDINAL:    Numerals that do not fall under another type.
-
