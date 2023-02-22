@@ -51,7 +51,7 @@ def process_json(data: list[Comment]):
                 "submission_title": comment.submission_title.decode('utf-8'),
                 "subreddit_id": comment.subreddit_id,
                 "subreddit_name": comment.subreddit_name,
-                "id": comment.id,
+                "comment_id": comment.id,
                 "comment": comment.comment.decode('utf-8'),
                 "timestamp": convert_to_datetime(comment.timestamp),
                 "url": comment.url,

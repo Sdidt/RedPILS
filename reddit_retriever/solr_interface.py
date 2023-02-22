@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 load_dotenv()
 sys.path.append(os.environ.get("SYS_PATH"))
 
-from utils import helpers,constants
+from utils.helpers import *
+from utils.constants import *
 
 class solr_ingest():
     def __init__(self,solr_url,collection_name,headers) -> None:
@@ -30,7 +31,7 @@ class solr_ingest():
             print(f'Error checking collection: {response.text}')
             return True
 
-    def create_collection(self,collection_name,schema):
+    def create_collection(self,collection_name,schema,unique_key):
         collection_exists = self.check_collection_exists(collection_name)
         if(collection_exists):
             print(f'Collection "{collection_name}" exists')
@@ -47,7 +48,8 @@ class solr_ingest():
             'name': collection_name,
             'numShards': num_shards,
             'replicationFactor': replication_factor,
-            'configName': config_name
+            'configName': config_name,
+            'uniqueKey': unique_key
         }
 
         response = requests.get(f'{self.solr_url}/admin/collections', params=request_data)
@@ -188,23 +190,23 @@ if __name__ == '__main__':
     # fl - fields to query
     # rows - max rows to query
     params = {
-            'q': 'comment_id:j1vkv1r',
+            'q': 'comment:on',
             'fl': 'comment_id,comment,score',
-            'rows': 10
+            'rows': 2
         }
     # define solr_ingest object
     data_ingest = solr_ingest(solr_url,collection_name,headers)
     # delete collection defined above
     data_ingest.delete_collection(collection_name)
     # create new collection using same name
-    data_ingest.create_collection(collection_name,constants.schema)
+    data_ingest.create_collection(collection_name,solr_var['data_schema'])
     # delete all data in the collection
     data_ingest.delete_data(collection_name)
     # read and process to save as json data
-    data_dict = helpers.read_data("test3")
-    data = helpers.process_json(data_dict)
-    helpers.store_json(data,"text3_json")
-    data = helpers.read_json("test3_json")
+    data_dict = read_data("test3")
+    data = process_json(data_dict)
+    store_json(data,"text3_json")
+    data = read_json("test3_json")
     # push data to the collection
     data_ingest.push_data(collection_name,data)
     # query data based on paramaters defined above
