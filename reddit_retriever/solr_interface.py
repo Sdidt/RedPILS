@@ -15,6 +15,17 @@ class solr_ingest():
         self.collection_name = collection_name
         self.headers = headers
 
+    def check_submission_exists(self, collection_name, submission_id):
+        query_params = {
+            'q': 'submission_id: {}'.format(submission_id),
+            'rows': 0
+        }
+
+        url = self.solr_url+'/'+collection_name
+        response = requests.get(f'{url}/select', params=query_params)
+        numFound = response.json()['response']['numFound']
+        return numFound > 0
+
     def check_collection_exists(self,collection_name):
         request_data = {
             'action': 'CLUSTERSTATUS'

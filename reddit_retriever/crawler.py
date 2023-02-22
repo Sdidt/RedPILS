@@ -9,6 +9,7 @@ sys.path.append(os.environ.get("SYS_PATH"))
 from utils.constants import subreddits, solr_var
 from utils.helpers import *
 from models.comment import Comment
+from reddit_retriever.solr_interface import solr_ingest
 
 class Crawler:
     def __init__(self, output_filename) -> None:
@@ -84,7 +85,7 @@ class Crawler:
                 # store_json(sub_data)
                 store_data(sub_data)
     
-    def keyword_crawl(self, dynamic_keywords, keyword_limit, submission_limit, data_ingest):
+    def keyword_crawl(self, dynamic_keywords, keyword_limit, submission_limit, data_ingest: solr_ingest):
         sub_data: list[Comment] = read_data(self.output_filename)
         for subreddit in subreddits.keys():
             print("==========SUBREDDIT {}==========".format(subreddit))
@@ -92,9 +93,10 @@ class Crawler:
             for keyword in dynamic_keywords:
                 for submission in sub.search('flair: "Politics"+{}'.format(keyword), limit=keyword_limit):
                     # relies on overloaded __eq__
-                    if submission.id not in sub_data:
+                    # if submission.id not in sub_data:
+                    if not data_ingest.check_submission_exists(solr_var['data_collection_name'], submission.id):
                         sub_data.extend(self.process_submission(submission, sub, submission_limit))
-                        print("extarcted data")
+                        print("extracted data")
                         # self.store_raw_data(dict(sub_data))
                         # the following 2 lines are for testing purposes; in the future they will be replaced by a call to add the documents to solr directly
                         # json_sub_data = process_json(sub_data)

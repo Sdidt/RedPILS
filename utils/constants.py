@@ -6,12 +6,14 @@ from models.political_wing import PoliticalWing
 # }
 
 subreddits = {
-    "indiaspeaks": PoliticalWing.RIGHT}
+    "indiaspeaks": PoliticalWing.RIGHT,
+    # "india": PoliticalWing.LEFT
+}
 
 
 keywords = [
-    "BJP",
-    "Congress",
+    # "BJP",
+    # "Congress",
     "AAP",
     # "Hindutva",
     # "Muslim",
@@ -32,7 +34,7 @@ solr_var = {
     {"name": "submission_title", "type": "text_en",'indexed': "true", "stored": "true"},
     {"name": "subreddit_id", "type": "text_en",'indexed': "true", "stored": "true"},
     {"name": "subreddit_name", "type": "text_en",'indexed': "true", "stored": "true"},
-    {"name": "comment_id", "type": "text_en",'indexed': "true", "stored": "true"},
+    {"name": "comment_id", "type": "string",'indexed': "true", "stored": "true"},
     {"name": "comment", "type": "text_en",'indexed': "true", "stored": "true"},
     {"name": "timestamp", "type": "text_en",'indexed': "true", "stored": "true"},
     {"name": "url", "type": "text_en"},
