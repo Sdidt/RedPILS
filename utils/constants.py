@@ -66,7 +66,7 @@ solr_var = {
             },
             {
                 "name": "stop",
-                "words": "stopwords.txt",
+                "words": "lang/stopwords_en.txt",
                 "ignoreCase": "true"
             },
             # not ideal; modify the NGram filter
@@ -90,7 +90,7 @@ solr_var = {
             },
             {
                 "name": "stop",
-                "words": "stopwords.txt",
+                "words": "lang/stopwords_en.txt",
                 "ignoreCase": "true"
             },
             # not ideal; modify the NGram filter
