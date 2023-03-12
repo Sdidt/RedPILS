@@ -24,6 +24,7 @@ class solr_ingest():
         url = self.solr_url+'/'+collection_name
         response = requests.get(f'{url}/select', params=query_params)
         numFound = response.json()['response']['numFound']
+        print("Number found: {}".format(numFound))
         return numFound > 0
 
     def check_collection_exists(self,collection_name):
@@ -59,8 +60,8 @@ class solr_ingest():
             'name': collection_name,
             'numShards': num_shards,
             'replicationFactor': replication_factor,
-            'configName': config_name,
-            'uniqueKey': unique_key
+            # 'collection.configName': config_name,
+            'collection.uniqueKey': unique_key
         }
 
         response = requests.get(f'{self.solr_url}/admin/collections', params=request_data)
@@ -88,6 +89,7 @@ class solr_ingest():
         response = requests.get(f'{self.solr_url}/admin/collections', params=request_data)
         if response.status_code == 200:
             print(f'The collection "{collection_name}" has been deleted.')
+            # print(response.text)
         else:
             print(f'Error deleting the collection: {response.text}')
 

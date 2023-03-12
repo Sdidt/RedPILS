@@ -32,25 +32,25 @@ keyword_ingest.delete_collection(solr_var['keyword_collection_name'])
 keyword_ingest.create_collection(solr_var['keyword_collection_name'],solr_var['keyword_schema'],solr_var['keyword_unique_key'])
 keyword_ingest.delete_data(solr_var['keyword_collection_name'])
 keyword_ingest.push_data(solr_var['keyword_collection_name'],keywords_dict)
-#-------------------------------------------------#
+# #-------------------------------------------------#
 
-#--------------------keyword extract--------------------#
-# crawler = Crawler(output_filename="solr_integration_test")
-# Uncomment below to test
-crawler.keyword_crawl(keywords[latest_level], 1, 1, data_ingest)
+# #--------------------keyword extract--------------------#
+crawler = Crawler(output_filename="solr_integration_test")
+# # Uncomment below to test
+crawler.keyword_crawl(keywords[latest_level], 5, 1, data_ingest)
 # get all documents stored in solr database
 # search_data = data_ingest.query_data(solr_var['params'],solr_var['data_collection_name'])
 search_data = data_ingest.query_data({'q':'*:*','rows':1000000},solr_var['data_collection_name'])
-store_json(search_data,'search_data')
+# store_json(search_data,'search_data')
 docs = crawler.get_all_docs()
 print(len(docs))
 ner = NER()
-# Uncomment to test translation; will not work at our scale since API request limit is hit
-# translitlator = Translitlator()
-# docs = translitlator.translate(list(docs.values()))
-#-------------------------------------------------#
+# # Uncomment to test translation; will not work at our scale since API request limit is hit
+# # translitlator = Translitlator()
+# # docs = translitlator.translate(list(docs.values()))
+# #-------------------------------------------------#
 
-#--------------------Keyword preprocess--------------------#
+# #--------------------Keyword preprocess--------------------#
 latest_level += 1
 keywords[latest_level] = set()
 for comment in docs.values():
@@ -59,10 +59,10 @@ for comment in docs.values():
     keywords[latest_level] = keywords[latest_level].union(new_keywords)
     # print("Keywords: {}".format(new_keywords))
 
-# print("ALL Keywords: {}".format(keywords))
-#-------------------------------------------------#
+print("ALL Keywords: {}".format(keywords))
+# #-------------------------------------------------#
 
-#--------------------TFIDF tokenizer--------------------#
+# #--------------------TFIDF tokenizer--------------------#
 tokenizer = TFIDF_tokenizer(docs, search_space=keywords[latest_level])
 tf_idf_score_dict, tf_score_dict, idf_score_dict = tokenizer.get_tf_idf_score()
 
@@ -76,9 +76,9 @@ for keyword, score in result.items():
         keywords_dict.append({'keyword':keyword})
 store_json(keywords_dict,"keywords_data")
 keyword_ingest.push_data(solr_var['keyword_collection_name'],keywords_dict)
-#-------------------------------------------------#
+# #-------------------------------------------------#
 
-#--------------------Dynamic Crawler--------------------#
-# Uncomment below to test dynamic crawling
-crawler.keyword_crawl(result, 1, 1, data_ingest)
-#-------------------------------------------------#
+# #--------------------Dynamic Crawler--------------------#
+# # Uncomment below to test dynamic crawling
+crawler.keyword_crawl(result, 5, 1, data_ingest)
+# #-------------------------------------------------#
