@@ -38,7 +38,7 @@ solr_var = {
     {"name": "comment", "type": "filtered_text",'indexed': "true", "stored": "true"},
     {"name": "timestamp", "type": "text_en",'indexed': "true", "stored": "true"},
     {"name": "url", "type": "text_en"},
-    {"name": "score", "type": "pint",'indexed': "true", "stored": "true"},
+    {"name": "reddit_score", "type": "pint",'indexed': "true", "stored": "true"},
     {"name": "redditor_id", "type": "text_en",'indexed': "true", "stored": "true"}
     ],
     'params': {
@@ -55,9 +55,12 @@ solr_var = {
         "autoGeneratePhraseQueries": "true",
         "indexAnalyzer": {
             "tokenizer": {
-                "name": "whitespace"
+                "name": "standard"
             },
             "filters": [
+            {
+                "name": "trim"
+            },
             {
                 "name": "lowercase"
             },
@@ -67,21 +70,21 @@ solr_var = {
                 "ignoreCase": "true"
             },
             # not ideal; modify the NGram filter
-            {
-                "name": "nGram",
-                "minGramSize": "2",
-                "maxGramSize": "3"
-            },
-            {
-                "name": "trim"
-            }
+            # {
+            #     "name": "nGram",
+            #     "minGramSize": "5",
+            #     "maxGramSize": "6"
+            # },
             ]
         },
         "queryAnalyzer": {
             "tokenizer": {
-                "name": "whitespace"
+                "name": "standard"
             },
             "filters": [
+            {
+                "name": "trim"
+            },
             {
                 "name": "lowercase"
             },
@@ -91,14 +94,11 @@ solr_var = {
                 "ignoreCase": "true"
             },
             # not ideal; modify the NGram filter
-            {
-                "name": "nGram",
-                "minGramSize": "2",
-                "maxGramSize": "3"
-            },
-            {
-                "name": "trim"
-            }
+            # {
+            #     "name": "nGram",
+            #     "minGramSize": "5",
+            #     "maxGramSize": "6"
+            # },
             ]
         },
         "similarity": {

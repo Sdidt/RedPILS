@@ -44,8 +44,7 @@ if __name__ == "__main__":
         'Kejriji is saying " Aap ka paisa aap ko hi free dene mein use kar rahe hai toh kya galat hai"? but never say about the direct tax payers involved in the economy, though indrect tax payers are every 1 but these free sceheme are mostly targeted towards illegal migrants and lower class who actually venture out to vote. '
     ]
     # print(transliterated)
-    translated = []
-    translated.append(translitlator.translate(texts))
+    translated = translitlator.translate(texts)
     print(translated)
 
 

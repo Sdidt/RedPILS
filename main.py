@@ -10,9 +10,9 @@ from reddit_retriever.crawler import Crawler
 
 #--------------------solr init - comments data--------------------#
 data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],solr_var['headers'])
-data_ingest.delete_collection(solr_var['data_collection_name'])
-data_ingest.create_collection(solr_var['data_collection_name'], solr_var['data_schema'], solr_var['data_unique_key'], solr_var['filtered_text_type'])
-data_ingest.delete_data(solr_var['data_collection_name'])
+# data_ingest.delete_collection(solr_var['data_collection_name'])
+# data_ingest.create_collection(solr_var['data_collection_name'], solr_var['data_schema'], solr_var['data_unique_key'], solr_var['filtered_text_type'])
+# data_ingest.delete_data(solr_var['data_collection_name'])
 #-------------------------------------------------#
 
 #--------------------solr init - keywords data--------------------#
@@ -21,7 +21,7 @@ keywords = {latest_level: set(keywords)}
 all_keywords = set(keywords[latest_level])
 crawler = Crawler(output_filename="solr_integration_test")
 # Uncomment below to test
-crawler.keyword_crawl(keywords[latest_level], 5, 1, data_ingest)
+crawler.keyword_crawl(keywords[latest_level], 15, 1, data_ingest)
 keywords_dict = []
 for key in keywords[latest_level]:
     keywords_dict.append({'keyword':key})
