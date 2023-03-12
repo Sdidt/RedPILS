@@ -1,7 +1,9 @@
 IR
 .env
 __pycache__
-outputs/
+outputs/*
 solr-9.1.1/
 redpils
 venv
+
+
