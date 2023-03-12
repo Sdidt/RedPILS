@@ -1,4 +1,4 @@
-from reddit_retriever.crawler import Crawler
+
 from text_process.spacy_ner import NER
 from text_process.tokenizer import TFIDF_tokenizer
 from text_process.translitlator import Translitlator
@@ -6,6 +6,7 @@ from text_process.translitlator import Translitlator
 from utils.constants import keywords, solr_var
 from utils.helpers import *
 from reddit_retriever.solr_interface import solr_ingest
+from reddit_retriever.crawler import Crawler
 
 
 #--------------------solr init - comments data--------------------#
