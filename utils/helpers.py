@@ -12,9 +12,9 @@ def store_raw_data(self, sub_data):
         pprint(sub_data, f)
 
 def store_data(sub_data,output_filename):
-    isExist = os.path.exists('./outputs')
+    isExist = os.path.exists('outputs')
     if not isExist:
-        os.makedirs('./outputs')
+        os.makedirs('outputs')
 
     with open("outputs/{}.txt".format(output_filename), "wb") as f:
         pickle.dump(sub_data, f)
