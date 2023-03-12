@@ -1,8 +1,8 @@
-from reddit_retriever.crawler import Crawler
 from text_process.spacy_ner import NER
 from text_process.tokenizer import TFIDF_tokenizer
 from text_process.translitlator import Translitlator
 from utils.constants import keywords
+from reddit_retriever.crawler import Crawler
 
 class Pipeline:
     def __init__(self, output_filename, keyword_limit, submission_limit, keywords: set) -> None:

@@ -1,3 +1,4 @@
+from __future__ import annotations  # required for older python versions before 3.9
 from dotenv import load_dotenv
 import os
 import sys
