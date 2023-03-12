@@ -35,7 +35,7 @@ solr_var = {
     {"name": "subreddit_id", "type": "text_en",'indexed': "true", "stored": "true"},
     {"name": "subreddit_name", "type": "text_en",'indexed': "true", "stored": "true"},
     {"name": "comment_id", "type": "string",'indexed': "true", "stored": "true"},
-    {"name": "comment", "type": "text_en",'indexed': "true", "stored": "true"},
+    {"name": "comment", "type": "filtered_text",'indexed': "true", "stored": "true"},
     {"name": "timestamp", "type": "text_en",'indexed': "true", "stored": "true"},
     {"name": "url", "type": "text_en"},
     {"name": "score", "type": "pint",'indexed': "true", "stored": "true"},
@@ -47,6 +47,62 @@ solr_var = {
             'rows': 10
         },
     'keyword_schema':[
-    {"name": "keyword", "type": "text_en",'indexed': "true", "stored": "true"},
-    ]
+    {"name": "keyword", "type": "filtered_text",'indexed': "true", "stored": "true"},
+    ],
+    'filtered_text_type': {
+        "name": "filtered_text",
+        "class": "solr.TextField",
+        "autoGeneratePhraseQueries": "true",
+        "indexAnalyzer": {
+            "tokenizer": {
+                "name": "whitespace"
+            },
+            "filters": [
+            {
+                "name": "lowercase"
+            },
+            {
+                "name": "stop",
+                "words": "stopwords.txt",
+                "ignoreCase": "true"
+            },
+            # not ideal; modify the NGram filter
+            {
+                "name": "nGram",
+                "minGramSize": "2",
+                "maxGramSize": "3"
+            },
+            {
+                "name": "trim"
+            }
+            ]
+        },
+        "queryAnalyzer": {
+            "tokenizer": {
+                "name": "whitespace"
+            },
+            "filters": [
+            {
+                "name": "lowercase"
+            },
+            {
+                "name": "stop",
+                "words": "stopwords.txt",
+                "ignoreCase": "true"
+            },
+            # not ideal; modify the NGram filter
+            {
+                "name": "nGram",
+                "minGramSize": "2",
+                "maxGramSize": "3"
+            },
+            {
+                "name": "trim"
+            }
+            ]
+        },
+        "similarity": {
+            "class": "solr.ClassicSimilarityFactory"
+        }
+    }
 }

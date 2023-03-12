@@ -95,6 +95,7 @@ class Crawler:
                 for submission in sub.search('flair: "Politics"+{}'.format(keyword), limit=keyword_limit):
                     # relies on overloaded __eq__
                     # if submission.id not in sub_data:
+                    print(submission.id)
                     if not data_ingest.check_submission_exists(solr_var['data_collection_name'], submission.id):
                         submission_result = self.process_submission(submission, sub, submission_limit)
                         sub_data.extend(submission_result)
@@ -108,6 +109,8 @@ class Crawler:
                         store_json(sub_data, self.output_filename)
                         store_data(sub_data, self.output_filename)
                         print("storing data")
+                else: 
+                    print("No results obtained!")
 
     def filter_comments(self, comments):
         # filtered_comments = [comment for comment in comments if (comment.body.encode('utf-8') != b'[removed]' and comment.body.encode('utf-8') != b'[deleted]' and (len(comment.body.encode('utf-8').split(b" ")) >= 30))]

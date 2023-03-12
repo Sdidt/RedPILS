@@ -43,7 +43,7 @@ class solr_ingest():
             print(f'Error checking collection: {response.text}')
             return True
 
-    def create_collection(self,collection_name,schema,unique_key):
+    def create_collection(self, collection_name,schema, unique_key, field_type=None):
         collection_exists = self.check_collection_exists(collection_name)
         if(collection_exists):
             print(f'Collection "{collection_name}" exists')
@@ -70,6 +70,8 @@ class solr_ingest():
         else:
             print(f'Error creating collection: {response.text}')
 
+        if field_type is not None:
+            self.add_new_field_type(collection_name, field_type)
         self.define_schema(collection_name,schema)
 
     def delete_collection(self,collection_name):
@@ -92,6 +94,20 @@ class solr_ingest():
             # print(response.text)
         else:
             print(f'Error deleting the collection: {response.text}')
+
+    def add_new_field_type(self, collection_name, new_field_type):
+        url = self.solr_url+'/'+collection_name
+
+        request_data = {
+            'add-field-type': new_field_type
+        }
+
+        response = requests.post(f'{url}/schema', headers=self.headers,json=request_data)
+
+        if response.status_code == 200:
+            print(f'The field type {new_field_type["name"]} for the collection "{collection_name}" has been added.')
+        else:
+            print(f'Error updating the schema: {response.text}')
 
     def define_schema(self,collection_name,schema):
         url = self.solr_url+'/'+collection_name
