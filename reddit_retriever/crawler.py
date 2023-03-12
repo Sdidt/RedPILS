@@ -96,15 +96,16 @@ class Crawler:
                     # relies on overloaded __eq__
                     # if submission.id not in sub_data:
                     if not data_ingest.check_submission_exists(solr_var['data_collection_name'], submission.id):
-                        sub_data.extend(self.process_submission(submission, sub, submission_limit))
+                        submission_result = self.process_submission(submission, sub, submission_limit)
+                        sub_data.extend(submission_result)
                         print("extracted data")
                         # self.store_raw_data(dict(sub_data))
                         # the following 2 lines are for testing purposes; in the future they will be replaced by a call to add the documents to solr directly
                         # json_sub_data = process_json(sub_data)
                         # print("processed data as json")
-                        data_ingest.push_data(solr_var['data_collection_name'],sub_data)
+                        data_ingest.push_data(solr_var['data_collection_name'],submission_result)
                         print("pushed data")
-                        store_json(sub_data,self.output_filename)
+                        store_json(sub_data, self.output_filename)
                         store_data(sub_data, self.output_filename)
                         print("storing data")
 
