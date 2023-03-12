@@ -1,3 +1,4 @@
+from __future__ import annotations  # required for older python versions before 3.9
 import os
 import json
 import pickle
