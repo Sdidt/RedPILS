@@ -1,3 +1,4 @@
+from __future__ import annotations  # required for older python versions before 3.9
 from elt import translit
 from googletrans import Translator
 from nltk import tokenize

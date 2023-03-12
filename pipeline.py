@@ -4,7 +4,6 @@ from text_process.translitlator import Translitlator
 from utils.constants import keywords
 from reddit_retriever.crawler import Crawler
 
-
 class Pipeline:
     def __init__(self, output_filename, keyword_limit, submission_limit, keywords: set) -> None:
         self.crawler = Crawler(output_filename)
