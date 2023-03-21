@@ -35,12 +35,49 @@ solr_var = {
     {"name": "subreddit_id", "type": "text_en",'indexed': "true", "stored": "true"},
     {"name": "subreddit_name", "type": "text_en",'indexed': "true", "stored": "true"},
     {"name": "comment_id", "type": "string",'indexed': "true", "stored": "true"},
-    {"name": "comment", "type": "filtered_text",'indexed': "true", "stored": "true"},
+    {"name": "comment", "type": "filtered_text",'indexed': "true", "stored": "true", "termVectors": "true"},
     {"name": "timestamp", "type": "text_en",'indexed': "true", "stored": "true"},
     {"name": "url", "type": "text_en"},
     {"name": "reddit_score", "type": "pint",'indexed': "true", "stored": "true"},
     {"name": "redditor_id", "type": "text_en",'indexed': "true", "stored": "true"}
     ],
+    "tag_field_type": {
+        "name": "tag",
+        "class": "solr.TextField",
+            "omitNorms":"true",
+        "omitTermFreqAndPositions":"true",
+        "indexAnalyzer":{
+        "tokenizer":{
+            "class":"solr.StandardTokenizerFactory" },
+        "filters":[
+            {"class":"solr.EnglishPossessiveFilterFactory"},
+            {"class":"solr.ASCIIFoldingFilterFactory"},
+            {"class":"solr.LowerCaseFilterFactory"},
+            {"class":"solr.ConcatenateGraphFilterFactory", "preservePositionIncrements":"false" }
+        ]},
+        "queryAnalyzer":{
+        "tokenizer":{
+            "class":"solr.StandardTokenizerFactory" },
+        "filters":[
+            {"class":"solr.EnglishPossessiveFilterFactory"},
+            {"class":"solr.ASCIIFoldingFilterFactory"},
+            {"class":"solr.LowerCaseFilterFactory"}
+      ]}
+    },
+    "tag_field": {
+        "name": "comment_tag",
+        "type": "tag",
+        "stored": "false"
+    },
+    "tag_request_handler": {
+        "name": "/tag",
+        "class":"solr.TaggerRequestHandler",
+        "defaults":{"field":"comment_tag"}
+    },
+    "copy_tag_field": {
+        "source": "comment", 
+        "dest": ["comment_tag"]
+    },
     'params': {
             'q': 'comment_id:j0u6jwf',
             'fl': 'comment_id,comment,score',
@@ -58,12 +95,8 @@ solr_var = {
                 "name": "standard"
             },
             "filters": [
-            {
-                "name": "trim"
-            },
-            {
-                "name": "lowercase"
-            },
+            {"name": "trim"},
+            {"name": "lowercase"},
             {
                 "name": "stop",
                 "words": "lang/stopwords_en.txt",

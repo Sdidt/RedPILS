@@ -32,6 +32,7 @@ class NER:
             elif len(tok) <= 5:
                 useless_toks.add(tok)
         imp_toks = imp_toks.difference(useless_toks)
+        imp_toks = set([tok.lower() for tok in imp_toks])
         # imp_toks = set(self.lemmatizer.lemmatize(tok) for tok in imp_toks)
         return imp_toks
         

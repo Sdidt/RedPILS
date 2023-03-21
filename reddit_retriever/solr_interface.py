@@ -15,6 +15,18 @@ class solr_ingest():
         self.collection_name = collection_name
         self.headers = headers
 
+    def get_doc_count(self, collection_name):
+        query_params = {
+            'q': "*:*", 
+            'rows': 0
+        }
+
+        url = self.solr_url+'/'+collection_name
+        response = requests.get(f'{url}/select', params=query_params)
+        numFound = response.json()['response']['numFound']
+        print("Number found: {}".format(numFound))
+        return numFound
+
     def check_submission_exists(self, collection_name, submission_id):
         query_params = {
             'q': 'submission_id: {}'.format(submission_id),
@@ -108,6 +120,34 @@ class solr_ingest():
             print(f'The field type {new_field_type["name"]} for the collection "{collection_name}" has been added.')
         else:
             print(f'Error updating the schema: {response.text}')
+        
+    def add_new_copy_field(self, collection_name, copy_field):
+        url = self.solr_url+'/'+collection_name
+
+        request_data = {
+            'add-copy-field': copy_field
+        }
+
+        response = requests.post(f'{url}/schema', headers=self.headers,json=request_data)
+
+        if response.status_code == 200:
+            print(f'The copy field {copy_field["dest"]} for the collection "{collection_name}" has copied fields now.')
+        else:
+            print(f'Error updating the schema: {response.text}')
+        
+    def add_new_request_handler(self, collection_name, request_handler):
+        url = self.solr_url+'/'+collection_name
+
+        request_data = {
+            'add-requesthandler': request_handler
+        }
+
+        response = requests.post(f'{url}/config', headers=self.headers,json=request_data)
+
+        if response.status_code == 200:
+            print(f'The request handler {request_handler["name"]} for the collection "{collection_name}" has been added.')
+        else:
+            print(f'Error updating the config: {response.text}')
 
     def define_schema(self,collection_name,schema):
         url = self.solr_url+'/'+collection_name
@@ -205,6 +245,25 @@ class solr_ingest():
                 print(f'Error querying updated document')
         else:
             print(f'Error querying documents')
+        
+    def compute_avg_tf_idf(self, term, collection_name):
+        url = self.solr_url+'/'+collection_name
+
+        query_params = {
+            "q": "{{!func}}mul(tf(comment, {}), idf(comment, {}))".format(term, term),
+            "fl": "score",
+            "rows": 100000
+        }
+
+        response = requests.get(f'{url}/select', params=query_params)
+        search_results = response.json()['response']['docs']
+        avg_score = sum([result["score"] for result in search_results])/len(search_results)
+
+        return avg_score
+
+    def get_imp_terms():
+        pass
+
 
 if __name__ == '__main__':
     # define solr endpoint

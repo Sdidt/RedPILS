@@ -31,47 +31,21 @@ class Crawler:
         submission.comments.replace_more(limit=comment_limit)
         comments = submission.comments.list()
         submission_id = submission.id
-        # comments = [comment.body.encode('utf-8') for comment in submission.comments.list()]
         comments = self.filter_comments(comments)
-        # list_data = [
-        #     Comment(
-        #         submission_id=submission_id,
-        #         submission_title=submission.title.encode('utf-8'), 
-        #         subreddit_id=sub.id,
-        #         subreddit_name=sub.name,
-        #         id=comment.id, 
-        #         comment=comment.body.encode('utf-8'),
-        #         timestamp=comment.created_utc,
-        #         url=comment.permalink,
-        #         score=comment.score,
-        #         redditor_id=comment.author.id if hasattr(comment, 'author') and hasattr(comment.author, 'id') else -1
-        #         ) for comment in comments 
-        # ]
         list_data = []
         for comment in comments:
-            dict_obj = {'submission_id':submission_id,
-                        'submission_title':submission.title,
-                        'subreddit_id':sub.id,
-                        'subreddit_name':sub.name,
-                        'comment_id':comment.id,
-                        'comment':comment.body,
-                        'timestamp':convert_to_datetime(comment.created_utc),
-                        'url':comment.permalink,
-                        'score':comment.score,
-                        "redditor_id":comment.author.id if hasattr(comment, 'author') and hasattr(comment.author, 'id') else -1}
-            list_data.append(dict_obj)
-        # Alternative:
-        # dict_data = {
-        #     "title": submission.title.encode('utf-8'),
-        #     "comments": [Comment(
-        #         id=comment.id, 
-        #         comment=comment.body.encode('utf-8'),
-        #         timestamp=comment.created_utc,
-        #         url=comment.permalink,
-        #         score=comment.score,
-        #         redditor_id=comment.author.id if hasattr(comment, 'author') and hasattr(comment.author, 'id') else -1
-        #         ) for comment in comments] 
-        # }
+            if b"I am a bot, and this action was performed automatically." not in comment.body.encode('utf-8'):
+                dict_obj = {'submission_id':submission_id,
+                            'submission_title':submission.title,
+                            'subreddit_id':sub.id,
+                            'subreddit_name':sub.name,
+                            'comment_id':comment.id,
+                            'comment':comment.body,
+                            'timestamp':convert_to_datetime(comment.created_utc),
+                            'url':comment.permalink,
+                            'reddit_score':comment.score,
+                            "redditor_id":comment.author.id if hasattr(comment, 'author') and hasattr(comment.author, 'id') else -1}
+                list_data.append(dict_obj)
         return list_data
 
     def crawl_data(self,crawl_limit,submission_limit):
