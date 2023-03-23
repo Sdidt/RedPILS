@@ -9,7 +9,7 @@ const SearchPage = () => {
     }
   return (
     <div>
-      <h1>My Search Engine</h1>
+      <h1>Suck it</h1>
       <form onSubmit={handleSearch}>
         <input type="text" value={query} onChange={e => setQuery(e.target.value)} />
         <button type="submit">Search</button>
