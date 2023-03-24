@@ -10,10 +10,12 @@ from utils.helpers import *
 from utils.constants import *
 
 class solr_ingest():
-    def __init__(self,solr_url,collection_name,headers) -> None:
+    def __init__(self,solr_url,collection_name,headers, alpha=0.9, beta=0.1) -> None:
         self.solr_url = solr_url
         self.collection_name = collection_name
         self.headers = headers
+        self.alpha = alpha
+        self.beta = beta
 
     def get_doc_count(self, collection_name):
         query_params = {
@@ -260,6 +262,20 @@ class solr_ingest():
         avg_score = sum([result["score"] for result in search_results])/len(search_results)
 
         return avg_score
+
+    def compute_query_term_score(self, query_term, collection_name, K):
+        url = self.solr_url+'/'+collection_name
+
+        query_params = {
+            "q": "{{!func}}sum(mul(0.9, tf(comment, {}), idf(comment,{})), mul(0.1, log(reddit_score)))".format(query_term, query_term),
+            "fl": "score,comment",
+            "rows": 100000
+        }
+
+        response = requests.get(f'{url}/select', params=query_params)
+        search_results = response.json()['response']['docs']
+
+        return search_results[:K]
 
     def get_imp_terms():
         pass
