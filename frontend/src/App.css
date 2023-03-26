@@ -114,3 +114,16 @@
   margin-bottom: 5%;
   background: rgb(47, 47, 47)
 }
+
+.bar_chart_styles{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pie_chart_styles{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
