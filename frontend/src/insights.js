@@ -1,9 +1,10 @@
 import React,{useState,useEffect} from 'react';
 import { Pie, Bar, Doughnut } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
+import SimpleWordcloud from './wordclouds';
 Chart.register(...registerables);
 
-const BarChart = () => {
+const Insights = () => {
   const dataItems = [
     {
       id: 0,
@@ -148,8 +149,11 @@ const BarChart = () => {
           <Doughnut data={doughChartData} options={options} />
         </div>
       </div>
+      <div className='wordcloud_styles'>
+        <SimpleWordcloud/>
+      </div>
     </div>
   );
 }
 
-export default BarChart;
+export default Insights;
