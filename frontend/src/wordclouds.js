@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactWordcloud from 'react-wordcloud';
+import WordCloud from 'react-wordcloud'
+import topics from "./services/topics.json";
  
 const SimpleWordcloud = () => {
     const words = [
@@ -21,14 +23,24 @@ const SimpleWordcloud = () => {
         },
         ]
     
-    const callbacks = {
+    const callbacks1 = {
         getWordColor: word => word.value > 50 ? "blue" : "red",
         onWordClick: console.log,
         onWordMouseOver: console.log,
         getWordTooltip: word => `${word.text} (${word.value}) [${word.value > 50 ? "good" : "bad"}]`,
         }
+    const callbacks2 = {
+        // getWordColor: word => word.value > 50 ? "blue" : "red",
+        onWordClick: console.log,
+        onWordMouseOver: console.log,
+        getWordTooltip: word => `${word.label} (${word.value}) [${word.value > 50 ? "good" : "bad"}]`,
+        }
     return (
-        <ReactWordcloud callbacks={callbacks} words={words} />
+        <div>
+            <ReactWordcloud callbacks={callbacks1} words={words} />
+            {/* <ReactWordcloud callbacks={callbacks2} words={topics} /> */}
+            {/* <WordCloud topics={topics}/> */}
+        </div>
     )
 }
 
