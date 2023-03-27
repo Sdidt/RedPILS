@@ -37,7 +37,7 @@ solr_var = {
     {"name": "comment_id", "type": "string",'indexed': "true", "stored": "true"},
     {"name": "comment", "type": "filtered_text",'indexed': "true", "stored": "true", "termVectors": "true"},
     {"name": "timestamp", "type": "text_en",'indexed': "true", "stored": "true"},
-    {"name": "url", "type": "text_en"},
+    {"name": "url", "type": "text_en", "indexed": "true", "stored": "true"},
     {"name": "reddit_score", "type": "pint",'indexed': "true", "stored": "true"},
     {"name": "redditor_id", "type": "text_en",'indexed': "true", "stored": "true"}
     ],
@@ -98,16 +98,21 @@ solr_var = {
             {"name": "trim"},
             {"name": "lowercase"},
             {
-                "name": "stop",
-                "words": "lang/stopwords_en.txt",
+                "name": "synonymGraph",
+                "synonyms": "synonyms_redpils.txt",
                 "ignoreCase": "true"
+            },
+            {
+                "name": "stop",
+                "words": "lang/stopwords_nltk.txt",
+                # "ignoreCase": "true"
             },
             # not ideal; modify the NGram filter
             # {
             #     "name": "nGram",
-            #     "minGramSize": "5",
-            #     "maxGramSize": "6"
-            # },
+            #     "minGramSize": "2",
+            #     "maxGramSize": "3"
+            # }
             ]
         },
         "queryAnalyzer": {
@@ -122,15 +127,20 @@ solr_var = {
                 "name": "lowercase"
             },
             {
-                "name": "stop",
-                "words": "lang/stopwords_en.txt",
+                "name": "synonymGraph",
+                "synonyms": "synonyms_redpils.txt",
                 "ignoreCase": "true"
+            },
+            {
+                "name": "stop",
+                "words": "lang/stopwords_nltk.txt",
+                # "ignoreCase": "true"
             },
             # not ideal; modify the NGram filter
             # {
             #     "name": "nGram",
-            #     "minGramSize": "5",
-            #     "maxGramSize": "6"
+            #     "minGramSize": "2",
+            #     "maxGramSize": "3"
             # },
             ]
         },

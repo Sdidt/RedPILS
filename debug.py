@@ -19,4 +19,4 @@ def compute_query_term_score(query_term):
     search_results = data_ingest.compute_query_term_score(query_term, solr_var['data_collection_name'], 10)
     [print("Score: {}\nComment: {}".format(doc["score"], doc["comment"])) for doc in search_results]
 
-compute_query_term_score("education")
+compute_query_term_score("INC")

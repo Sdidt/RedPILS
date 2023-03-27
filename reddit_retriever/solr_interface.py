@@ -151,6 +151,20 @@ class solr_ingest():
         else:
             print(f'Error updating the config: {response.text}')
 
+    def update_existing_field_type(self, collection_name, field_type_def):
+        url = self.solr_url+'/'+collection_name
+
+        request_data = {
+            'replace-field-type': field_type_def
+        }
+
+        response = requests.post(f'{url}/schema', headers=self.headers,json=request_data)
+
+        if response.status_code == 200:
+            print('The field type {} for the collection "{}" has been updated.'.format(field_type_def['name'], collection_name))
+        else:
+            print(f'Error updating the schema: {response.text}')
+
     def define_schema(self,collection_name,schema):
         url = self.solr_url+'/'+collection_name
 
@@ -183,6 +197,20 @@ class solr_ingest():
             print('Schema has been updated in Solr.')
         else:
             print(f'Error updating schema in Solr: {response.text}')
+
+    def replace_schema(self,collection_name,schema):
+        url = self.solr_url+'/'+collection_name
+
+        request_data = {
+            'replace-field': schema
+        }
+
+        response = requests.post(f'{url}/schema', headers=self.headers,json=request_data)
+
+        if response.status_code == 200:
+            print(f'The schema for the collection "{collection_name}" has been replaced.')
+        else:
+            print(f'Error replacing the schema: {response.text}')
 
     def push_data(self,collection_name,data):
         url = self.solr_url+'/'+collection_name
@@ -267,9 +295,10 @@ class solr_ingest():
         url = self.solr_url+'/'+collection_name
 
         query_params = {
-            "q": "{{!func}}sum(mul(0.9, tf(comment, {}), idf(comment,{})), mul(0.1, log(reddit_score)))".format(query_term, query_term),
+            "q": "comment:{}".format(query_term),
+            "_query_": "{!rank f='pagerank', function='log' scalingFactor='1.2'}",
             "fl": "score,comment",
-            "rows": 100000
+            "rows": 100
         }
 
         response = requests.get(f'{url}/select', params=query_params)
