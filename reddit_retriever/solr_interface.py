@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 sys.path.append(os.environ.get("SYS_PATH"))
-
+from zipfile import ZipFile
 from utils.helpers import *
 from utils.constants import *
 
@@ -29,22 +29,25 @@ class solr_ingest():
         print("Number found: {}".format(numFound))
         return numFound
 
-    def upload_configset(self, configset_zip_path, configset_name, overwrite=True):
+    def upload_configset(self, configset_zip_path, configset_name, overwrite="true"):
         query_params = {
             "action": "UPLOAD",
             "name": configset_name,
             "overwrite": overwrite
         }
+        with open(configset_zip_path, 'rb') as zip:
+            # printing all the contents of the zip file
+            # zip.printdir()
+            print(zip.read())
+            headers = {
+                'Content-type': 'application/octet-stream'
+            }
+            data = {
+                'file': zip
+            }
+            url = self.solr_url + '/admin/configs'
 
-        headers = {
-            'Content-type': 'application/octet-stream'
-        }
-        data = {
-            'file': open(configset_zip_path, 'rb')
-        }
-        url = self.solr_url + '/admin/configs'
-
-        response = requests.post(url, params=query_params, files=data, headers=headers)
+            response = requests.post(url, params=query_params, files=data, headers=headers)
         if response.status_code == 200:
             print("Config set {} successfully updated.".format(configset_name))
         else:
@@ -87,7 +90,7 @@ class solr_ingest():
         else:
             print(f'Collection "{collection_name}" does not exist')
 
-        config_name = 'myConfigSet'
+        config_name = solr_var['configset_name']
         num_shards = 2
         replication_factor = 2
 
@@ -336,7 +339,7 @@ class solr_ingest():
             "defType": "edismax",
             "qs": "100",
             "ps": "100",
-            # "bf": "log(reddit_score)",
+            "bf": "log(reddit_score)",
             "qf": "comment^{}".format(term_imp),
             "fl": "comment,score,url",
             "pf": "comment^{}".format(full_phrase_imp),

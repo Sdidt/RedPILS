@@ -12,8 +12,8 @@ def retain_all_except_id_version(list_data):
 
 #--------------------solr init - comments data--------------------#
 data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],solr_var['headers'])
-data_ingest.upload_configset(solr_var["configset_zip_path"], solr_var["configset_name"], True)
-data_ingest.define_schema(solr_var['data_collection_name'], solr_var['data_schema'])
+# data_ingest.upload_configset(solr_var["configset_zip_path"], solr_var["configset_name"], "true")
+# data_ingest.define_schema(solr_var['data_collection_name'], solr_var['data_schema'])
 data_ingest.delete_collection(solr_var['data_collection_name'])
 data_ingest.create_collection(solr_var['data_collection_name'], solr_var['data_schema'], solr_var['data_unique_key'], solr_var['filtered_text_type'])
 data_ingest.delete_data(solr_var['data_collection_name'])
