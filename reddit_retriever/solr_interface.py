@@ -29,7 +29,7 @@ class solr_ingest():
         print("Number found: {}".format(numFound))
         return numFound
 
-    def upload_configset(self, configset_zip_path, configset_name, overwrite=True):
+    def upload_configset(self, configset_zip_path, configset_name, overwrite="true"):
         query_params = {
             "action": "UPLOAD",
             "name": configset_name,
@@ -49,7 +49,6 @@ class solr_ingest():
             print("Config set {} successfully updated.".format(configset_name))
         else:
             print("Error occurred uploading config set: {}".format(response.text))
-
 
     def check_submission_exists(self, collection_name, submission_id):
         query_params = {
@@ -87,7 +86,7 @@ class solr_ingest():
         else:
             print(f'Collection "{collection_name}" does not exist')
 
-        config_name = 'myConfigSet'
+        config_name = solr_var["configset_name"]
         num_shards = 2
         replication_factor = 2
 
@@ -338,7 +337,7 @@ class solr_ingest():
             "ps": "100",
             "bf": "log(reddit_score)",
             "qf": "comment^{}".format(term_imp),
-            "fl": "comment,score,url",
+            "fl": "comment,score,url,reddit_score",
             "pf": "comment^{}".format(full_phrase_imp),
             "pf2": "comment^{}".format(bigram_imp),
             "pf3": "comment^{}".format(trigram_imp),
