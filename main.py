@@ -24,7 +24,7 @@ def get_top_n(dict_elem, n, existing_keywords) -> dict:
     return result
 
 #--------------------solr init - comments data--------------------#
-data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],solr_var['headers'])
+# data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],solr_var['headers'])
 # data_ingest.define_schema(solr_var['data_collection_name'], solr_var['data_schema'])
 # data_ingest.delete_collection(solr_var['data_collection_name'])
 # data_ingest.create_collection(solr_var['data_collection_name'], solr_var['data_schema'], solr_var['data_unique_key'], solr_var['filtered_text_type'])
@@ -42,7 +42,9 @@ data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],
 # for key in keywords[latest_level]:
 #     keywords_dict.append({'keyword':key})
 
-# keyword_ingest = solr_ingest(solr_var["solr_url"],solr_var['keyword_collection_name'],solr_var['headers'])
+keyword_ingest = solr_ingest(solr_var["solr_url"],solr_var['keyword_collection_name'],solr_var['headers'])
+keyword_data = keyword_ingest.query_data({'q':'*:*','rows':1000000},solr_var['keyword_collection_name'])
+store_json(keyword_data, "keywords")
 # keyword_ingest.delete_collection(solr_var['keyword_collection_name'])
 # keyword_ingest.create_collection(solr_var['keyword_collection_name'],solr_var['keyword_schema'],solr_var['keyword_unique_key'], solr_var['filtered_text_type'])
 # keyword_ingest.delete_data(solr_var['keyword_collection_name'])

@@ -29,6 +29,28 @@ class solr_ingest():
         print("Number found: {}".format(numFound))
         return numFound
 
+    def upload_configset(self, configset_zip_path, configset_name, overwrite=True):
+        query_params = {
+            "action": "UPLOAD",
+            "name": configset_name,
+            "overwrite": overwrite
+        }
+
+        headers = {
+            'Content-type': 'application/octet-stream'
+        }
+        data = {
+            'file': open(configset_zip_path, 'rb')
+        }
+        url = self.solr_url + '/admin/configs'
+
+        response = requests.post(url, params=query_params, files=data, headers=headers)
+        if response.status_code == 200:
+            print("Config set {} successfully updated.".format(configset_name))
+        else:
+            print("Error occurred uploading config set: {}".format(response.text))
+
+
     def check_submission_exists(self, collection_name, submission_id):
         query_params = {
             'q': 'submission_id: {}'.format(submission_id),
@@ -65,7 +87,7 @@ class solr_ingest():
         else:
             print(f'Collection "{collection_name}" does not exist')
 
-        config_name = 'my_config'
+        config_name = 'myConfigSet'
         num_shards = 2
         replication_factor = 2
 
@@ -74,7 +96,7 @@ class solr_ingest():
             'name': collection_name,
             'numShards': num_shards,
             'replicationFactor': replication_factor,
-            # 'collection.configName': config_name,
+            'collection.configName': config_name,
             'collection.uniqueKey': unique_key
         }
 
