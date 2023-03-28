@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 sys.path.append(os.environ.get("SYS_PATH"))
-
+from zipfile import ZipFile
 from utils.helpers import *
 from utils.constants import *
 
@@ -35,16 +35,19 @@ class solr_ingest():
             "name": configset_name,
             "overwrite": overwrite
         }
+        with open(configset_zip_path, 'rb') as zip:
+            # printing all the contents of the zip file
+            # zip.printdir()
+            print(zip.read())
+            headers = {
+                'Content-type': 'application/octet-stream'
+            }
+            data = {
+                'file': zip
+            }
+            url = self.solr_url + '/admin/configs'
 
-        headers = {
-            'Content-type': 'application/octet-stream'
-        }
-        data = {
-            'file': open(configset_zip_path, 'rb')
-        }
-        url = self.solr_url + '/admin/configs'
-
-        response = requests.post(url, params=query_params, files=data, headers=headers)
+            response = requests.post(url, params=query_params, files=data, headers=headers)
         if response.status_code == 200:
             print("Config set {} successfully updated.".format(configset_name))
         else:
@@ -86,7 +89,7 @@ class solr_ingest():
         else:
             print(f'Collection "{collection_name}" does not exist')
 
-        config_name = solr_var["configset_name"]
+        config_name = solr_var['configset_name']
         num_shards = 2
         replication_factor = 2
 
@@ -343,10 +346,12 @@ class solr_ingest():
             "pf3": "comment^{}".format(trigram_imp),
             "rows": 3000
         }
-
+        # print(url)
+        # print(query_params)
         response = requests.get(f'{url}/select', params=query_params)
+        # print (response.json())
         search_results = response.json()['response']['docs']
-
+        # print(search_results)
         return search_results[:K]
 
 
