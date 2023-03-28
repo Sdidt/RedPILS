@@ -314,7 +314,7 @@ class solr_ingest():
             "defType": "edismax",
             "qs": "100",
             "ps": "100",
-            "bf": "log(reddit_score)",
+            # "bf": "log(reddit_score)",
             "qf": "comment^{}".format(term_imp),
             "fl": "comment,score,url",
             "pf": "comment^{}".format(full_phrase_imp),
@@ -322,10 +322,12 @@ class solr_ingest():
             "pf3": "comment^{}".format(trigram_imp),
             "rows": 3000
         }
-
+        # print(url)
+        # print(query_params)
         response = requests.get(f'{url}/select', params=query_params)
+        # print (response.json())
         search_results = response.json()['response']['docs']
-
+        # print(search_results)
         return search_results[:K]
 
 

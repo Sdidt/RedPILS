@@ -60,6 +60,7 @@ def search_db(query):
         "url": "https://www.reddit.com" + doc["url"]
     } for doc in search_results]
     [print("Score: {}\nComment: {}\nURL: {}".format(doc["score"], doc["comment"], doc["url"])) for doc in search_results]
+    return search_results
     
 #---------------------------------------------- APIs -------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/query', methods=["POST", "GET"])
