@@ -4,8 +4,10 @@ from dotenv import load_dotenv
 import os
 import sys
 import json
+import re
 
 load_dotenv()
+print(os.environ.get("SYS_PATH"))
 sys.path.append(os.environ.get("SYS_PATH"))
 
 from reddit_retriever.solr_interface import solr_ingest
@@ -15,7 +17,7 @@ app = Flask(__name__)
 CORS(app)
 cors = CORS(app, resources={r"/*": {"origins":"*"}})
 
-
+#---------------------------------------------- TEST -------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/')
 def hello():
     return "Hello World! This is a test app"
@@ -39,23 +41,44 @@ def dummy():
         response.headers.add("Access-Control-Allow-Origin", "*")
         return response
 
-@app.route('/query', methods=["POST"])
+#----------------------------------------------- Helpers------------------------------------------------------------------------------
+
+def process_query(query):
+    operators = [" AND ", " OR ", " NOT "]
+    processed_query=query
+    for op in operators:
+        regex_pattern = re.compile(re.escape(op), re.IGNORECASE)
+        processed_query = regex_pattern.sub(op, processed_query)
+    return processed_query
+    
+def search_db(query):
+    data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],solr_var['headers'])
+    search_results = data_ingest.phrase_query(solr_var['data_collection_name'], query, 5, 10, 20, 40, 10)
+    search_results = [{
+        "score": doc["score"],
+        "comment": doc["comment"],
+        "url": "https://www.reddit.com" + doc["url"]
+    } for doc in search_results]
+    [print("Score: {}\nComment: {}\nURL: {}".format(doc["score"], doc["comment"], doc["url"])) for doc in search_results]
+    
+#---------------------------------------------- APIs -------------------------------------------------------------------------------------------------------------------------------------------------------------
+@app.route('/query', methods=["POST", "GET"])
 def query():
-    args = request.args
-    query = args.get("query")
+
     if request.method=='POST':
         body = request.json
-        data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],solr_var['headers'])
-        search_results = data_ingest.phrase_query(solr_var['data_collection_name'], body["query"], 5, 10, 20, 40, 10)
-        search_results = [{
-            "score": doc["score"],
-            "comment": doc["comment"],
-            "url": "https://www.reddit.com" + doc["url"]
-        } for doc in search_results]
-        [print("Score: {}\nComment: {}\nURL: {}".format(doc["score"], doc["comment"], doc["url"])) for doc in search_results]
-        response = jsonify({"query":query, "topk":search_results})
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        return response
+        # print(body)
+        query=body["query"]
+    elif request.method=='GET':
+        args = request.args
+        query = args.get("query")
+    print(query)
+    query=process_query(query)
+    print(query)
+    search_results=search_db(query)
+    response = jsonify({"query":query, "topk":search_results})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 if __name__ == "__main__":
    app.run(debug=True)
