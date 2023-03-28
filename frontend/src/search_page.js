@@ -1,64 +1,75 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import DATA from './services/datalist'
 import { ReactSearchAutocomplete } from 'react-search-autocomplete'
 
 const SearchPage = () => {
 
-    const [query, setQuery] = useState('');
-    const [results, setResults] = useState([0]);
-    const handleSearch=(e)=>{
-        e.preventDefault();
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([0]);
+  const [queryResults, setQueryResults] = useState([]);
+  const handleSearch=(e)=>{
+      e.preventDefault();
+  }
+  const items = [
+      {
+        id: 0,
+        name: 'Cobol'
+      },
+      {
+        id: 1,
+        name: 'JavaScript'
+      },
+      {
+        id: 2,
+        name: 'Basic'
+      },
+      {
+        id: 3,
+        name: 'PHP'
+      },
+      {
+        id: 4,
+        name: 'Java'
+      }
+    ]
+  
+    const handleOnSearch = (string, results) => {
+      // onSearch will have as the first callback parameter
+      // the string searched and for the second the results.
+      console.log(string, results)
     }
-    const items = [
-        {
-          id: 0,
-          name: 'Cobol'
-        },
-        {
-          id: 1,
-          name: 'JavaScript'
-        },
-        {
-          id: 2,
-          name: 'Basic'
-        },
-        {
-          id: 3,
-          name: 'PHP'
-        },
-        {
-          id: 4,
-          name: 'Java'
-        }
-      ]
-    
-      const handleOnSearch = (string, results) => {
-        // onSearch will have as the first callback parameter
-        // the string searched and for the second the results.
-        console.log(string, results)
-      }
-    
-      const handleOnHover = (result) => {
-        // the item hovered
-        console.log(result)
-      }
-    
-      const handleOnSelect = (item) => {
-        // the item selected
-        console.log(item)
-      }
-    
-      const handleOnFocus = () => {
-        console.log('Focused')
-      }
-    
-      const formatResult = (item) => {
-        return (
-          <>
-            <span style={{ display: 'block', textAlign: 'left' }}>id: {item.id}</span>
-            <span style={{ display: 'block', textAlign: 'left' }}>name: {item.name}</span>
-          </>
-        )
-      }
+  
+    const handleOnHover = (result) => {
+      // the item hovered
+      console.log(result)
+    }
+  
+    const handleOnSelect = (item) => {
+      // the item selected
+      console.log(item)
+    }
+  
+    const handleOnFocus = () => {
+      console.log('Focused')
+    }
+  
+    const formatResult = (item) => {
+      return (
+        <>
+          <span style={{ display: 'block', textAlign: 'left' }}>id: {item.id}</span>
+          <span style={{ display: 'block', textAlign: 'left' }}>name: {item.name}</span>
+        </>
+      )
+    }
+
+  useEffect ( () => {
+    console.log("inside use effect")
+    const getData = async () => {
+      setQueryResults(await DATA.QueryData())
+      console.log(queryResults)}
+    getData();
+  },[])
+
   return (
     <div className='SearchPageMain'>
     <div className='SearchPageResults'>
