@@ -24,6 +24,8 @@ keywords = [
 
 solr_var = {
     "solr_url" : 'http://localhost:8983/solr',
+    "configset_zip_path": "configset_modified.zip",
+    "configset_name": "myConfigSet",
     "data_collection_name" : 'data_collection',
     "data_unique_key": "comment_id",
     "keyword_collection_name" : 'keyword_collection',
