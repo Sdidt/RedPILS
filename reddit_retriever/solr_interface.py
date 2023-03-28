@@ -306,8 +306,27 @@ class solr_ingest():
 
         return search_results[:K]
 
-    def get_imp_terms():
-        pass
+    def phrase_query(self, collection_name, phrase_query, term_imp, bigram_imp, trigram_imp, full_phrase_imp, K):
+        url = self.solr_url+'/'+collection_name
+
+        query_params = {
+            "q": phrase_query,
+            "defType": "edismax",
+            "qs": "100",
+            "ps": "100",
+            "bf": "log(reddit_score)",
+            "qf": "comment^{}".format(term_imp),
+            "fl": "comment,score",
+            "pf": "comment^{}".format(full_phrase_imp),
+            "pf2": "comment^{}".format(bigram_imp),
+            "pf3": "comment^{}".format(trigram_imp),
+            "rows": 3000
+        }
+
+        response = requests.get(f'{url}/select', params=query_params)
+        search_results = response.json()['response']['docs']
+
+        return search_results[:K]
 
 
 if __name__ == '__main__':
