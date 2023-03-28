@@ -281,7 +281,7 @@ class solr_ingest():
 
         query_params = {
             "q": "{{!func}}mul(tf(comment, {}), idf(comment, {}))".format(term, term),
-            "fl": "score",
+            "fl": "score,url",
             "rows": 100000
         }
 
@@ -297,7 +297,7 @@ class solr_ingest():
         query_params = {
             "q": "comment:{}".format(query_term),
             "_query_": "{!rank f='pagerank', function='log' scalingFactor='1.2'}",
-            "fl": "score,comment",
+            "fl": "score,comment,url",
             "rows": 100
         }
 
@@ -316,7 +316,7 @@ class solr_ingest():
             "ps": "100",
             "bf": "log(reddit_score)",
             "qf": "comment^{}".format(term_imp),
-            "fl": "comment,score",
+            "fl": "comment,score,url",
             "pf": "comment^{}".format(full_phrase_imp),
             "pf2": "comment^{}".format(bigram_imp),
             "pf3": "comment^{}".format(trigram_imp),

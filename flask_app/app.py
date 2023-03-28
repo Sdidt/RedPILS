@@ -1,9 +1,20 @@
 from flask_cors import CORS
 from flask import Flask, request, url_for, jsonify
+from dotenv import load_dotenv
+import os
+import sys
 import json
+
+load_dotenv()
+sys.path.append(os.environ.get("SYS_PATH"))
+
+from reddit_retriever.solr_interface import solr_ingest
+from utils.constants import solr_var
+
 app = Flask(__name__)
 CORS(app)
 cors = CORS(app, resources={r"/*": {"origins":"*"}})
+
 
 @app.route('/')
 def hello():
@@ -25,6 +36,24 @@ def dummy():
             response = jsonify({"query":query, "topk":top_kl})
         response = jsonify({"query":query, "topk":top_kr})
 
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response
+
+@app.route('/query', methods=["POST"])
+def query():
+    args = request.args
+    query = args.get("query")
+    if request.method=='POST':
+        body = request.json
+        data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],solr_var['headers'])
+        search_results = data_ingest.phrase_query(solr_var['data_collection_name'], body["query"], 5, 10, 20, 40, 10)
+        search_results = [{
+            "score": doc["score"],
+            "comment": doc["comment"],
+            "url": "https://www.reddit.com" + doc["url"]
+        } for doc in search_results]
+        [print("Score: {}\nComment: {}\nURL: {}".format(doc["score"], doc["comment"], doc["url"])) for doc in search_results]
+        response = jsonify({"query":query, "topk":search_results})
         response.headers.add("Access-Control-Allow-Origin", "*")
         return response
 
