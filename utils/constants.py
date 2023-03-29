@@ -38,7 +38,7 @@ solr_var = {
     {"name": "subreddit_name", "type": "text_en",'indexed': "true", "stored": "true"},
     {"name": "comment_id", "type": "string",'indexed': "true", "stored": "true"},
     {"name": "comment", "type": "filtered_text",'indexed': "true", "stored": "true", "termVectors": "true"},
-    {"name": "timestamp", "type": "text_en",'indexed': "true", "stored": "true"},
+    {"name": "timestamp", "type": "pdate",'indexed': "true", "stored": "true"},
     {"name": "url", "type": "text_en", "indexed": "true", "stored": "true"},
     {"name": "reddit_score", "type": "pint",'indexed': "true", "stored": "true"},
     {"name": "redditor_id", "type": "text_en",'indexed': "true", "stored": "true"}
@@ -85,6 +85,20 @@ solr_var = {
             'fl': 'comment_id,comment,score',
             'rows': 10
         },
+    "posted_at_field": {
+        "name": "posted_at",
+        "type": "pdate",
+        "stored": "true",
+        "indexed": "true",
+        "docValues": "true"
+    },
+    "copy_timestamp_field": {
+        "source": "timestamp",
+        "dest": ["posted_at"]
+    },
+    "update_timestamp": {
+        "name": "timestamp", "type": "pdate",'indexed': "true", "stored": "true"
+    },
     'keyword_schema':[
     {"name": "keyword", "type": "filtered_text",'indexed': "true", "stored": "true"},
     ],

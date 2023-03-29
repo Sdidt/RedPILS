@@ -330,7 +330,7 @@ class solr_ingest():
 
         return search_results[:K]
 
-    def phrase_query(self, collection_name, phrase_query, term_imp, bigram_imp, trigram_imp, full_phrase_imp, K):
+    def phrase_query(self, collection_name, phrase_query, term_imp, bigram_imp, trigram_imp, full_phrase_imp, start_month, end_month, K):
         url = self.solr_url+'/'+collection_name
 
         query_params = {
@@ -340,10 +340,11 @@ class solr_ingest():
             "ps": "100",
             "bf": "log(reddit_score)",
             "qf": "comment^{}".format(term_imp),
-            "fl": "comment,score,url,reddit_score",
+            "fl": "comment,score,url,reddit_score,timestamp",
             "pf": "comment^{}".format(full_phrase_imp),
             "pf2": "comment^{}".format(bigram_imp),
             "pf3": "comment^{}".format(trigram_imp),
+            "fq": "timestamp:[{} TO {}]".format(start_month, end_month),
             "rows": 3000
         }
         # print(url)
