@@ -15,7 +15,7 @@ from utils.constants import solr_var
 
 app = Flask(__name__)
 CORS(app)
-cors = CORS(app, resources={r"/*": {"origins":"*"}})
+cors = CORS(app, resources={r"/*": {"origins":["*","http://localhost:8000"]}})
 
 #---------------------------------------------- TEST -------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/')
