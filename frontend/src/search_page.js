@@ -3,6 +3,7 @@ import Iframe from 'react-iframe-click';
 import { ReactSearchAutocomplete } from 'react-search-autocomplete'
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
+import Markup from 'react-html-markup';
 import DATA from './services/datalist'
 import dummy_data from "./services/topics.json"
 import ProfilePictureCopy from "./pic1.png";
@@ -51,10 +52,15 @@ const SearchPage = () => {
     }
   ]
 
-  const dropdownOptions = [
-    'one', 'two', 'three'
+  const timeDropDown = [
+    'All', '6h', '12h','24h','1d'
   ];
-  const defaultOption = dropdownOptions[0];
+  const timeDropDownDefault = timeDropDown[0];
+
+  const redditPolarityDropDown = [
+    'All', '+ve', '-ve'
+  ];
+  const redditPolarityDefault = redditPolarityDropDown[0];
   
   const handleOnSearch = async(string, results) => {
     // onSearch will have as the first callback parameter
@@ -155,7 +161,12 @@ const SearchPage = () => {
                 styling={{borderRadius: "8px"}}
             />
             </div>
-            <Dropdown options={dropdownOptions} value={defaultOption} placeholder="Select an option" className='DropDownDiv' />
+            <div className='dropdowndiv'>
+              <Dropdown options={redditPolarityDropDown} value={redditPolarityDefault} placeholder="Select an option" className='dropdownindv' />
+            </div>
+            <div className='dropdowndiv'>
+              <Dropdown options={timeDropDown} value={timeDropDownDefault} placeholder="Select an option" className='dropdownindv' />
+            </div>
             <button className='SearchButton' onClick={()=>handleButtonSearch(searchTerm)}>Search</button>
           </div>
           <br/>
@@ -172,8 +183,8 @@ const SearchPage = () => {
                       height="500"
                       width="1000"
                   ></iframe> */}
+                  {console.log(result.url)}
                   <Iframe
-                    // onInferredClick={() => console.log('You clicked')}
                     onInferredClick={() => handleIframeClick(index)}
                     id = {result.url}
                     src={"https://www.redditmedia.com/"+(result.url).substring(23,((result.url).length-1))+"?limit=2/?ref\_source=embed\&amp;ref=share\&amp;embed=true&limit=5"}
@@ -181,7 +192,7 @@ const SearchPage = () => {
                     style={{border: "none", overflow: "auto" }}
                     height = '300px'
                     width="100%"
-                  ></Iframe>;
+                  ></Iframe>             
               </div>
               )}
           </div>

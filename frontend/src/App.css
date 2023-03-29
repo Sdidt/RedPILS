@@ -198,6 +198,11 @@
   /* position: relative; */
 }
 
-.DropDownDiv{
-  padding-right: 2%;
+.dropdowndiv{
+  padding-right: 1%;
+}
+
+.dropdownindv{
+  width: 100%;
+  color: #ff9301;
 }
