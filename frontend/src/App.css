@@ -2,6 +2,12 @@
   text-align: center;
   background-color: #282c34;
   padding: 5%;
+  height: 75vh;
+  width: 90vw;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: absolute;
 }
 
 .App-logo {
@@ -80,8 +86,43 @@
   flex-direction: row;
 }
 
+.SearchResults1{
+  width: 95%;
+}
+
+.SearchBar{
+  width: 90%;
+  padding-right: 1%;
+  border-radius: "8px"
+}
+
+.SearchBarDiv {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.SearchButton {
+  color:#ffffff;
+  height: 40px;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  text-transform: uppercase;
+  text-align: center;
+  background: #ff4500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .reddit_embed{
   padding-bottom: 3%;
+  /* height: 20vw; */
+  min-height: 200px;
+  /* max-height: 500px; */
 }
 
 .side-box {
@@ -134,4 +175,25 @@
   justify-content: center;
   height: 400px;
   width: 400px;
+}
+
+.NoResultsDiv{
+  padding-top: 5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: large;
+  font-style: italic;
+  color: #61dafb;
+  padding-bottom: 5%;
+}
+
+.NoResultsImg{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 100%;
+  /* position: relative; */
 }
