@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Iframe from 'react-iframe-click';
 import { ReactSearchAutocomplete } from 'react-search-autocomplete'
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
 import DATA from './services/datalist'
 import dummy_data from "./services/topics.json"
 import ProfilePictureCopy from "./pic1.png";
@@ -48,6 +50,11 @@ const SearchPage = () => {
       embed_link: "https://www.redditmedia.com//r/IndiaSpeaks/comments/zpre2v/2_judges_cant_decide_bjp_mps_strong_objection_on/j0uassz?limit=2/?ref\_source=embed\&amp;ref=share\&amp;embed=true&limit=5"
     }
   ]
+
+  const dropdownOptions = [
+    'one', 'two', 'three'
+  ];
+  const defaultOption = dropdownOptions[0];
   
   const handleOnSearch = async(string, results) => {
     // onSearch will have as the first callback parameter
@@ -78,11 +85,11 @@ const SearchPage = () => {
       console.log(dummy_data_store['topk'])
       setDataCollect(dummy_data_store['topk'])
     }
-    else{
-      const dummy_data_store = await DATA.QueryData('BJP')
-      console.log(dummy_data_store['topk'])
-      setDataCollect(dummy_data_store['topk'])
-    }
+    // else{
+    //   const dummy_data_store = await DATA.QueryData('BJP')
+    //   console.log(dummy_data_store['topk'])
+    //   setDataCollect(dummy_data_store['topk'])
+    // }
   }
 
   const handleKeywordSearch = async(searchTerm) => {
@@ -122,10 +129,10 @@ const SearchPage = () => {
       console.log(queryResults)
       setResults(dummy_results)
     }
-    if(queryResults.length==0){
-      getData();
-    }
-  },[queryResults])
+    // if(queryResults.length==0){
+    //   getData();
+    // }
+  },[dataCollect])
   console.log(queryResults)
   console.log(results)
 
@@ -148,6 +155,7 @@ const SearchPage = () => {
                 styling={{borderRadius: "8px"}}
             />
             </div>
+            <Dropdown options={dropdownOptions} value={defaultOption} placeholder="Select an option" className='DropDownDiv' />
             <button className='SearchButton' onClick={()=>handleButtonSearch(searchTerm)}>Search</button>
           </div>
           <br/>
