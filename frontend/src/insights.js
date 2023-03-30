@@ -29,30 +29,6 @@ const Insights = () => {
     }
   ]
 
-    // const options = {
-    //   scales: {
-    //     y: {
-    //       beginAtZero: true,
-    //       title: {
-    //         display: true,
-    //         text: 'Count',
-    //         font: {
-    //           size: 16,
-    //         },
-    //       },
-    //     },
-    //     x: {
-    //       title: {
-    //         display: true,
-    //         text: 'Category',
-    //         font: {
-    //           size: 16,
-    //         },
-    //       },
-    //     },
-    //   },
-    // };
-
   const options= {
     scales: {
       y: {
@@ -95,7 +71,6 @@ const Insights = () => {
   const [items, setItems] = useState(dataItems)
   const [categories,setCategories] = useState([])
   const [dataCounts,setDataCounts] = useState([])
-  // const [categories, dataCounts] = countData(items);
   const getData = async() => {
     const statsData = await DATA.QueryStatsData()
 
@@ -145,7 +120,6 @@ const Insights = () => {
   }, [items]);
 
   return (
-    // <div style={{ height: '400px', width: '600px' }}>
     <div>
       <div className='bar_chart_styles'>
         <div style={{ height: '400px', width: '600px' }}>

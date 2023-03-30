@@ -4,22 +4,33 @@ import { ReactSearchAutocomplete } from 'react-search-autocomplete'
 import Dropdown from 'react-dropdown';
 import Multiselect from 'multiselect-react-dropdown';
 import 'react-dropdown/style.css';
-import Markup from 'react-html-markup';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Autocomplete from '@mui/material/Autocomplete';
 import DATA from './services/datalist'
-import dummy_data from "./services/topics.json"
+import SearchResultsComp from './search_results_comp';
+import InsightsComp from './insights_comp';
 import NoResultsImg from "./pic1.png";
 
 const SearchPage = () => {
 
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState(dummy_data);
-  const [queryResults, setQueryResults] = useState([]);
   const [dataCollect, setDataCollect] = useState([]);
   const [filterDataCollect, setFilterDataCollect] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [divClicked, setDivClicked] = useState([])
-  const [redditPolarConst, setRedditPolarConst] = useState("")
   const [timeSelectConst, setTimeSelectConst] = useState("All")
+  const [statsCheck , setStatsCheck] = useState(0)
+  const [alignment, setAlignment] = React.useState('searchResults');
+  const [redditScoreAll, setRedditScoreAll] = React.useState('all');
+
+  // const [categories,setCategories] = useState([])
+  // const [dataCounts,setDataCounts] = useState([])
+
+
   const handleSearch=(e)=>{
       e.preventDefault();
   }
@@ -45,16 +56,6 @@ const SearchPage = () => {
         name: 'Bla'
       }
     ]
-  const dummy_results = [
-    {
-      id: 0,
-      embed_link: "https://www.redditmedia.com//r/IndiaSpeaks/comments/zpre2v/2_judges_cant_decide_bjp_mps_strong_objection_on/j0uassz?limit=2/?ref\_source=embed\&amp;ref=share\&amp;embed=true&limit=5"
-    },
-    {
-      id: 1,
-      embed_link: "https://www.redditmedia.com//r/IndiaSpeaks/comments/zpre2v/2_judges_cant_decide_bjp_mps_strong_objection_on/j0uassz?limit=2/?ref\_source=embed\&amp;ref=share\&amp;embed=true&limit=5"
-    }
-  ]
 
   const timeDropDown = [
     'All', '1M', '3M','12M','24M'
@@ -69,10 +70,25 @@ const SearchPage = () => {
   const multiselectoptions = {
     options: [{name: 'Option 1️⃣', id: 1},{name: 'Option 2️⃣', id: 2}]
 };
+
+  const data = {
+    labels: [],
+    datasets: [
+        {
+        label: 'Count',
+        data: [],
+        backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1,
+        },
+    ],
+  };
+
+  const [barChartData, setBarChartData] = useState(data);
+  const [pieChartData, setPieChartData] = useState(data);
+  const [doughChartData, setDoughChartData] = useState(data);
   
   const handleOnSearch = async(string, results) => {
-    // onSearch will have as the first callback parameter
-    // the string searched and for the second the results.
     if(string!=''){
       setSearchTerm(string)
     }
@@ -96,26 +112,60 @@ const SearchPage = () => {
     console.log(searchTerm)
     console.log(timeSelectConst)
     if(searchTerm!=""){
-      const dummy_data_store = await DATA.QueryData(searchTerm,timeSelectConst)
+      var dummy_data_store = await DATA.QueryData(searchTerm,timeSelectConst)
       console.log(dummy_data_store['topk'])
       setDataCollect(dummy_data_store['topk'])
       setFilterDataCollect(dummy_data_store['topk'])
+
+      var dummy_data_store = await DATA.QueryStatsData()
+      setStatsCheck(dummy_data_store['x-val-num-fieldname'].length)
+      var dataCounts = dummy_data_store['x-val-num-fieldname']
+      var categories = dummy_data_store['x-val-cat-fieldname']
+      console.log(dummy_data_store)
+      // setDataCounts(dummy_data_store['x-val-num-fieldname'])
+      // setCategories(dummy_data_store['x-val-cat-fieldname'])
+      setBarChartData({
+        ...data,
+        labels: categories,
+        datasets: [
+          {
+            ...data.datasets[0],
+            data: dataCounts,
+          },
+        ],
+      });
+
+      setPieChartData({
+      ...data,
+      labels: categories,
+      datasets: [
+          {
+          ...data.datasets[0],
+          data: dataCounts,
+          },
+      ],
+      });
+
+      setDoughChartData({
+      ...data,
+      labels: categories,
+      datasets: [
+          {
+          ...data.datasets[0],
+          data: dataCounts,
+          },
+      ],
+      });
     }
-    // else{
-    //   const dummy_data_store = await DATA.QueryData('BJP')
-    //   console.log(dummy_data_store['topk'])
-    //   setDataCollect(dummy_data_store['topk'])
-    // }
   }
 
+  console.log(barChartData)
+
   const handleKeywordSearch = async(searchTerm) => {
-    console.log(searchTerm)
     const dummy_data_store = await DATA.QueryData(searchTerm,timeSelectConst)
-    console.log(dummy_data_store['topk'].length)
     if(dummy_data_store['topk'].length==0){
       const dummy_data_store = await DATA.QueryData('BJP')
     }
-    console.log(dummy_data_store['topk'])
     setDataCollect(dummy_data_store['topk'])
     setFilterDataCollect(dummy_data_store['topk'])
   }
@@ -128,13 +178,6 @@ const SearchPage = () => {
         <span style={{ display: 'block', textAlign: 'left' }}>{item.name}</span>
       </>
     )
-  }
-
-  const handleIframeClick = (event) => {
-    console.log(event)
-    setDivClicked(result =>
-      results.map((item, buttonIndex) => (buttonIndex === event ? true : item)));
-    console.log(divClicked)
   }
 
   const handleRedditScoreSelect = (selectItem) => {
@@ -153,8 +196,6 @@ const SearchPage = () => {
     else{
       setFilterDataCollect(dataCollect)
     }
-    setRedditPolarConst(selectItem.value)
-    console.log(selectItem.value)
   }
 
   const handleDateSelect = (selectItem) => {
@@ -166,21 +207,37 @@ const SearchPage = () => {
     }
   }
 
+  const handleToggleChange = (element) => {
+    setAlignment(element.target.value)
+  }
+
+  const handleScoreChange = (element) => {
+    setRedditScoreAll(element.target.value)
+    if(element.target.value == "positiveScore"){
+      const dataCollectFilter =  dataCollect.filter(function(dataObj) {
+        return dataObj.reddit_score >= 0;
+      });
+      setFilterDataCollect(dataCollectFilter)
+    }
+    else if(element.target.value == "negativeScore"){
+      const dataCollectFilter =  dataCollect.filter(function(dataObj) {
+        return dataObj.reddit_score < 0;
+      });
+      setFilterDataCollect(dataCollectFilter)
+    }
+    else{
+      setFilterDataCollect(dataCollect)
+    }
+  }
+
   useEffect (() => {
     console.log("inside use effect")
     const getData = async () => {
       const dummy_data_store = await DATA.QueryData('BJP')
       console.log(dummy_data_store['topk'])
       setDataCollect(dummy_data_store['topk'])
-      console.log(queryResults)
-      setResults(dummy_results)
     }
-    // if(queryResults.length==0){
-    //   getData();
-    // }
   },[dataCollect,filterDataCollect])
-  console.log(queryResults)
-  console.log(results)
 
   return (
     <div className='SearchPageMain'>
@@ -188,63 +245,78 @@ const SearchPage = () => {
         <div className='SearchResults1'>
           <div className='SearchBarDiv'>
             <div className='SearchBar'>
-            <ReactSearchAutocomplete
-                items={items}
-                onSearch={handleOnSearch}
-                onHover={handleOnHover}
-                onSelect={handleOnSelect}
-                onFocus={handleOnFocus}
-                autoFocus
-                showIcon={true}
-                placeholder="Search"
-                formatResult={formatResult}
-                styling={{borderRadius: "8px"}}
-            />
-            </div>
-            <div className='dropdowndiv'>
-              <Dropdown onChange={handleRedditScoreSelect} options={redditPolarityDropDown} value={redditPolarityDefault} placeholder="Select an option" className='dropdownindv' />
-            </div>
-            <div className='dropdowndiv'>
-              <Dropdown onChange={handleDateSelect}  options={timeDropDown} value={timeDropDownDefault} placeholder="Select an option" className='dropdownindv' />
-            </div>
-            <div className='dropdowndiv'>
-              <Multiselect
-              options={multiselectoptions.options} // Options to display in the dropdown
-              // selectedValues={this.state.selectedValue} // Preselected value to persist in dropdown
-              // onSelect={this.onSelect} // Function will trigger on select event
-              // onRemove={this.onRemove} // Function will trigger on remove event
-              displayValue="name" // Property name to display in the dropdown options
+              <ReactSearchAutocomplete
+                  items={items}
+                  onSearch={handleOnSearch}
+                  onHover={handleOnHover}
+                  onSelect={handleOnSelect}
+                  onFocus={handleOnFocus}
+                  autoFocus
+                  showIcon={true}
+                  placeholder="Search"
+                  formatResult={formatResult}
+                  styling={{borderRadius: "8px",zIndex:999}}
               />
+            </div>
+            {/* <div class="vl"></div> */}
+            <div className='searchFiltersDiv'>
+              <div className='dropdowndiv'>
+                <Dropdown onChange={handleDateSelect}  options={timeDropDown} value={timeDropDownDefault} placeholder="Select an option" className='dropdownindv' />
+              </div>
+              <br/>
+              <div className='dropdowndiv'>
+                <Multiselect
+                options={multiselectoptions.options} // Options to display in the dropdown
+                // selectedValues={this.state.selectedValue} // Preselected value to persist in dropdown
+                // onSelect={this.onSelect} // Function will trigger on select event
+                // onRemove={this.onRemove} // Function will trigger on remove event
+                displayValue="name" // Property name to display in the dropdown options
+                />
+              </div>
             </div>
             <button className='SearchButton' onClick={()=>handleButtonSearch(searchTerm,timeSelectConst)}>Search</button>
           </div>
+          <div className='filtersDiv'>
+            <div className='toggleTabDiv'>
+              <ToggleButtonGroup
+                color="primary"
+                value={alignment}
+                exclusive
+                onChange={handleToggleChange}
+                aria-label="Platform"
+              >
+                <ToggleButton value="redditScore" style={{color:"#ff4500" , backgroundColor:"#161515"}}>Type : </ToggleButton>
+                <ToggleButton value="searchResults" style={{color: 'white'}}>Search Results</ToggleButton>
+                <ToggleButton value="insights" style={{color: 'white'}}>Insights</ToggleButton>
+              </ToggleButtonGroup>
+            </div>
+            <div className='ToggleScoreDiv'>
+              <ToggleButtonGroup
+                color="primary"
+                value={redditScoreAll}
+                exclusive
+                onChange={handleScoreChange}
+                aria-label="Platform"
+              >
+                <ToggleButton value="redditScore" style={{color:"#ff4500" , backgroundColor:"#161515"}}>Reddit Score :</ToggleButton>
+                <ToggleButton value="all" style={{color: 'white'}}>All</ToggleButton>
+                <ToggleButton value="positiveScore" style={{color: 'white'}}>+ve</ToggleButton>
+                <ToggleButton value="negativeScore" style={{color: 'white'}}>-ve</ToggleButton>
+              </ToggleButtonGroup>
+            </div>
+          </div>
           <br/>
-          {filterDataCollect.length > 0 ? (
-          <div>
-            {filterDataCollect.map((result,index) => 
-                <div className='reddit_embed' key={result.url}>
-                  <Iframe
-                    id = {result.url}
-                    src={"https://www.redditmedia.com/"+(result.url).substring(23,((result.url).length-1))+"?limit=2/?ref\_source=embed\&amp;ref=share\&amp;embed=true&limit=5"}
-                    sandbox="allow-scripts allow-same-origin allow-popups"
-                    style={{border: "none", overflow: "auto" }}
-                    height = '300px'
-                    width="100%"
-                  ></Iframe>
-              </div>
-              )
-            }
-          </div>
-           ) : (
-          <div>
-          <div className='NoResultsDiv'>
-            Nothing to display here. Search for a term or click on commonly search terms to see more results.
-          </div> 
-          <div className='NoResultsImg'>
-            <img src = {NoResultsImg} alt="NoResultImg" className="about-img" style={{width:"40%",height:"40%"}}></img>
-          </div>
-          </div>
-          )}
+          {alignment == 'searchResults' ? (
+            <SearchResultsComp 
+            data = {filterDataCollect}/>
+            ):(
+            <InsightsComp
+            barChartData = {barChartData}
+            pieChartData = {pieChartData} 
+            doughChartData = {doughChartData}
+            statsCheck = {statsCheck}/>
+            )
+          }
         </div>
         <div className="side-box">
             <div>

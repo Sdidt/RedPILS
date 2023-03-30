@@ -9,14 +9,14 @@ const Navbar = () => {
     return (
         <nav className='navbar'>
             <h1 className='navbar-logo'>RedPils</h1>
-            <ul className='navbar-links'>
+            {/* <ul className='navbar-links'>
                 <li className='navbar-item'>
                 <a href='/'>Search</a>
                 </li>
                 <li className='navbar-item'>
                 <a href='/insights'>Insights</a>
                 </li>
-            </ul>
+            </ul> */}
         </nav>
       );
 }

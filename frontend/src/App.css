@@ -47,11 +47,13 @@
 
 .navbar {
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
+  /* justify-content: center; */
   align-items: center;
   background-color: #b6b6b6;
   color: #950000;
-  padding: 10px 30px;
+  padding: 0.5%;
+  padding-left: 3.2%;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -87,21 +89,54 @@
 }
 
 .SearchResults1{
-  width: 95%;
+  width: 75%;
+  padding-right: 2%;
 }
 
 .SearchBar{
   width: 90%;
   padding-right: 1%;
-  border-radius: "8px"
+  border-radius: "8px";
+  position:relative;
+  z-index:999;
 }
 
 .SearchBarDiv {
+  padding : 1%;
   width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  border-top: 2px solid rgb(127, 127, 127);
+  border-bottom: 2px solid rgb(127, 127, 127);
+}
+
+.filtersDiv{
+  position:relative;
+  z-index: 1;
+  padding-top: 2%;
+  display: flex;
+  flex-direction: row;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.toggleTabDiv .Mui-selected{
+  color: #fff;
+  /* background-color: #034eaa !important; */
+  background-color: rgba(0, 86, 191, 0.5) !important;
+}
+
+.ToggleScoreDiv{
+  padding-left: 5%;
+}
+
+.ToggleScoreDiv .Mui-selected {
+  color: #fff;
+  /* background-color: #464646 !important; */
+  background-color: rgba(0, 86, 191, 0.5) !important;
 }
 
 .SearchButton {
@@ -113,9 +148,9 @@
   text-transform: uppercase;
   text-align: center;
   background: #ff4500;
-  display: flex;
+  /* display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: center; */
 }
 
 .reddit_embed{
@@ -131,7 +166,7 @@
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   margin: 10px;
-  max-width: 20%;
+  max-width: 15%;
   height: 100%;
 }
 
@@ -198,10 +233,17 @@
   /* position: relative; */
 }
 
+.searchFiltersDiv{
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
 .dropdowndiv{
   height: 40px;
-  width:12%;
-  padding-right: 1%;
+  width:100%;
 }
 
 .dropdownindv{
@@ -209,4 +251,9 @@
   height: 100%;
   width: 100%;
   color: #ff9301;
+}
+
+.vl {
+  border-left: 2px solid rgb(127, 127, 127);
+  height: 100px;
 }
