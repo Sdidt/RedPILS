@@ -65,10 +65,9 @@ def process_query(query):
         processed_query = regex_pattern.sub(op, processed_query)
     return processed_query
     
-def search_db(query, d1="*", d2="*"):
-    print(d1, d2)
+def search_db(query, K=10, d1="*", d2="*", intitle=""):
     data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],solr_var['headers'])
-    search_results = data_ingest.phrase_query(solr_var['data_collection_name'], query, 5, 10, 20, 40, d2, d1,10)
+    time_elapsed, search_results = data_ingest.phrase_query(solr_var['data_collection_name'], query, 5, 10, 20, 40, d2, d1,K)
     search_results = [{
         "score": doc["score"],
         "comment": doc["comment"],
@@ -76,10 +75,9 @@ def search_db(query, d1="*", d2="*"):
         "url": "https://www.reddit.com" + doc["url"]
     } for doc in search_results]
     # [print("Score: {}\nComment: {}\nURL: {}".format(doc["score"], doc["comment"], doc["url"])) for doc in search_results]
-    return search_results
+    return time_elapsed, search_results
 
 def avg_scores(search_results):
-    print(search_results)
     reddit_avg=0
     score_avg=0
     if len(search_results)!=0:
@@ -120,6 +118,7 @@ def query():
     
     input: query (str)
            timeframe - in months (int)
+           region - str
     
 
     Returns:
@@ -131,25 +130,54 @@ def query():
     if request.method=='POST':
         body = request.json
         query=body["query"]
+        if body["region"]:
+            region=body["region"]
+        else:
+            region=None         
         if body["timeframe"]:
             timeframe=body["timeframe"]
         else: 
             timeframe=None
+        if body["k"]:
+            K=body["k"]
+        else: 
+            K=10
+        if body["intitle"]:
+            intitle=body["intitle"]
+        else: 
+            intitle=None
+    
+    
+    #if request is of type GET
     elif request.method=='GET':
         args = request.args
         query = args.get("query")
         try:
+            region=args.get("region")
+        except:
+            region=None
+        try:
+            intitle=args.get("intitle")
+        except:
+            intitle=None
+        try:
             timeframe=args.get("timeframe")
         except:
             timeframe=None
-            
+        try:
+            K=int(args.get("k"))
+        except:
+            K=10
     
+    
+    if region!=None and region!="":      
+        query=query+" AND ("+ region+")"
     query=process_query(query)
     d1, d2=process_date(timeframe)
     print(d1, d2)
-    search_results=search_db(query, d1, d2)
+    time_elapsed, search_results=search_db(query, K, d1, d2, intitle)
     reddit_avg, score_avg=avg_scores(search_results)
-    response = jsonify({"query":query, "topk":search_results, "avg_reddit_score":reddit_avg, "avg_score":score_avg})
+    response = jsonify({"search_time":time_elapsed, "query":query, "topk":search_results, "avg_reddit_score":reddit_avg, "avg_score":score_avg})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 

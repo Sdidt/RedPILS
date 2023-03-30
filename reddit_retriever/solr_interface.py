@@ -8,6 +8,7 @@ sys.path.append(os.environ.get("SYS_PATH"))
 from zipfile import ZipFile
 from utils.helpers import *
 from utils.constants import *
+import time
 
 class solr_ingest():
     def __init__(self,solr_url,collection_name,headers, alpha=0.9, beta=0.1) -> None:
@@ -349,11 +350,13 @@ class solr_ingest():
         }
         # print(url)
         # print(query_params)
+        start_timer=time.time()
         response = requests.get(f'{url}/select', params=query_params)
-        print (response.json())
+        time_elapsed=time.time()-start_timer
+        # print (response.json())
         search_results = response.json()['response']['docs']
         # print(search_results)
-        return search_results[:K]
+        return time_elapsed, search_results[:K]
 
 
 if __name__ == '__main__':
