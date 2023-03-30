@@ -5,6 +5,7 @@ import os
 import sys
 import json
 import re
+import datetime
 
 load_dotenv()
 print(os.environ.get("SYS_PATH"))
@@ -92,7 +93,10 @@ def avg_scores(search_results):
 def process_date(timeframe=None):
     if timeframe==None:
         return "*", "*"
-    return "*", "*"
+    # return "*", "*"
+    current_time = datetime.datetime.utcnow()
+    past_time = current_time - datetime.timedelta(days=int(timeframe)*30)
+    return current_time.strftime("%Y-%m-%dT%H:%M:%SZ"), past_time.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 #---------------------------------------------- APIs -------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -141,6 +145,7 @@ def query():
     
     query=process_query(query)
     d1, d2=process_date(timeframe)
+    print(d1, d2)
     search_results=search_db(query, d1, d2)
     reddit_avg, score_avg=avg_scores(search_results)
     response = jsonify({"query":query, "topk":search_results, "avg_reddit_score":reddit_avg, "avg_score":score_avg})
