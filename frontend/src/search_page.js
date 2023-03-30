@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import Iframe from 'react-iframe-click';
 import { ReactSearchAutocomplete } from 'react-search-autocomplete'
 import Dropdown from 'react-dropdown';
+import Multiselect from 'multiselect-react-dropdown';
 import 'react-dropdown/style.css';
 import Markup from 'react-html-markup';
 import DATA from './services/datalist'
 import dummy_data from "./services/topics.json"
-import ProfilePictureCopy from "./pic1.png";
+import NoResultsImg from "./pic1.png";
 
 const SearchPage = () => {
 
@@ -14,8 +15,11 @@ const SearchPage = () => {
   const [results, setResults] = useState(dummy_data);
   const [queryResults, setQueryResults] = useState([]);
   const [dataCollect, setDataCollect] = useState([]);
+  const [filterDataCollect, setFilterDataCollect] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [divClicked, setDivClicked] = useState([])
+  const [redditPolarConst, setRedditPolarConst] = useState("")
+  const [timeSelectConst, setTimeSelectConst] = useState("All")
   const handleSearch=(e)=>{
       e.preventDefault();
   }
@@ -53,7 +57,7 @@ const SearchPage = () => {
   ]
 
   const timeDropDown = [
-    'All', '6h', '12h','24h','1d'
+    'All', '1M', '3M','12M','24M'
   ];
   const timeDropDownDefault = timeDropDown[0];
 
@@ -61,6 +65,10 @@ const SearchPage = () => {
     'All', '+ve', '-ve'
   ];
   const redditPolarityDefault = redditPolarityDropDown[0];
+
+  const multiselectoptions = {
+    options: [{name: 'Option 1️⃣', id: 1},{name: 'Option 2️⃣', id: 2}]
+};
   
   const handleOnSearch = async(string, results) => {
     // onSearch will have as the first callback parameter
@@ -84,12 +92,14 @@ const SearchPage = () => {
     // console.log('Focused')
   }
 
-  const handleButtonSearch = async(searchTerm) => {
+  const handleButtonSearch = async(searchTerm,timeSelectConst) => {
     console.log(searchTerm)
+    console.log(timeSelectConst)
     if(searchTerm!=""){
-      const dummy_data_store = await DATA.QueryData(searchTerm)
+      const dummy_data_store = await DATA.QueryData(searchTerm,timeSelectConst)
       console.log(dummy_data_store['topk'])
       setDataCollect(dummy_data_store['topk'])
+      setFilterDataCollect(dummy_data_store['topk'])
     }
     // else{
     //   const dummy_data_store = await DATA.QueryData('BJP')
@@ -100,13 +110,14 @@ const SearchPage = () => {
 
   const handleKeywordSearch = async(searchTerm) => {
     console.log(searchTerm)
-    const dummy_data_store = await DATA.QueryData(searchTerm)
+    const dummy_data_store = await DATA.QueryData(searchTerm,timeSelectConst)
     console.log(dummy_data_store['topk'].length)
     if(dummy_data_store['topk'].length==0){
       const dummy_data_store = await DATA.QueryData('BJP')
     }
     console.log(dummy_data_store['topk'])
     setDataCollect(dummy_data_store['topk'])
+    setFilterDataCollect(dummy_data_store['topk'])
   }
 
   const formatResult = (item) => {
@@ -126,6 +137,35 @@ const SearchPage = () => {
     console.log(divClicked)
   }
 
+  const handleRedditScoreSelect = (selectItem) => {
+    if(selectItem.value == "+ve"){
+      const dataCollectFilter =  dataCollect.filter(function(dataObj) {
+        return dataObj.reddit_score >= 0;
+      });
+      setFilterDataCollect(dataCollectFilter)
+    }
+    else if(selectItem.value == "-ve"){
+      const dataCollectFilter =  dataCollect.filter(function(dataObj) {
+        return dataObj.reddit_score < 0;
+      });
+      setFilterDataCollect(dataCollectFilter)
+    }
+    else{
+      setFilterDataCollect(dataCollect)
+    }
+    setRedditPolarConst(selectItem.value)
+    console.log(selectItem.value)
+  }
+
+  const handleDateSelect = (selectItem) => {
+    if(selectItem.value != "All"){
+    var timeDummy = (selectItem.value).substring(0,((selectItem.value).length-1))
+    setTimeSelectConst(timeDummy)}
+    else{
+      setTimeSelectConst("All")
+    }
+  }
+
   useEffect (() => {
     console.log("inside use effect")
     const getData = async () => {
@@ -138,7 +178,7 @@ const SearchPage = () => {
     // if(queryResults.length==0){
     //   getData();
     // }
-  },[dataCollect])
+  },[dataCollect,filterDataCollect])
   console.log(queryResults)
   console.log(results)
 
@@ -162,39 +202,38 @@ const SearchPage = () => {
             />
             </div>
             <div className='dropdowndiv'>
-              <Dropdown options={redditPolarityDropDown} value={redditPolarityDefault} placeholder="Select an option" className='dropdownindv' />
+              <Dropdown onChange={handleRedditScoreSelect} options={redditPolarityDropDown} value={redditPolarityDefault} placeholder="Select an option" className='dropdownindv' />
             </div>
             <div className='dropdowndiv'>
-              <Dropdown options={timeDropDown} value={timeDropDownDefault} placeholder="Select an option" className='dropdownindv' />
+              <Dropdown onChange={handleDateSelect}  options={timeDropDown} value={timeDropDownDefault} placeholder="Select an option" className='dropdownindv' />
             </div>
-            <button className='SearchButton' onClick={()=>handleButtonSearch(searchTerm)}>Search</button>
+            <div className='dropdowndiv'>
+              <Multiselect
+              options={multiselectoptions.options} // Options to display in the dropdown
+              // selectedValues={this.state.selectedValue} // Preselected value to persist in dropdown
+              // onSelect={this.onSelect} // Function will trigger on select event
+              // onRemove={this.onRemove} // Function will trigger on remove event
+              displayValue="name" // Property name to display in the dropdown options
+              />
+            </div>
+            <button className='SearchButton' onClick={()=>handleButtonSearch(searchTerm,timeSelectConst)}>Search</button>
           </div>
           <br/>
-          {console.log(dataCollect.length)}
-          {dataCollect.length > 0 ? (
+          {filterDataCollect.length > 0 ? (
           <div>
-            {dataCollect.map((result,index) => 
-              <div className='reddit_embed' key={result.url}>
-                  {/* <iframe
-                      id={result.id}
-                      src={result.embed_link}
-                      sandbox="allow-scripts allow-same-origin allow-popups"
-                      style={{border: "none", overflow: "auto" }}
-                      height="500"
-                      width="1000"
-                  ></iframe> */}
-                  {console.log(result.url)}
+            {filterDataCollect.map((result,index) => 
+                <div className='reddit_embed' key={result.url}>
                   <Iframe
-                    onInferredClick={() => handleIframeClick(index)}
                     id = {result.url}
                     src={"https://www.redditmedia.com/"+(result.url).substring(23,((result.url).length-1))+"?limit=2/?ref\_source=embed\&amp;ref=share\&amp;embed=true&limit=5"}
                     sandbox="allow-scripts allow-same-origin allow-popups"
                     style={{border: "none", overflow: "auto" }}
                     height = '300px'
                     width="100%"
-                  ></Iframe>             
+                  ></Iframe>
               </div>
-              )}
+              )
+            }
           </div>
            ) : (
           <div>
@@ -202,7 +241,7 @@ const SearchPage = () => {
             Nothing to display here. Search for a term or click on commonly search terms to see more results.
           </div> 
           <div className='NoResultsImg'>
-            <img src = {ProfilePictureCopy} alt="Abhishek" className="about-img" style={{width:"40%",height:"40%"}}></img>
+            <img src = {NoResultsImg} alt="NoResultImg" className="about-img" style={{width:"40%",height:"40%"}}></img>
           </div>
           </div>
           )}
