@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Iframe from 'react-iframe-click';
 import { ReactSearchAutocomplete } from 'react-search-autocomplete'
 import Dropdown from 'react-dropdown';
+import Multiselect from 'multiselect-react-dropdown';
 import 'react-dropdown/style.css';
 import Markup from 'react-html-markup';
 import DATA from './services/datalist'
@@ -18,7 +19,7 @@ const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [divClicked, setDivClicked] = useState([])
   const [redditPolarConst, setRedditPolarConst] = useState("")
-  const [timeSelectConst, setTimeSelectConst] = useState("")
+  const [timeSelectConst, setTimeSelectConst] = useState("All")
   const handleSearch=(e)=>{
       e.preventDefault();
   }
@@ -56,7 +57,7 @@ const SearchPage = () => {
   ]
 
   const timeDropDown = [
-    'All', '6h', '12h','24h','1d'
+    'All', '1M', '3M','12M','24M'
   ];
   const timeDropDownDefault = timeDropDown[0];
 
@@ -64,6 +65,10 @@ const SearchPage = () => {
     'All', '+ve', '-ve'
   ];
   const redditPolarityDefault = redditPolarityDropDown[0];
+
+  const multiselectoptions = {
+    options: [{name: 'Option 1️⃣', id: 1},{name: 'Option 2️⃣', id: 2}]
+};
   
   const handleOnSearch = async(string, results) => {
     // onSearch will have as the first callback parameter
@@ -87,10 +92,11 @@ const SearchPage = () => {
     // console.log('Focused')
   }
 
-  const handleButtonSearch = async(searchTerm) => {
+  const handleButtonSearch = async(searchTerm,timeSelectConst) => {
     console.log(searchTerm)
+    console.log(timeSelectConst)
     if(searchTerm!=""){
-      const dummy_data_store = await DATA.QueryData(searchTerm)
+      const dummy_data_store = await DATA.QueryData(searchTerm,timeSelectConst)
       console.log(dummy_data_store['topk'])
       setDataCollect(dummy_data_store['topk'])
       setFilterDataCollect(dummy_data_store['topk'])
@@ -104,7 +110,7 @@ const SearchPage = () => {
 
   const handleKeywordSearch = async(searchTerm) => {
     console.log(searchTerm)
-    const dummy_data_store = await DATA.QueryData(searchTerm)
+    const dummy_data_store = await DATA.QueryData(searchTerm,timeSelectConst)
     console.log(dummy_data_store['topk'].length)
     if(dummy_data_store['topk'].length==0){
       const dummy_data_store = await DATA.QueryData('BJP')
@@ -152,8 +158,12 @@ const SearchPage = () => {
   }
 
   const handleDateSelect = (selectItem) => {
-    setTimeSelectConst(selectItem.value)
-    console.log(selectItem)
+    if(selectItem.value != "All"){
+    var timeDummy = (selectItem.value).substring(0,((selectItem.value).length-1))
+    setTimeSelectConst(timeDummy)}
+    else{
+      setTimeSelectConst("All")
+    }
   }
 
   useEffect (() => {
@@ -197,7 +207,16 @@ const SearchPage = () => {
             <div className='dropdowndiv'>
               <Dropdown onChange={handleDateSelect}  options={timeDropDown} value={timeDropDownDefault} placeholder="Select an option" className='dropdownindv' />
             </div>
-            <button className='SearchButton' onClick={()=>handleButtonSearch(searchTerm)}>Search</button>
+            <div className='dropdowndiv'>
+              <Multiselect
+              options={multiselectoptions.options} // Options to display in the dropdown
+              // selectedValues={this.state.selectedValue} // Preselected value to persist in dropdown
+              // onSelect={this.onSelect} // Function will trigger on select event
+              // onRemove={this.onRemove} // Function will trigger on remove event
+              displayValue="name" // Property name to display in the dropdown options
+              />
+            </div>
+            <button className='SearchButton' onClick={()=>handleButtonSearch(searchTerm,timeSelectConst)}>Search</button>
           </div>
           <br/>
           {filterDataCollect.length > 0 ? (
