@@ -350,7 +350,7 @@ class solr_ingest():
         # print(url)
         # print(query_params)
         response = requests.get(f'{url}/select', params=query_params)
-        # print (response.json())
+        print (response.json())
         search_results = response.json()['response']['docs']
         # print(search_results)
         return search_results[:K]

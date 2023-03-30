@@ -66,8 +66,9 @@ def process_query(query):
     return processed_query
     
 def search_db(query, d1="*", d2="*"):
+    print(d1, d2)
     data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],solr_var['headers'])
-    search_results = data_ingest.phrase_query(solr_var['data_collection_name'], query, 5, 10, 20, 40, d1, d2,10)
+    search_results = data_ingest.phrase_query(solr_var['data_collection_name'], query, 5, 10, 20, 40, d2, d1,10)
     search_results = [{
         "score": doc["score"],
         "comment": doc["comment"],
