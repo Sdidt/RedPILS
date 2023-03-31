@@ -331,8 +331,18 @@ class solr_ingest():
 
         return search_results[:K]
 
-    def phrase_query(self, collection_name, phrase_query, term_imp, bigram_imp, trigram_imp, full_phrase_imp, start_month, end_month, K):
+    def phrase_query(self, collection_name, phrase_query, term_imp, bigram_imp, trigram_imp, full_phrase_imp, start_month, end_month, intitle,  K):
         url = self.solr_url+'/'+collection_name
+
+        qf = "comment^{}".format(term_imp)
+        pf = "comment^{}".format(full_phrase_imp)
+        pf2 = "comment^{}".format(bigram_imp)
+        pf3 = "comment^{}".format(trigram_imp)
+        if (intitle):
+            qf = qf + " submission_title^{}".format(2 * term_imp)
+            pf = pf + " submission_title^{}".format(2 * full_phrase_imp)
+            pf2 = pf2 + " submission_title^{}".format(2 * bigram_imp)
+            pf3 = pf3 + " submission_title^{}".format(2 * trigram_imp)
 
         query_params = {
             "q": phrase_query,
@@ -340,11 +350,11 @@ class solr_ingest():
             "qs": "100",
             "ps": "100",
             "bf": "log(reddit_score)",
-            "qf": "comment^{}".format(term_imp),
-            "fl": "comment,score,url,reddit_score,timestamp",
-            "pf": "comment^{}".format(full_phrase_imp),
-            "pf2": "comment^{}".format(bigram_imp),
-            "pf3": "comment^{}".format(trigram_imp),
+            "qf": qf,
+            "fl": "comment,submission_title,score,url,reddit_score,timestamp",
+            "pf": pf,
+            "pf2": pf2,
+            "pf3": pf3,
             "fq": "timestamp:[{} TO {}]".format(start_month, end_month),
             "rows": 3000
         }
