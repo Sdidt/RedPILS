@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import Iframe from 'react-iframe-click';
+
+// Autocomplete 
 import { ReactSearchAutocomplete } from 'react-search-autocomplete'
 import Dropdown from 'react-dropdown';
 import Multiselect from 'multiselect-react-dropdown';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
+
+// Toggle button imports
 import 'react-dropdown/style.css';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -11,7 +17,23 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import Autocomplete from '@mui/material/Autocomplete';
+
+// Accordian Imports
+import {ArrowForwardSharp} from '@mui/icons-material';
+import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
+import MuiAccordionSummary, {
+  AccordionSummaryProps,
+} from '@mui/material/AccordionSummary';
+import MuiAccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
+
+// Multi select component
+import OutlinedInput from '@mui/material/OutlinedInput';
+import ListItemText from '@mui/material/ListItemText';
+import Checkbox from '@mui/material/Checkbox';
+
+// Data and Component imports
 import DATA from './services/datalist'
 import SearchResultsComp from './search_results_comp';
 import InsightsComp from './insights_comp';
@@ -26,6 +48,11 @@ const SearchPage = () => {
   const [statsCheck , setStatsCheck] = useState(0)
   const [alignment, setAlignment] = React.useState('searchResults');
   const [redditScoreAll, setRedditScoreAll] = React.useState('all');
+  const [locationName, setLocationName] = useState([]);
+  const [timeframe, setTimeFrame] = useState('All');
+  const [kValue, setKValue] = useState("10");
+  const [titleValue, setTitleValue] = React.useState('');
+  const [expanded, setExpanded] = useState(false);
 
   // const [categories,setCategories] = useState([])
   // const [dataCounts,setDataCounts] = useState([])
@@ -56,6 +83,40 @@ const SearchPage = () => {
         name: 'Bla'
       }
     ]
+
+  const top100Films = [
+    { label: 'The Shawshank Redemption', year: 1994 },
+    { label: 'The Godfather', year: 1972 },
+    { label: 'The Godfather: Part II', year: 1974 },
+    { label: 'The Dark Knight', year: 2008 },
+    { label: '12 Angry Men', year: 1957 },
+    { label: "Schindler's List", year: 1993 },
+    { label: 'Pulp Fiction', year: 1994 },
+    {
+      label: 'The Lord of the Rings: The Return of the King',
+      year: 2003,
+    }]
+
+  const ITEM_HEIGHT = 48;
+  const ITEM_PADDING_TOP = 8;
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+        width: 250,
+      },
+    },
+  };
+  
+  const LocationNames = [
+    'Karnataka',
+    'Tamil Nadu',
+    'Kerala',
+    'Arunachal Pradesh',
+    'Andhra Pradesh',
+    'Telangana',
+    'Gujarat',
+  ];
 
   const timeDropDown = [
     'All', '1M', '3M','12M','24M'
@@ -108,11 +169,12 @@ const SearchPage = () => {
     // console.log('Focused')
   }
 
-  const handleButtonSearch = async(searchTerm,timeSelectConst) => {
+  const handleButtonSearch = async(searchTerm,timeSelectConst,locationName,titleValue,kValue) => {
     console.log(searchTerm)
     console.log(timeSelectConst)
+    console.log(locationName)
     if(searchTerm!=""){
-      var dummy_data_store = await DATA.QueryData(searchTerm,timeSelectConst)
+      var dummy_data_store = await DATA.QueryData(searchTerm,timeSelectConst,locationName,titleValue,kValue)
       console.log(dummy_data_store['topk'])
       setDataCollect(dummy_data_store['topk'])
       setFilterDataCollect(dummy_data_store['topk'])
@@ -122,8 +184,6 @@ const SearchPage = () => {
       var dataCounts = dummy_data_store['x-val-num-fieldname']
       var categories = dummy_data_store['x-val-cat-fieldname']
       console.log(dummy_data_store)
-      // setDataCounts(dummy_data_store['x-val-num-fieldname'])
-      // setCategories(dummy_data_store['x-val-cat-fieldname'])
       setBarChartData({
         ...data,
         labels: categories,
@@ -162,7 +222,7 @@ const SearchPage = () => {
   console.log(barChartData)
 
   const handleKeywordSearch = async(searchTerm) => {
-    const dummy_data_store = await DATA.QueryData(searchTerm,timeSelectConst)
+    const dummy_data_store = await DATA.QueryData(searchTerm,timeframe,locationName)
     if(dummy_data_store['topk'].length==0){
       const dummy_data_store = await DATA.QueryData('BJP')
     }
@@ -230,13 +290,75 @@ const SearchPage = () => {
     }
   }
 
+  const handleLocationChange = (event: SelectChangeEvent<typeof personName>) => {
+    const {
+      target: { value },
+    } = event;
+    setLocationName(
+      // On autofill we get a stringified value.
+      typeof value === 'string' ? value.split(',') : value,
+    );
+  };
+
+  const handleTimeFrameSelect = (event: SelectChangeEvent) => {
+    setTimeFrame(event.target.value);
+  };
+
+  const handleKSelect = (event) => {
+    setKValue(event.target.value)
+  }
+
+  const handleTitleChange = (event) => {
+    console.log(event.target.value)
+    setTitleValue(event.target.value)
+  }
+
+  console.log(kValue)
+  console.log(titleValue)
+
+  const Accordion = styled((props: AccordionProps) => (
+    <MuiAccordion disableGutters elevation={0} square {...props} />
+  ))(({ theme }) => ({
+    border: `2px solid ${theme.palette.divider}`,
+    borderRadius : '8px',
+    backgroundColor: 'rgb(220, 220, 220)',
+    // color: 'rgb(255, 69, 0)',
+    color: 'black',
+    '&:not(:last-child)': {
+      borderBottom: 0,
+    },
+    '&:before': {
+      display: 'none',
+    },
+  }));
+
+  const AccordionSummary = styled((props: AccordionSummaryProps) => (
+    <MuiAccordionSummary
+      expandIcon={<ArrowForwardSharp sx={{ fontSize: '0.9rem' }} />}
+      {...props}
+    />
+  ))(({ theme }) => ({
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, .05)'
+        : 'rgba(0, 0, 0, .03)',
+    flexDirection: 'row-reverse',
+    '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+      transform: 'rotate(90deg)',
+    },
+    '& .MuiAccordionSummary-content': {
+      marginLeft: theme.spacing(1),
+    },
+  }));
+  
+  const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
+    padding: theme.spacing(2),
+    borderTop: '1px solid rgba(0, 0, 0, .125)',
+  }));
+
+
   useEffect (() => {
     console.log("inside use effect")
-    const getData = async () => {
-      const dummy_data_store = await DATA.QueryData('BJP')
-      console.log(dummy_data_store['topk'])
-      setDataCollect(dummy_data_store['topk'])
-    }
   },[dataCollect,filterDataCollect])
 
   return (
@@ -257,24 +379,73 @@ const SearchPage = () => {
                   formatResult={formatResult}
                   styling={{borderRadius: "8px",zIndex:999}}
               />
+            <br/>
+            <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)}>
+                <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
+                <Typography>Advanced Search</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                <div className='searchFiltersDiv'>
+                  <TextField 
+                  id="outlined-basic" 
+                  label="Title Search" 
+                  variant="outlined" 
+                  defaultValue={titleValue}
+                  sx={{ m: 1, backgroundColor:'white', width:"30%"}} 
+                  onBlur={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setTitleValue(event.target.value);
+                  }}/>
+                  <FormControl sx={{ m: 1, width: "30%", backgroundColor:'white'}} expanded={expanded}>
+                    <InputLabel id="demo-multiple-checkbox-label">Location</InputLabel>
+                    <Select
+                      labelId="demo-multiple-checkbox-label"
+                      id="demo-multiple-checkbox"
+                      multiple
+                      value={locationName}
+                      onChange={handleLocationChange}
+                      onSelect={() => setExpanded(!expanded)}
+                      input={<OutlinedInput label="Tag" />}
+                      renderValue={(selected) => selected.join(', ')}
+                      MenuProps={MenuProps}
+                    >
+                      {LocationNames.map((name) => (
+                        <MenuItem key={name} value={name}>
+                          <Checkbox checked={locationName.indexOf(name) > -1} />
+                          <ListItemText primary={name} />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <FormControl sx={{ m: 1, width: "15%", backgroundColor:'white'}}>
+                    <InputLabel id="demo-simple-select-label">TimeFrame</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={timeframe}
+                      label="Age"
+                      onChange={handleTimeFrameSelect}
+                    >
+                      <MenuItem value={"All"}>All</MenuItem>
+                      <MenuItem value={"1"}>1 Month</MenuItem>
+                      <MenuItem value={"6"}>6 Months</MenuItem>
+                      <MenuItem value={"12"}>12 Months</MenuItem>
+                      <MenuItem value={"24"}>24 Months</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <TextField 
+                  id="outlined-basic" 
+                  label="No of Results" 
+                  variant="outlined" 
+                  defaultValue={kValue}
+                  sx={{ m: 1, backgroundColor:'white',width:"15%"}} 
+                  onBlur={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setKValue(event.target.value);
+                  }}/>
+                </div>
+                </AccordionDetails>
+            </Accordion>
             </div>
-            {/* <div class="vl"></div> */}
-            <div className='searchFiltersDiv'>
-              <div className='dropdowndiv'>
-                <Dropdown onChange={handleDateSelect}  options={timeDropDown} value={timeDropDownDefault} placeholder="Select an option" className='dropdownindv' />
-              </div>
-              <br/>
-              <div className='dropdowndiv'>
-                <Multiselect
-                options={multiselectoptions.options} // Options to display in the dropdown
-                // selectedValues={this.state.selectedValue} // Preselected value to persist in dropdown
-                // onSelect={this.onSelect} // Function will trigger on select event
-                // onRemove={this.onRemove} // Function will trigger on remove event
-                displayValue="name" // Property name to display in the dropdown options
-                />
-              </div>
-            </div>
-            <button className='SearchButton' onClick={()=>handleButtonSearch(searchTerm,timeSelectConst)}>Search</button>
+            <button className='SearchButton' onClick={()=>handleButtonSearch(searchTerm,timeframe,locationName,titleValue,kValue)}>Search</button>
           </div>
           <div className='filtersDiv'>
             <div className='toggleTabDiv'>

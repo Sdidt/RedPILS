@@ -235,8 +235,8 @@
 
 .searchFiltersDiv{
   display: flex;
-  flex-direction: column;
-  width: 20%;
+  flex-direction: row;
+  /* width: 20%; */
   padding-left: 2%;
   padding-right: 2%;
 }
