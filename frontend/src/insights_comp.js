@@ -34,7 +34,7 @@ const InsightsComp = (props) => {
                 <div className='numberMetricsDiv'>
                     <div className='numericIndvDiv'>
                         <Typography variant="h4" gutterBottom style={{color:'white'}}>
-                            Query Speeds (sec)
+                            Query Speed (sec)
                         </Typography>
                         <Typography variant="h1" gutterBottom style={{color:'rgb(0, 255, 0)'}}>
                             {searchTime.toFixed(2)}

@@ -1,13 +1,20 @@
 import Iframe from 'react-iframe-click';
+import Typography from '@mui/material/Typography';
 import NoResultsImg from "./pic1.png";
 
 const SearchResultsComp = (props) => {
     let filterDataCollect = props.data
-    console.log(filterDataCollect.length)
+    let numResults = props.numResults
     return (
     <div>
     {filterDataCollect.length > 0 ? (
         <div>
+            <div>
+            <Typography variant="h6" gutterBottom style={{color:'white',textAlign:'left'}}>
+                Total results returned {numResults} .....
+            </Typography>
+            <br/>
+            </div>
           {filterDataCollect.map((result,index) => 
               <div className='reddit_embed' key={result.url}>
                 <Iframe

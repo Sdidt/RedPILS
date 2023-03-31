@@ -236,6 +236,8 @@
 .searchFiltersDiv{
   display: flex;
   flex-direction: row;
+  justify-content: center;
+  align-items: center;
   /* width: 20%; */
   padding-left: 2%;
   padding-right: 2%;
@@ -254,9 +256,8 @@
 }
 
 .vl {
-  /* padding-top: 2%;
-  padding-bottom: 4%; */
-  border-left: 2px solid rgb(127, 127, 127);
+  /* border-left: 2px solid rgb(127, 127, 127); */
+  border-left: 2px solid rgb(184, 184, 184);
   height: 10vh;
 }
 
@@ -271,4 +272,13 @@
 .numericIndvDiv{
   padding: 4%;
   /* border-right: 2px solid rgb(127, 127, 127) ; */
+}
+
+.datePickerDiv{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 90%;
+  padding-left: 5%;
 }
