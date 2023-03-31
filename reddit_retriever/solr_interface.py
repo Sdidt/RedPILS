@@ -356,7 +356,7 @@ class solr_ingest():
         # print (response.json())
         search_results = response.json()['response']['docs']
         # print(search_results)
-        return time_elapsed, search_results[:K]
+        return time_elapsed, search_results
 
 
 if __name__ == '__main__':

@@ -23,7 +23,7 @@ def hello():
 top_kr=[{'comment': "Rahul Gandhi can never be Savarkar", 'url': "https://example.com"}, {'comment': "Pappu is UNFORTUNATELY an MP", 'url': "https://example.com"}, {'comment': "Congress should get rid of Gandhis", 'url': "https://example.com"}, {'comment': "Democracy is not a family Business", 'url': "https://example.com"}, {'comment': "Pappu becomes a joke again", 'url': "https://example.com"}]
 top_kl=[{'comment': "Death of Democracy", 'url': "https://example.com"}, {'comment': "BJP silencing critics. bad sign for democracy", 'url': "https://example.com"}, {'comment': "Rahul arrest is dirty hindutwa politics", 'url': "https://example.com"}, {'comment': "Modi diverting attention from Adani Scam", 'url': "https://example.com"}, {'comment': "Rahul arrest will backfire on Modi", 'url': "https://example.com"}]
 
-@app.route('/dummy_chart', methods=["GET"])
+@app.route('/dummy_query', methods=["GET"])
 def dummy():
     args = request.args
     query = args.get("query")
@@ -101,6 +101,12 @@ def query():
             intitle=body["intitle"]
         else: 
             intitle=None
+        if body["from"] and body["to"]:
+            sd=body["from"]
+            ed=body["to"]
+        else: 
+            sd=None
+            ed=None
     
     
     #if request is of type GET
@@ -123,18 +129,24 @@ def query():
             K=int(args.get("k"))
         except:
             K=10
+        try:
+            sd=args.get("from")
+            ed=args.get("to")
+        except:
+            sd=None
+            ed=None
     
     
     if region!=None and region!="":      
         query=query+" AND ("+ region+")"
     query=process_query(query)
-    d1, d2=process_date(timeframe)
+    d1, d2=process_date(timeframe, sd, ed)
     print(d1, d2)
     
-    time_elapsed, search_results=search_db(query, K, d1, d2, intitle)
+    time_elapsed, num_results, search_results=search_db(query, K, d1, d2, intitle)
     reddit_avg, score_avg=avg_scores(search_results)
     
-    response = jsonify({"search_time":time_elapsed, "query":query, "topk":search_results, "avg_reddit_score":reddit_avg, "avg_score":score_avg})
+    response = jsonify({"search_time":time_elapsed, "query":query, "topk":search_results, "avg_reddit_score":reddit_avg, "avg_score":score_avg, "num_results":num_results})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
