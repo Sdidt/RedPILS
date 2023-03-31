@@ -23,7 +23,7 @@ def process_query(query):
     
 def search_db(query, K=10, d1="*", d2="*", intitle=""):
     data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],solr_var['headers'])
-    time_elapsed, search_results = data_ingest.phrase_query(solr_var['data_collection_name'], query, 5, 10, 20, 40, d1, d2,K)
+    time_elapsed, search_results = data_ingest.phrase_query(solr_var['data_collection_name'], query, 5, 10, 20, 40, d1, d2, intitle,K)
     num_results=len(search_results)
     search_results=search_results[:K]
     search_results = [{
