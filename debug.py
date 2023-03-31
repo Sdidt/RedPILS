@@ -18,7 +18,8 @@ def compute_query_term_score(query_term):
     [print("Score: {}\nComment: {}".format(doc["score"], doc["comment"])) for doc in search_results]
 
 def get_phrase_query_results(phrase_query):
-    search_results = data_ingest.phrase_query(solr_var['data_collection_name'], phrase_query, 5, 10, 20, 40, "2022-03-29T00:00:00Z", "2022-04-29T00:00:00Z", 10)
+    time_elapsed, search_results = data_ingest.phrase_query(solr_var['data_collection_name'], phrase_query, 5, 10, 20, 40, "2022-03-29T00:00:00Z", "2022-04-29T00:00:00Z", True, 10)
+    print(search_results)
     search_results = [{
         "score": doc["score"],
         "comment": doc["comment"],
@@ -30,4 +31,4 @@ def get_phrase_query_results(phrase_query):
 if __name__ == "__main__":
     # compute_query_term_score("INC")
     data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],solr_var['headers'])
-    get_phrase_query_results("BJP rss Bhakts Hindu Sanatan dharma NOT congress")
+    get_phrase_query_results("islam NOT Congress")
