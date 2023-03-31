@@ -3,6 +3,8 @@ import { Chart, registerables } from 'chart.js';
 import SimpleWordcloud from './wordclouds';
 import React, { useEffect, useState } from 'react';
 import { defaultCallbacks } from 'react-wordcloud';
+import Typography from '@mui/material/Typography';
+import { NumericFormat } from 'react-number-format';
 import NoResultsImg from "./pic1.png";
 Chart.register(...registerables);
 
@@ -11,6 +13,9 @@ const InsightsComp = (props) => {
     let pieChartData = props.pieChartData
     let doughChartData = props.doughChartData
     let statsCheck = props.statsCheck
+    let avgRedditScore = props.avgRedditScore
+    let avgScore = props.avgScore
+    let searchTime = props.searchTime
 
     console.log(barChartData)
 
@@ -26,18 +31,44 @@ const InsightsComp = (props) => {
         <div>
             {statsCheck > 0 ? (
             <div>
+                <div className='numberMetricsDiv'>
+                    <div className='numericIndvDiv'>
+                        <Typography variant="h4" gutterBottom style={{color:'white'}}>
+                            Query Speeds (sec)
+                        </Typography>
+                        <Typography variant="h1" gutterBottom style={{color:'rgb(0, 255, 0)'}}>
+                            {searchTime.toFixed(2)}
+                        </Typography>
+                    </div>
+                    <div class="vl"></div>
+                    <div className='numericIndvDiv'>
+                        <Typography variant="h4" gutterBottom style={{color:'white'}}>
+                            Average Reddit Score
+                        </Typography>
+                        <Typography variant="h1" gutterBottom style={{color:'rgb(0, 255, 0)'}}>
+                            {avgRedditScore.toFixed(2)}
+                        </Typography>
+                    </div>
+                    <div class="vl"></div>
+                    <div className='numericIndvDiv'>
+                        <Typography variant="h4" gutterBottom style={{color:'white'}}>
+                            Average Score
+                        </Typography>
+                        <Typography variant="h1" gutterBottom style={{color:'rgb(0, 255, 0)'}}>
+                            {avgScore.toFixed(2)}
+                        </Typography>
+                    </div>
+                </div>
                 <div className='bar_chart_styles'>
                     <div style={{ height: '400px', width: '600px' }}>
                     <Bar data={barChartData} options={options} />
                     </div>
                 </div>
                 <div className='pie_chart_styles'>
-                    <div style={{ height: '400px', width: '400px', alignItems: 'center'}}>
+                    <div style={{ height: '400px', width: '400px', alignItems: 'center',padding:"2%"}}>
                     <Pie data={pieChartData} options={options} />
                     </div>
-                    <br/>
-                    <br/>
-                    <div style={{ height: '400px', width: '400px', alignItems: 'center' }}>
+                    <div style={{ height: '400px', width: '400px', alignItems: 'center',padding:"2%"}}>
                     <Doughnut data={doughChartData} options={options} />
                     </div>
                 </div>

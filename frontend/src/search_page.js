@@ -43,6 +43,9 @@ const SearchPage = () => {
 
   const [dataCollect, setDataCollect] = useState([]);
   const [filterDataCollect, setFilterDataCollect] = useState([]);
+  const [avgRedditScore, setAvgRedditScore] = useState('');
+  const [avgScore, setAvgScore] = useState('');
+  const [searchTime, setSearchTime] = useState('');
   const [searchTerm, setSearchTerm] = useState("");
   const [timeSelectConst, setTimeSelectConst] = useState("All")
   const [statsCheck , setStatsCheck] = useState(0)
@@ -162,7 +165,10 @@ const SearchPage = () => {
 
   const handleOnSelect = (item) => {
     // the item selected
-    // console.log(item)
+    if(item.name!=''){
+      setSearchTerm(item.name)
+    }
+    console.log(item.name)
   }
 
   const handleOnFocus = () => {
@@ -178,6 +184,9 @@ const SearchPage = () => {
       console.log(dummy_data_store['topk'])
       setDataCollect(dummy_data_store['topk'])
       setFilterDataCollect(dummy_data_store['topk'])
+      setAvgRedditScore(dummy_data_store['avg_reddit_score'])
+      setAvgScore(dummy_data_store['avg_score'])
+      setSearchTime(dummy_data_store['search_time']);
 
       var dummy_data_store = await DATA.QueryStatsData()
       setStatsCheck(dummy_data_store['x-val-num-fieldname'].length)
@@ -222,7 +231,7 @@ const SearchPage = () => {
   console.log(barChartData)
 
   const handleKeywordSearch = async(searchTerm) => {
-    const dummy_data_store = await DATA.QueryData(searchTerm,timeframe,locationName)
+    const dummy_data_store = await DATA.QueryData(searchTerm,timeframe,locationName,titleValue,kValue)
     if(dummy_data_store['topk'].length==0){
       const dummy_data_store = await DATA.QueryData('BJP')
     }
@@ -485,7 +494,10 @@ const SearchPage = () => {
             barChartData = {barChartData}
             pieChartData = {pieChartData} 
             doughChartData = {doughChartData}
-            statsCheck = {statsCheck}/>
+            statsCheck = {statsCheck}
+            avgRedditScore = {avgRedditScore}
+            avgScore = {avgScore}
+            searchTime = {searchTime}/>
             )
           }
         </div>

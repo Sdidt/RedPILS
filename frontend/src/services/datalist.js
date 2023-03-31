@@ -27,22 +27,28 @@ const QueryStatsData = async () => {
     return res_data;
 }
 
-const QueryData = async (searchTerm,timeSelectConst,locationName) => {
+const QueryData = async (searchTerm,timeSelectConst,locationName,titleValue,kValue) => {
     console.log(timeSelectConst)
     let res
     const concatenateLocationName = locationName.join(' OR ');
     console.log(concatenateLocationName)
     if(timeSelectConst!="All" && concatenateLocationName!=[]){
         const whitespaceRemoved = searchTerm.replace(/\s/g, '+')
-        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&timeframe="+timeSelectConst+"&region="+concatenateLocationName)
+        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&timeframe="+timeSelectConst+"&region="+concatenateLocationName+"&intitle="+titleValue+"&k="+kValue)
     }
     else if(timeSelectConst!="All"){
         const whitespaceRemoved = searchTerm.replace(/\s/g, '+')
-        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&timeframe="+timeSelectConst)
+        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&timeframe="+timeSelectConst+"&intitle="+titleValue+"&k="+kValue)
     }
     else if(concatenateLocationName!=[]){
+        console.log("hello")
         const whitespaceRemoved = searchTerm.replace(/\s/g, '+')
-        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&region="+concatenateLocationName)
+        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&region="+concatenateLocationName+"&intitle="+titleValue+"&k="+kValue)
+    }
+    else{
+        console.log("hello")
+        const whitespaceRemoved = searchTerm.replace(/\s/g, '+')
+        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&intitle="+titleValue+"&k="+kValue)
     }
     console.log(res)
     if (res == null){

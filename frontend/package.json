@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.11.15",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
@@ -20,6 +21,7 @@
     "react-html-markup": "^1.0.8",
     "react-icons": "^4.8.0",
     "react-iframe-click": "^2.0.2",
+    "react-number-format": "^5.1.4",
     "react-router-dom": "^6.9.0",
     "react-scripts": "5.0.1",
     "react-search-autocomplete": "^8.3.2",
