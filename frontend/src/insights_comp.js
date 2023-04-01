@@ -49,27 +49,30 @@ const InsightsComp = (props) => {
             <div>
                 <div className='numberMetricsDiv'>
                     <div className='numericIndvDiv'>
-                        <Typography variant="h4" gutterBottom style={{color:'white'}}>
+                        <Typography variant="h4" gutterBottom style={{color:'white',height:"55px",width:"100%"}}>
                             Query Speed
                         </Typography>
+                        <br></br>
                         <Typography variant="h1" gutterBottom style={{color:'rgb(0, 255, 0)'}}>
                             {searchTime.toFixed(2)}
                         </Typography>
                     </div>
                     <div class="vl"></div>
                     <div className='numericIndvDiv'>
-                        <Typography variant="h4" gutterBottom style={{color:'white'}}>
+                        <Typography variant="h4" gutterBottom style={{color:'white',height:"55px",width:"100%"}}>
                             Average Reddit Score
                         </Typography>
+                        <br></br>
                         <Typography variant="h1" gutterBottom style={{color:'rgb(0, 255, 0)'}}>
                             {avgRedditScore.toFixed(2)}
                         </Typography>
                     </div>
                     <div class="vl"></div>
                     <div className='numericIndvDiv'>
-                        <Typography variant="h4" gutterBottom style={{color:'white'}}>
-                            Average Score
+                        <Typography variant="h4" gutterBottom style={{color:'white',height:"55px",width:"100%"}}>
+                            Average Weighted Score
                         </Typography>
+                        <br></br>
                         <Typography variant="h1" gutterBottom style={{color:'rgb(0, 255, 0)'}}>
                             {avgScore.toFixed(2)}
                         </Typography>
