@@ -33,20 +33,35 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 
+// Date Component 
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { LocalizationProvider } from '@mui/x-date-pickers-pro';
+import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+import dayjs from 'dayjs';
+
 // Data and Component imports
 import DATA from './services/datalist'
 import SearchResultsComp from './search_results_comp';
 import InsightsComp from './insights_comp';
 import NoResultsImg from "./pic1.png";
 
+// Checkbox
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+
 const SearchPage = () => {
 
   const [dataCollect, setDataCollect] = useState([]);
   const [filterDataCollect, setFilterDataCollect] = useState([]);
+  const [numResults, setNumResults] = useState('');
   const [avgRedditScore, setAvgRedditScore] = useState('');
   const [avgScore, setAvgScore] = useState('');
   const [searchTime, setSearchTime] = useState('');
   const [searchTerm, setSearchTerm] = useState("");
+  const [timeSelect, setTimeSelect] = useState([null,null]);
+  const [fromTimeSelect, setFromTimeSelect] = useState(null);
+  const [toTimeSelect, setToTimeSelect] = useState(null);
   const [timeSelectConst, setTimeSelectConst] = useState("All")
   const [statsCheck , setStatsCheck] = useState(0)
   const [alignment, setAlignment] = React.useState('searchResults');
@@ -55,6 +70,7 @@ const SearchPage = () => {
   const [timeframe, setTimeFrame] = useState('All');
   const [kValue, setKValue] = useState("10");
   const [titleValue, setTitleValue] = React.useState('');
+  const [titleSelect, setTitleSelect] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
   // const [categories,setCategories] = useState([])
@@ -175,15 +191,17 @@ const SearchPage = () => {
     // console.log('Focused')
   }
 
-  const handleButtonSearch = async(searchTerm,timeSelectConst,locationName,titleValue,kValue) => {
+  const handleButtonSearch = async(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue) => {
     console.log(searchTerm)
     console.log(timeSelectConst)
     console.log(locationName)
+    console.log(kValue)
     if(searchTerm!=""){
-      var dummy_data_store = await DATA.QueryData(searchTerm,timeSelectConst,locationName,titleValue,kValue)
+      var dummy_data_store = await DATA.QueryData(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue)
       console.log(dummy_data_store['topk'])
       setDataCollect(dummy_data_store['topk'])
       setFilterDataCollect(dummy_data_store['topk'])
+      setNumResults(dummy_data_store['num_results'])
       setAvgRedditScore(dummy_data_store['avg_reddit_score'])
       setAvgScore(dummy_data_store['avg_score'])
       setSearchTime(dummy_data_store['search_time']);
@@ -231,7 +249,7 @@ const SearchPage = () => {
   console.log(barChartData)
 
   const handleKeywordSearch = async(searchTerm) => {
-    const dummy_data_store = await DATA.QueryData(searchTerm,timeframe,locationName,titleValue,kValue)
+    const dummy_data_store = await DATA.QueryData(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue)
     if(dummy_data_store['topk'].length==0){
       const dummy_data_store = await DATA.QueryData('BJP')
     }
@@ -313,17 +331,29 @@ const SearchPage = () => {
     setTimeFrame(event.target.value);
   };
 
-  const handleKSelect = (event) => {
-    setKValue(event.target.value)
-  }
+  // const handleKSelect = (event) => {
+  //   console.log(event.target.value)
+  //   setKValue(event.target.value)
+  // }
 
   const handleTitleChange = (event) => {
     console.log(event.target.value)
     setTitleValue(event.target.value)
   }
 
-  console.log(kValue)
-  console.log(titleValue)
+  const handleDateChange = (newValue) => {
+    if (newValue[0] && newValue[1]) {
+      const startFormatted = dayjs(newValue[0]).format('DDMMYYYY');
+      const endFormatted = dayjs(newValue[1]).format('DDMMYYYY');
+      setFromTimeSelect(startFormatted)
+      setToTimeSelect(endFormatted)
+      setTimeSelect(newValue);
+    }
+  }
+
+  const handleTitleSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTitleSelect(event.target.checked)
+  }
 
   const Accordion = styled((props: AccordionProps) => (
     <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -389,13 +419,13 @@ const SearchPage = () => {
                   styling={{borderRadius: "8px",zIndex:999}}
               />
             <br/>
-            <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)}>
+            <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)} style={{alignItems:"center",justifyContent:"center"}}>
                 <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
                 <Typography>Advanced Search</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                 <div className='searchFiltersDiv'>
-                  <TextField 
+                  {/* <TextField 
                   id="outlined-basic" 
                   label="Title Search" 
                   variant="outlined" 
@@ -403,8 +433,11 @@ const SearchPage = () => {
                   sx={{ m: 1, backgroundColor:'white', width:"30%"}} 
                   onBlur={(event: React.ChangeEvent<HTMLInputElement>) => {
                     setTitleValue(event.target.value);
-                  }}/>
-                  <FormControl sx={{ m: 1, width: "30%", backgroundColor:'white'}} expanded={expanded}>
+                  }}/> */}
+                  <FormGroup sx={{ m: 1, width: "15%" , backgroundColor:'white', border: "1px solid rgb(184, 184, 184)" , borderRadius:"2px",paddingLeft:"1%"}}>
+                    <FormControlLabel control={<Checkbox defaultChecked />} label="Intitle Search" checked={titleSelect} onChange={handleTitleSelect}/>
+                  </FormGroup>
+                  <FormControl sx={{ m: 1, width: "40%", backgroundColor:'white'}} expanded={expanded}>
                     <InputLabel id="demo-multiple-checkbox-label">Location</InputLabel>
                     <Select
                       labelId="demo-multiple-checkbox-label"
@@ -425,7 +458,7 @@ const SearchPage = () => {
                       ))}
                     </Select>
                   </FormControl>
-                  <FormControl sx={{ m: 1, width: "15%", backgroundColor:'white'}}>
+                  {/* <FormControl sx={{ m: 1, width: "15%", backgroundColor:'white'}}>
                     <InputLabel id="demo-simple-select-label">TimeFrame</InputLabel>
                     <Select
                       labelId="demo-simple-select-label"
@@ -440,7 +473,7 @@ const SearchPage = () => {
                       <MenuItem value={"12"}>12 Months</MenuItem>
                       <MenuItem value={"24"}>24 Months</MenuItem>
                     </Select>
-                  </FormControl>
+                  </FormControl> */}
                   <TextField 
                   id="outlined-basic" 
                   label="No of Results" 
@@ -451,10 +484,17 @@ const SearchPage = () => {
                     setKValue(event.target.value);
                   }}/>
                 </div>
+                <div className='datePickerDiv'>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DemoContainer components={['DateRangePicker']}>
+                      <DateRangePicker localeText={{ start: 'Start', end: 'End' }} value={timeSelect} onChange={handleDateChange}/>
+                    </DemoContainer>
+                  </LocalizationProvider>
+                </div>
                 </AccordionDetails>
             </Accordion>
             </div>
-            <button className='SearchButton' onClick={()=>handleButtonSearch(searchTerm,timeframe,locationName,titleValue,kValue)}>Search</button>
+            <button className='SearchButton' onClick={()=>handleButtonSearch(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue)}>Search</button>
           </div>
           <div className='filtersDiv'>
             <div className='toggleTabDiv'>
@@ -488,7 +528,8 @@ const SearchPage = () => {
           <br/>
           {alignment == 'searchResults' ? (
             <SearchResultsComp 
-            data = {filterDataCollect}/>
+            data = {filterDataCollect}
+            numResults = {numResults}/>
             ):(
             <InsightsComp
             barChartData = {barChartData}

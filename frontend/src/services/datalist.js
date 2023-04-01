@@ -27,28 +27,25 @@ const QueryStatsData = async () => {
     return res_data;
 }
 
-const QueryData = async (searchTerm,timeSelectConst,locationName,titleValue,kValue) => {
-    console.log(timeSelectConst)
+const QueryData = async (searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue) => {
     let res
     const concatenateLocationName = locationName.join(' OR ');
+    const whitespaceRemoved = searchTerm.replace(/\s/g, '+')
     console.log(concatenateLocationName)
-    if(timeSelectConst!="All" && concatenateLocationName!=[]){
-        const whitespaceRemoved = searchTerm.replace(/\s/g, '+')
-        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&timeframe="+timeSelectConst+"&region="+concatenateLocationName+"&intitle="+titleValue+"&k="+kValue)
+    console.log(kValue)
+    if(toTimeSelect!=null && fromTimeSelect!=null && concatenateLocationName!=[]){
+        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&from="+fromTimeSelect+"&to="+toTimeSelect+"&region="+concatenateLocationName+"&intitle="+titleSelect+"&k="+kValue)
     }
-    else if(timeSelectConst!="All"){
-        const whitespaceRemoved = searchTerm.replace(/\s/g, '+')
-        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&timeframe="+timeSelectConst+"&intitle="+titleValue+"&k="+kValue)
+    else if(toTimeSelect!=null && fromTimeSelect!=null ){
+        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&from="+fromTimeSelect+"&to="+toTimeSelect+"&intitle="+titleSelect+"&k="+kValue)
     }
     else if(concatenateLocationName!=[]){
         console.log("hello")
-        const whitespaceRemoved = searchTerm.replace(/\s/g, '+')
-        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&region="+concatenateLocationName+"&intitle="+titleValue+"&k="+kValue)
+        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&region="+concatenateLocationName+"&intitle="+titleSelect+"&k="+kValue)
     }
     else{
         console.log("hello")
-        const whitespaceRemoved = searchTerm.replace(/\s/g, '+')
-        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&intitle="+titleValue+"&k="+kValue)
+        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&intitle="+titleSelect+"&k="+kValue)
     }
     console.log(res)
     if (res == null){
