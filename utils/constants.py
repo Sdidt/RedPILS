@@ -33,7 +33,7 @@ solr_var = {
     "headers" : {'Content-type': 'application/json'},
     "data_schema" : [
     {"name": "submission_id", "type": "string",'indexed': "true", "stored": "true"},
-    {"name": "submission_title", "type": "text_en",'indexed': "true", "stored": "true"},
+    {"name": "submission_title", "type": "filtered_text",'indexed': "true", "stored": "true"},
     {"name": "subreddit_id", "type": "text_en",'indexed': "true", "stored": "true"},
     {"name": "subreddit_name", "type": "text_en",'indexed': "true", "stored": "true"},
     {"name": "comment_id", "type": "string",'indexed': "true", "stored": "true"},
@@ -41,7 +41,8 @@ solr_var = {
     {"name": "timestamp", "type": "pdate",'indexed': "true", "stored": "true"},
     {"name": "url", "type": "text_en", "indexed": "true", "stored": "true"},
     {"name": "reddit_score", "type": "pint",'indexed': "true", "stored": "true"},
-    {"name": "redditor_id", "type": "text_en",'indexed': "true", "stored": "true"}
+    {"name": "redditor_id", "type": "text_en",'indexed': "true", "stored": "true"},
+    {"name": "polarity", "type": "text_en", "indexed": "true", "stored": "true", "default": "netural"}
     ],
     "tag_field_type": {
         "name": "tag",
