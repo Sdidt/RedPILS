@@ -51,7 +51,7 @@
   /* justify-content: center; */
   align-items: center;
   background-color: #b6b6b6;
-  color: #950000;
+  color: #ff4500;
   padding: 0.5%;
   padding-left: 3.2%;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -154,6 +154,10 @@
 }
 
 .reddit_embed{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   padding-bottom: 3%;
   /* height: 20vw; */
   min-height: 200px;
@@ -281,4 +285,12 @@
   align-items: center;
   width: 90%;
   padding-left: 5%;
+}
+
+.progressBarDiv{
+  padding-left: 2%;
+}
+
+.spaceDiv{
+  padding : 2%;
 }

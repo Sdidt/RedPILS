@@ -22,8 +22,24 @@ const InsightsComp = (props) => {
     const options= {
         scales: {
           y: {
-            beginAtZero: true
+            beginAtZero: true,
+            color:"white",
+            ticks: {
+                color: 'white', // change x axis label color here
+              },
+          },
+          x: {
+            ticks: {
+                color: 'white', // change x axis label color here
+              },
           }
+        },
+        plugins: {
+            legend: {
+              labels: {
+                color: 'white' // set legend labels color
+              }
+            }
         }
       };
 
@@ -34,7 +50,7 @@ const InsightsComp = (props) => {
                 <div className='numberMetricsDiv'>
                     <div className='numericIndvDiv'>
                         <Typography variant="h4" gutterBottom style={{color:'white'}}>
-                            Query Speed (sec)
+                            Query Speed
                         </Typography>
                         <Typography variant="h1" gutterBottom style={{color:'rgb(0, 255, 0)'}}>
                             {searchTime.toFixed(2)}
@@ -60,7 +76,7 @@ const InsightsComp = (props) => {
                     </div>
                 </div>
                 <div className='bar_chart_styles'>
-                    <div style={{ height: '400px', width: '600px' }}>
+                    <div style={{ height: '400px', width: '600px' ,color:"white"}}>
                     <Bar data={barChartData} options={options} />
                     </div>
                 </div>
