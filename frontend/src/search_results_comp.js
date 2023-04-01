@@ -77,7 +77,7 @@ const SearchResultsComp = (props) => {
                   <Typography gutterBottom>Prediction class</Typography>
                   <Slider
                     aria-label="Custom marks"
-                    defaultValue={[-1,0]}
+                    defaultValue={[result['political_leaning'],0]}
                     step={0.1}
                     min={-2}
                     max={2}
