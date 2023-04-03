@@ -339,6 +339,7 @@ class solr_ingest():
         pf2 = "comment^{}".format(bigram_imp)
         pf3 = "comment^{}".format(trigram_imp)
         if (intitle):
+            print("In title is true")
             qf = qf + " submission_title^{}".format(2 * term_imp)
             pf = pf + " submission_title^{}".format(2 * full_phrase_imp)
             pf2 = pf2 + " submission_title^{}".format(2 * bigram_imp)
