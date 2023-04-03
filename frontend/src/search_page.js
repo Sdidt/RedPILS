@@ -1,144 +1,607 @@
 import React, { useEffect, useState } from 'react';
 import Iframe from 'react-iframe-click';
+
+// Autocomplete 
 import { ReactSearchAutocomplete } from 'react-search-autocomplete'
+import Dropdown from 'react-dropdown';
+import Multiselect from 'multiselect-react-dropdown';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
+
+// Toggle button imports
+import 'react-dropdown/style.css';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+
+// Accordian Imports
+import {ArrowForwardSharp} from '@mui/icons-material';
+import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
+import MuiAccordionSummary, {
+  AccordionSummaryProps,
+} from '@mui/material/AccordionSummary';
+import MuiAccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
+
+// Multi select component
+import OutlinedInput from '@mui/material/OutlinedInput';
+import ListItemText from '@mui/material/ListItemText';
+import Checkbox from '@mui/material/Checkbox';
+
+// Date Component 
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { LocalizationProvider } from '@mui/x-date-pickers-pro';
+import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+import dayjs from 'dayjs';
+
+// Data and Component imports
 import DATA from './services/datalist'
-import dummy_data from "./services/topics.json"
+import SearchResultsComp from './search_results_comp';
+import InsightsComp from './insights_comp';
+import NoResultsImg from "./pic1.png";
+
+// Checkbox
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 const SearchPage = () => {
 
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState(dummy_data);
-  const [queryResults, setQueryResults] = useState([]);
-  const [dataCheck, setDataCheck] = useState(0);
-  const [divClicked, setDivClicked] = useState([])
+  const [dataCollect, setDataCollect] = useState([]);
+  const [filterDataCollect, setFilterDataCollect] = useState([]);
+  const [numResults, setNumResults] = useState('');
+  const [avgRedditScore, setAvgRedditScore] = useState('');
+  const [avgScore, setAvgScore] = useState('');
+  const [searchTime, setSearchTime] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [timeSelect, setTimeSelect] = useState([null,null]);
+  const [fromTimeSelect, setFromTimeSelect] = useState(null);
+  const [toTimeSelect, setToTimeSelect] = useState(null);
+  const [timeSelectConst, setTimeSelectConst] = useState("All")
+  const [statsCheck , setStatsCheck] = useState(0)
+  const [alignment, setAlignment] = React.useState('searchResults');
+  const [redditScoreAll, setRedditScoreAll] = React.useState('all');
+  const [locationName, setLocationName] = useState([]);
+  const [timeframe, setTimeFrame] = useState('All');
+  const [kValue, setKValue] = useState("10");
+  const [titleValue, setTitleValue] = React.useState('');
+  const [titleSelect, setTitleSelect] = useState(false);
+  const [allTimeSelect, setAllTimeSelect] = useState(false)
+  const [expanded, setExpanded] = useState(false);
+
+  // const [categories,setCategories] = useState([])
+  // const [dataCounts,setDataCounts] = useState([])
+
+
   const handleSearch=(e)=>{
       e.preventDefault();
   }
   const items = [
       {
         id: 0,
-        name: 'Cobol'
+        name: 'BJP'
       },
       {
         id: 1,
-        name: 'JavaScript'
+        name: 'Congress'
       },
       {
         id: 2,
-        name: 'Basic'
+        name: 'AAP'
       },
       {
         id: 3,
-        name: 'PHP'
+        name: 'Kejriwal'
       },
       {
         id: 4,
-        name: 'Java'
-      }
+        name: 'Tharoor'
+      },
+      {
+        id: 5,
+        name: 'Punjab'
+      },
+      {
+        id: 6,
+        name: 'Government'
+      },
+      {
+        id: 7,
+        name: 'Education'
+      },
+      {
+        id: 8,
+        name: 'Modi'
+      },
     ]
-  const dummy_results = [
+
+  const top100Films = [
+    { label: 'The Shawshank Redemption', year: 1994 },
+    { label: 'The Godfather', year: 1972 },
+    { label: 'The Godfather: Part II', year: 1974 },
+    { label: 'The Dark Knight', year: 2008 },
+    { label: '12 Angry Men', year: 1957 },
+    { label: "Schindler's List", year: 1993 },
+    { label: 'Pulp Fiction', year: 1994 },
     {
-      id: 0,
-      embed_link: "https://www.redditmedia.com//r/IndiaSpeaks/comments/zpre2v/2_judges_cant_decide_bjp_mps_strong_objection_on/j0uassz?limit=2/?ref\_source=embed\&amp;ref=share\&amp;embed=true&limit=5"
+      label: 'The Lord of the Rings: The Return of the King',
+      year: 2003,
+    }]
+
+  const ITEM_HEIGHT = 48;
+  const ITEM_PADDING_TOP = 8;
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+        width: 250,
+      },
     },
-    {
-      id: 1,
-      embed_link: "https://www.redditmedia.com//r/IndiaSpeaks/comments/zpre2v/2_judges_cant_decide_bjp_mps_strong_objection_on/j0uassz?limit=2/?ref\_source=embed\&amp;ref=share\&amp;embed=true&limit=5"
-    }
-  ]
+  };
   
-  const handleOnSearch = (string, results) => {
-    // onSearch will have as the first callback parameter
-    // the string searched and for the second the results.
-    console.log(string, results)
+  const LocationNames = [
+    "Andaman and Nicobar",
+    "Andhra Pradesh",
+    "Arunachal Pradesh",
+    "Assam",
+    "Bihar",
+    "Chandigarh",
+    "Chhattisgarh",
+    "Dadra and Nagar Haveli and Daman and Diu",
+    "Delhi",
+    "Goa",
+    "Gujarat",
+    "Haryana",
+    "Himachal Pradesh",
+    "Jammu and Kashmir",
+    "Jharkhand",
+    "Karnataka",
+    "Kerala",
+    "Ladakh",
+    "Lakshadweep",
+    "Madhya Pradesh",
+    "Maharashtra",
+    "Manipur",
+    "Meghalaya",
+    "Mizoram",
+    "Nagaland",
+    "Odisha",
+    "Puducherry",
+    "Punjab",
+    "Rajasthan",
+    "Sikkim",
+    "Tamil Nadu",
+    "Telangana",
+    "Tripura",
+    "Union territory",
+    "Uttar Pradesh",
+    "Uttarakhand",
+    "West Bengal",
+    "India",
+    "China",
+    "Pakistan",
+    "Sri Lanka",
+    "Britain",
+    "Bangladesh",
+    "Afghanistan" 
+  ];
+
+  const timeDropDown = [
+    'All', '1M', '3M','12M','24M'
+  ];
+  const timeDropDownDefault = timeDropDown[0];
+
+  const redditPolarityDropDown = [
+    'All', '+ve', '-ve'
+  ];
+  const redditPolarityDefault = redditPolarityDropDown[0];
+
+  const multiselectoptions = {
+    options: [{name: 'Option 1️⃣', id: 1},{name: 'Option 2️⃣', id: 2}]
+};
+
+  const data = {
+    labels: [],
+    datasets: [
+        {
+        label: 'Count',
+        data: [],
+        backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1,
+        },
+    ],
+  };
+
+  const [barChartData, setBarChartData] = useState(data);
+  const [pieChartData, setPieChartData] = useState(data);
+  const [doughChartData, setDoughChartData] = useState(data);
+  
+  const handleOnSearch = async(string, results) => {
+    if(string!=''){
+      setSearchTerm(string)
+    }
   }
 
   const handleOnHover = (result) => {
     // the item hovered
-    console.log(result)
+    // console.log(result)
   }
 
   const handleOnSelect = (item) => {
     // the item selected
-    console.log(item)
+    if(item.name!=''){
+      setSearchTerm(item.name)
+    }
+    console.log(item.name)
   }
 
   const handleOnFocus = () => {
-    console.log('Focused')
+    // console.log('Focused')
+  }
+
+  const handleButtonSearch = async(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect) => {
+    console.log(searchTerm)
+    console.log(timeSelectConst)
+    console.log(locationName)
+    console.log(kValue)
+    if(searchTerm!=""){
+      var dummy_data_store = await DATA.QueryData(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect)
+      console.log(dummy_data_store['topk'])
+      setDataCollect(dummy_data_store['topk'])
+      setFilterDataCollect(dummy_data_store['topk'])
+      setNumResults(dummy_data_store['num_results'])
+      setAvgRedditScore(dummy_data_store['avg_reddit_score'])
+      setAvgScore(dummy_data_store['avg_score'])
+      setSearchTime(dummy_data_store['search_time']);
+
+      var dummy_data_store = await DATA.QueryStatsData()
+      setStatsCheck(dummy_data_store['x-val-num-fieldname'].length)
+      var dataCounts = dummy_data_store['x-val-num-fieldname']
+      var categories = dummy_data_store['x-val-cat-fieldname']
+      console.log(dummy_data_store)
+      setBarChartData({
+        ...data,
+        labels: categories,
+        datasets: [
+          {
+            ...data.datasets[0],
+            data: dataCounts,
+          },
+        ],
+      });
+
+      setPieChartData({
+      ...data,
+      labels: categories,
+      datasets: [
+          {
+          ...data.datasets[0],
+          data: dataCounts,
+          },
+      ],
+      });
+
+      setDoughChartData({
+      ...data,
+      labels: categories,
+      datasets: [
+          {
+          ...data.datasets[0],
+          data: dataCounts,
+          },
+      ],
+      });
+    }
+  }
+
+  console.log(barChartData)
+
+  const handleKeywordSearch = async(searchTerm) => {
+    const dummy_data_store = await DATA.QueryData(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect)
+    if(dummy_data_store['topk'].length==0){
+      const dummy_data_store = await DATA.QueryData('BJP')
+    }
+    setDataCollect(dummy_data_store['topk'])
+    setFilterDataCollect(dummy_data_store['topk'])
   }
 
   const formatResult = (item) => {
     return (
       <>
-        <span style={{ display: 'block', textAlign: 'left' }}>id: {item.id}</span>
-        <span style={{ display: 'block', textAlign: 'left' }}>name: {item.name}</span>
+        {/* <span style={{ display: 'block', textAlign: 'left' }}>id: {item.id}</span>
+        <span style={{ display: 'block', textAlign: 'left' }}>name: {item.name}</span> */}
+        <span style={{ display: 'block', textAlign: 'left' }}>{item.name}</span>
       </>
     )
   }
 
-  const handleIframeClick = (event) => {
-    console.log(event)
-    setDivClicked(result =>
-      results.map((item, buttonIndex) => (buttonIndex === event ? true : item)));
-    console.log(divClicked)
+  const handleRedditScoreSelect = (selectItem) => {
+    if(selectItem.value == "+ve"){
+      const dataCollectFilter =  dataCollect.filter(function(dataObj) {
+        return dataObj.reddit_score >= 0;
+      });
+      setFilterDataCollect(dataCollectFilter)
+    }
+    else if(selectItem.value == "-ve"){
+      const dataCollectFilter =  dataCollect.filter(function(dataObj) {
+        return dataObj.reddit_score < 0;
+      });
+      setFilterDataCollect(dataCollectFilter)
+    }
+    else{
+      setFilterDataCollect(dataCollect)
+    }
   }
+
+  const handleDateSelect = (selectItem) => {
+    if(selectItem.value != "All"){
+    var timeDummy = (selectItem.value).substring(0,((selectItem.value).length-1))
+    setTimeSelectConst(timeDummy)}
+    else{
+      setTimeSelectConst("All")
+    }
+  }
+
+  const handleToggleChange = (element) => {
+    setAlignment(element.target.value)
+  }
+
+  const handleScoreChange = (element) => {
+    setRedditScoreAll(element.target.value)
+    if(element.target.value == "positiveScore"){
+      const dataCollectFilter =  dataCollect.filter(function(dataObj) {
+        return dataObj.reddit_score >= 0;
+      });
+      setFilterDataCollect(dataCollectFilter)
+    }
+    else if(element.target.value == "negativeScore"){
+      const dataCollectFilter =  dataCollect.filter(function(dataObj) {
+        return dataObj.reddit_score < 0;
+      });
+      setFilterDataCollect(dataCollectFilter)
+    }
+    else{
+      setFilterDataCollect(dataCollect)
+    }
+  }
+
+  const handleLocationChange = (event: SelectChangeEvent<typeof personName>) => {
+    const {
+      target: { value },
+    } = event;
+    setLocationName(
+      // On autofill we get a stringified value.
+      typeof value === 'string' ? value.split(',') : value,
+    );
+  };
+
+  const handleTimeFrameSelect = (event: SelectChangeEvent) => {
+    setTimeFrame(event.target.value);
+  };
+
+  // const handleKSelect = (event) => {
+  //   console.log(event.target.value)
+  //   setKValue(event.target.value)
+  // }
+
+  const handleTitleChange = (event) => {
+    console.log(event.target.value)
+    setTitleValue(event.target.value)
+  }
+
+  const handleDateChange = (newValue) => {
+    if (newValue[0] && newValue[1]) {
+      const startFormatted = dayjs(newValue[0]).format('DDMMYYYY');
+      const endFormatted = dayjs(newValue[1]).format('DDMMYYYY');
+      setFromTimeSelect(startFormatted)
+      setToTimeSelect(endFormatted)
+      setTimeSelect(newValue);
+    }
+  }
+
+  const handleTitleSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTitleSelect(event.target.checked)
+  }
+
+  const handleAllTimeSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAllTimeSelect(event.target.checked)
+  }
+
+  const Accordion = styled((props: AccordionProps) => (
+    <MuiAccordion disableGutters elevation={0} square {...props} />
+  ))(({ theme }) => ({
+    border: `2px solid ${theme.palette.divider}`,
+    borderRadius : '8px',
+    backgroundColor: 'rgb(220, 220, 220)',
+    // color: 'rgb(255, 69, 0)',
+    color: 'black',
+    '&:not(:last-child)': {
+      borderBottom: 0,
+    },
+    '&:before': {
+      display: 'none',
+    },
+  }));
+
+  const AccordionSummary = styled((props: AccordionSummaryProps) => (
+    <MuiAccordionSummary
+      expandIcon={<ArrowForwardSharp sx={{ fontSize: '0.9rem' }} />}
+      {...props}
+    />
+  ))(({ theme }) => ({
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, .05)'
+        : 'rgba(0, 0, 0, .03)',
+    flexDirection: 'row-reverse',
+    '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+      transform: 'rotate(90deg)',
+    },
+    '& .MuiAccordionSummary-content': {
+      marginLeft: theme.spacing(1),
+    },
+  }));
+  
+  const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
+    padding: theme.spacing(2),
+    borderTop: '1px solid rgba(0, 0, 0, .125)',
+  }));
+
 
   useEffect (() => {
     console.log("inside use effect")
-    const getData = async () => {
-      const dummy_data_store = await DATA.QueryData()
-      console.log(dummy_data_store)
-      setQueryResults(dummy_data_store)
-      console.log(queryResults)
-      setResults(dummy_results)
-    }
-    if(queryResults.length==0){
-      getData();
-    }
-  },[dataCheck])
-  console.log(queryResults)
-  console.log(results)
+  },[dataCollect,filterDataCollect])
 
   return (
     <div className='SearchPageMain'>
     <div className='SearchPageResults'>
         <div className='SearchResults1'>
-        <ReactSearchAutocomplete
-                items={items}
-                onSearch={handleOnSearch}
-                onHover={handleOnHover}
-                onSelect={handleOnSelect}
-                onFocus={handleOnFocus}
-                autoFocus
-                formatResult={formatResult}
-            />
+          <div className='SearchBarDiv'>
+            <div className='SearchBar'>
+              <ReactSearchAutocomplete
+                  items={items}
+                  onSearch={handleOnSearch}
+                  onHover={handleOnHover}
+                  onSelect={handleOnSelect}
+                  onFocus={handleOnFocus}
+                  autoFocus
+                  showIcon={true}
+                  placeholder="Search"
+                  formatResult={formatResult}
+                  styling={{borderRadius: "8px",zIndex:999}}
+              />
             <br/>
-        <div>
-          {console.log(results.length)}
-          {results.map((result,index) => 
-            <div className='reddit_embed' key={result.id}>
-                {/* <iframe
-                    id={result.id}
-                    src={result.embed_link}
-                    sandbox="allow-scripts allow-same-origin allow-popups"
-                    style={{border: "none", overflow: "auto" }}
-                    height="500"
-                    width="1000"
-                ></iframe> */}
-                <Iframe
-                  // onInferredClick={() => console.log('You clicked')}
-                  onInferredClick={() => handleIframeClick(index)}
-                  // id={`iframe-${index}-${result.id}`}
-                  id = {result.id}
-                  src={result.embed_link}
-                  sandbox="allow-scripts allow-same-origin allow-popups"
-                  style={{border: "none", overflow: "auto" }}
-                  height="500"
-                  width="1000"
-                ></Iframe>;
+            <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)} style={{alignItems:"center",justifyContent:"center"}}>
+                <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
+                <Typography>Advanced Search</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                <div className='searchFiltersDiv'>
+                  {/* <TextField 
+                  id="outlined-basic" 
+                  label="Title Search" 
+                  variant="outlined" 
+                  defaultValue={titleValue}
+                  sx={{ m: 1, backgroundColor:'white', width:"30%"}} 
+                  onBlur={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setTitleValue(event.target.value);
+                  }}/> */}
+                  <FormGroup sx={{ m: 1, width: "15%" , backgroundColor:'white', border: "1px solid rgb(184, 184, 184)" , borderRadius:"2px",paddingLeft:"1%"}}>
+                    <FormControlLabel control={<Checkbox defaultChecked />} label="Intitle Search" checked={titleSelect} onChange={handleTitleSelect}/>
+                  </FormGroup>
+                  <FormControl sx={{ m: 1, width: "40%", backgroundColor:'white'}} expanded={expanded}>
+                    <InputLabel id="demo-multiple-checkbox-label">Location</InputLabel>
+                    <Select
+                      labelId="demo-multiple-checkbox-label"
+                      id="demo-multiple-checkbox"
+                      multiple
+                      value={locationName}
+                      onChange={handleLocationChange}
+                      onSelect={() => setExpanded(!expanded)}
+                      input={<OutlinedInput label="Tag" />}
+                      renderValue={(selected) => selected.join(', ')}
+                      MenuProps={MenuProps}
+                    >
+                      {LocationNames.map((name) => (
+                        <MenuItem key={name} value={name}>
+                          <Checkbox checked={locationName.indexOf(name) > -1} />
+                          <ListItemText primary={name} />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  {/* <FormControl sx={{ m: 1, width: "15%", backgroundColor:'white'}}>
+                    <InputLabel id="demo-simple-select-label">TimeFrame</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={timeframe}
+                      label="Age"
+                      onChange={handleTimeFrameSelect}
+                    >
+                      <MenuItem value={"All"}>All</MenuItem>
+                      <MenuItem value={"1"}>1 Month</MenuItem>
+                      <MenuItem value={"6"}>6 Months</MenuItem>
+                      <MenuItem value={"12"}>12 Months</MenuItem>
+                      <MenuItem value={"24"}>24 Months</MenuItem>
+                    </Select>
+                  </FormControl> */}
+                  <TextField 
+                  id="outlined-basic" 
+                  label="No of Results" 
+                  variant="outlined" 
+                  defaultValue={kValue}
+                  sx={{ m: 1, backgroundColor:'white',width:"15%"}} 
+                  onBlur={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setKValue(event.target.value);
+                  }}/>
+                </div>
+                <div className='datePickerDiv'>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DemoContainer components={['DateRangePicker']}>
+                      <DateRangePicker localeText={{ start: 'Start', end: 'End' }} value={timeSelect} onChange={handleDateChange} sx={{ m: 1,paddingBottom:"1.5%"}}/>
+                    </DemoContainer>
+                  </LocalizationProvider>
+                  <FormGroup sx={{width: "15%" , backgroundColor:'white', border: "1px solid rgb(184, 184, 184)" , borderRadius:"2px",paddingLeft:"1%"}}>
+                    <FormControlLabel control={<Checkbox defaultChecked />} label="All time" checked={allTimeSelect} onChange={handleAllTimeSelect}/>
+                  </FormGroup>
+                </div>
+                </AccordionDetails>
+            </Accordion>
             </div>
-            )}
-        </div>
+            <button className='SearchButton' onClick={()=>handleButtonSearch(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue)}>Search</button>
+          </div>
+          <div className='filtersDiv'>
+            <div className='toggleTabDiv'>
+              <ToggleButtonGroup
+                color="primary"
+                value={alignment}
+                exclusive
+                onChange={handleToggleChange}
+                aria-label="Platform"
+              >
+                <ToggleButton value="redditScore" style={{color:"#ff4500" , backgroundColor:"#161515"}}>Type : </ToggleButton>
+                <ToggleButton value="searchResults" style={{color: 'white'}}>Search Results</ToggleButton>
+                <ToggleButton value="insights" style={{color: 'white'}}>Insights</ToggleButton>
+              </ToggleButtonGroup>
+            </div>
+            <div className='ToggleScoreDiv'>
+              <ToggleButtonGroup
+                color="primary"
+                value={redditScoreAll}
+                exclusive
+                onChange={handleScoreChange}
+                aria-label="Platform"
+              >
+                <ToggleButton value="redditScore" style={{color:"#ff4500" , backgroundColor:"#161515"}}>Reddit Score :</ToggleButton>
+                <ToggleButton value="all" style={{color: 'white'}}>All</ToggleButton>
+                <ToggleButton value="positiveScore" style={{color: 'white'}}>+ve</ToggleButton>
+                <ToggleButton value="negativeScore" style={{color: 'white'}}>-ve</ToggleButton>
+              </ToggleButtonGroup>
+            </div>
+          </div>
+          <br/>
+          {alignment == 'searchResults' ? (
+            <SearchResultsComp 
+            data = {filterDataCollect}
+            numResults = {numResults}/>
+            ):(
+            <InsightsComp
+            barChartData = {barChartData}
+            pieChartData = {pieChartData} 
+            doughChartData = {doughChartData}
+            statsCheck = {statsCheck}
+            avgRedditScore = {avgRedditScore}
+            avgScore = {avgScore}
+            searchTime = {searchTime}/>
+            )
+          }
         </div>
         <div className="side-box">
             <div>
@@ -147,7 +610,7 @@ const SearchPage = () => {
             <br/>
             <div className='buttons-start'>
             {items.map((object_ele,i)=>
-            <button className='btn-orange' onClick={onclick} key={i}>{object_ele.name}</button>
+            <button className='btn-orange' onClick={()=>handleKeywordSearch(object_ele.name)} key={i}>{object_ele.name}</button>
             )}
             </div>
         </div>

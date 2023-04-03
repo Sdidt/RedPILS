@@ -1,8 +1,11 @@
 IR
 .env
 __pycache__
-outputs/
+outputs/*
 solr-9.1.1/
+solr-9.1.1.tgz
+backup.txt
 redpils
 venv
 node_modules
+configset_modified.zip

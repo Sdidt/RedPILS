@@ -1,0 +1,63 @@
+AFSPA,Armed Forces (Special Powers) Act
+AAP, Aam Aadmi Party
+BJP,Bharatiya Janata Party,
+TMC, AITC, Trinamool, Trinamool
+BSP,Bahujan Samaj Party
+CE,Common Era
+ICSSR,Indian Council of Social Science Research
+IPT,Indian Political Thought
+IT,Information Technology
+INC,Indian National Congress
+MIPT,Modern Indian Political Thought
+MRPS,Madiga Reservation Porata Samithi
+TRS, Telangana Rashtra Samithi
+OBCs,Other Backward Classes
+RPI,Republican Party of India
+SCs,Scheduled Castes
+SP,Samajwadi Party
+ST,Scheduled Tribe
+US,United States
+Andaman and Nicobar Islands, A&N islands, Andaman, Nicobar, Andaman and Nicobar
+Andhra Pradesh, Andhra, AP
+Arunachal Pradesh, Arunachal
+Assam
+Bihar
+Chandigarh
+Chhattisgarh
+Dadra and Nagar Haveli and Daman and Diu, Dadra, Nagar Haveli, Diu, Daman, Daman & Diu, Daman and Diu
+Delhi, New Delhi, NCT
+Goa
+Gujarat
+Haryana
+Himachal Pradesh, HP, Himachal
+Jammu and Kashmir, JK, J&K, POK, Jammu, Kashmir, Jammu & Kashmir, Azad JK, Gilgit, Gilgit Baltistan
+Jharkhand
+Karnataka
+Kerala
+Ladakh
+Lakshadweep
+Madhya Pradesh, MP
+Maharashtra
+Manipur
+Meghalaya
+Mizoram
+Nagaland
+Odisha, Orissa
+Puducherry, Pondicherry
+Punjab
+Rajasthan
+Sikkim
+Tamil Nadu, TN
+Telangana
+Tripura
+Union territory, UT
+Uttar Pradesh, UP
+Uttarakhand, Uttaranchal
+West Bengal, WB, Bengal
+India, Hindustan, Bharat
+China
+Pakistan, Pak
+Sri Lanka, SL 
+Britain, UK, United Kingdom, British
+Bangladesh
+Afghanistan, Afghan

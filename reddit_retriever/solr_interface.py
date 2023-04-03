@@ -1,12 +1,70 @@
 import requests
 import json
+import sys
+import os
+from dotenv import load_dotenv
+load_dotenv()
+sys.path.append(os.environ.get("SYS_PATH"))
+from zipfile import ZipFile
+from utils.helpers import *
+from utils.constants import *
+import time
 
 class solr_ingest():
-    def __init__(self,solr_url,collection_name,headers,data) -> None:
+    def __init__(self,solr_url,collection_name,headers, alpha=0.9, beta=0.1) -> None:
         self.solr_url = solr_url
         self.collection_name = collection_name
         self.headers = headers
-        self.data = data
+        self.alpha = alpha
+        self.beta = beta
+
+    def get_doc_count(self, collection_name):
+        query_params = {
+            'q': "*:*", 
+            'rows': 0
+        }
+
+        url = self.solr_url+'/'+collection_name
+        response = requests.get(f'{url}/select', params=query_params)
+        numFound = response.json()['response']['numFound']
+        print("Number found: {}".format(numFound))
+        return numFound
+
+    def upload_configset(self, configset_zip_path, configset_name, overwrite="true"):
+        query_params = {
+            "action": "UPLOAD",
+            "name": configset_name,
+            "overwrite": overwrite
+        }
+        with open(configset_zip_path, 'rb') as zip:
+            # printing all the contents of the zip file
+            # zip.printdir()
+            print(zip.read())
+            headers = {
+                'Content-type': 'application/octet-stream'
+            }
+            data = {
+                'file': zip
+            }
+            url = self.solr_url + '/admin/configs'
+
+            response = requests.post(url, params=query_params, files=data, headers=headers)
+        if response.status_code == 200:
+            print("Config set {} successfully updated.".format(configset_name))
+        else:
+            print("Error occurred uploading config set: {}".format(response.text))
+
+    def check_submission_exists(self, collection_name, submission_id):
+        query_params = {
+            'q': 'submission_id: {}'.format(submission_id),
+            'rows': 0
+        }
+
+        url = self.solr_url+'/'+collection_name
+        response = requests.get(f'{url}/select', params=query_params)
+        numFound = response.json()['response']['numFound']
+        print("Number found: {}".format(numFound))
+        return numFound > 0
 
     def check_collection_exists(self,collection_name):
         request_data = {
@@ -24,7 +82,7 @@ class solr_ingest():
             print(f'Error checking collection: {response.text}')
             return True
 
-    def create_collection(self,collection_name,schema):
+    def create_collection(self, collection_name,schema, unique_key, field_type=None):
         collection_exists = self.check_collection_exists(collection_name)
         if(collection_exists):
             print(f'Collection "{collection_name}" exists')
@@ -32,7 +90,7 @@ class solr_ingest():
         else:
             print(f'Collection "{collection_name}" does not exist')
 
-        config_name = 'my_config'
+        config_name = solr_var['configset_name']
         num_shards = 2
         replication_factor = 2
 
@@ -41,7 +99,8 @@ class solr_ingest():
             'name': collection_name,
             'numShards': num_shards,
             'replicationFactor': replication_factor,
-            'configName': config_name
+            'collection.configName': config_name,
+            'collection.uniqueKey': unique_key
         }
 
         response = requests.get(f'{self.solr_url}/admin/collections', params=request_data)
@@ -50,6 +109,8 @@ class solr_ingest():
         else:
             print(f'Error creating collection: {response.text}')
 
+        if field_type is not None:
+            self.add_new_field_type(collection_name, field_type)
         self.define_schema(collection_name,schema)
 
     def delete_collection(self,collection_name):
@@ -69,8 +130,65 @@ class solr_ingest():
         response = requests.get(f'{self.solr_url}/admin/collections', params=request_data)
         if response.status_code == 200:
             print(f'The collection "{collection_name}" has been deleted.')
+            # print(response.text)
         else:
             print(f'Error deleting the collection: {response.text}')
+
+    def add_new_field_type(self, collection_name, new_field_type):
+        url = self.solr_url+'/'+collection_name
+
+        request_data = {
+            'add-field-type': new_field_type
+        }
+
+        response = requests.post(f'{url}/schema', headers=self.headers,json=request_data)
+
+        if response.status_code == 200:
+            print(f'The field type {new_field_type["name"]} for the collection "{collection_name}" has been added.')
+        else:
+            print(f'Error updating the schema: {response.text}')
+        
+    def add_new_copy_field(self, collection_name, copy_field):
+        url = self.solr_url+'/'+collection_name
+
+        request_data = {
+            'add-copy-field': copy_field
+        }
+
+        response = requests.post(f'{url}/schema', headers=self.headers,json=request_data)
+
+        if response.status_code == 200:
+            print(f'The copy field {copy_field["dest"]} for the collection "{collection_name}" has copied fields now.')
+        else:
+            print(f'Error updating the schema: {response.text}')
+        
+    def add_new_request_handler(self, collection_name, request_handler):
+        url = self.solr_url+'/'+collection_name
+
+        request_data = {
+            'add-requesthandler': request_handler
+        }
+
+        response = requests.post(f'{url}/config', headers=self.headers,json=request_data)
+
+        if response.status_code == 200:
+            print(f'The request handler {request_handler["name"]} for the collection "{collection_name}" has been added.')
+        else:
+            print(f'Error updating the config: {response.text}')
+
+    def update_existing_field_type(self, collection_name, field_type_def):
+        url = self.solr_url+'/'+collection_name
+
+        request_data = {
+            'replace-field-type': field_type_def
+        }
+
+        response = requests.post(f'{url}/schema', headers=self.headers,json=request_data)
+
+        if response.status_code == 200:
+            print('The field type {} for the collection "{}" has been updated.'.format(field_type_def['name'], collection_name))
+        else:
+            print(f'Error updating the schema: {response.text}')
 
     def define_schema(self,collection_name,schema):
         url = self.solr_url+'/'+collection_name
@@ -105,11 +223,24 @@ class solr_ingest():
         else:
             print(f'Error updating schema in Solr: {response.text}')
 
-
-    def push_data(self,collection_name):
+    def replace_schema(self,collection_name,schema):
         url = self.solr_url+'/'+collection_name
 
-        doc_json = json.dumps(self.data)
+        request_data = {
+            'replace-field': schema
+        }
+
+        response = requests.post(f'{url}/schema', headers=self.headers,json=request_data)
+
+        if response.status_code == 200:
+            print(f'The schema for the collection "{collection_name}" has been replaced.')
+        else:
+            print(f'Error replacing the schema: {response.text}')
+
+    def push_data(self,collection_name,data):
+        url = self.solr_url+'/'+collection_name
+
+        doc_json = json.dumps(data)
         response = requests.post(f'{url}/update/json/docs', headers=self.headers, data=doc_json)
         requests.get(f'{url}/update?commit=true')
 
@@ -169,6 +300,75 @@ class solr_ingest():
                 print(f'Error querying updated document')
         else:
             print(f'Error querying documents')
+        
+    def compute_avg_tf_idf(self, term, collection_name):
+        url = self.solr_url+'/'+collection_name
+
+        query_params = {
+            "q": "{{!func}}mul(tf(comment, {}), idf(comment, {}))".format(term, term),
+            "fl": "score,url",
+            "rows": 100000
+        }
+
+        response = requests.get(f'{url}/select', params=query_params)
+        search_results = response.json()['response']['docs']
+        avg_score = sum([result["score"] for result in search_results])/len(search_results)
+
+        return avg_score
+
+    def compute_query_term_score(self, query_term, collection_name, K):
+        url = self.solr_url+'/'+collection_name
+
+        query_params = {
+            "q": "comment:{}".format(query_term),
+            "_query_": "{!rank f='pagerank', function='log' scalingFactor='1.2'}",
+            "fl": "score,comment,url",
+            "rows": 100
+        }
+
+        response = requests.get(f'{url}/select', params=query_params)
+        search_results = response.json()['response']['docs']
+
+        return search_results[:K]
+
+    def phrase_query(self, collection_name, phrase_query, term_imp, bigram_imp, trigram_imp, full_phrase_imp, start_month, end_month, intitle,  K):
+        url = self.solr_url+'/'+collection_name
+
+        qf = "comment^{}".format(term_imp)
+        pf = "comment^{}".format(full_phrase_imp)
+        pf2 = "comment^{}".format(bigram_imp)
+        pf3 = "comment^{}".format(trigram_imp)
+        if (intitle):
+            print("In title is true")
+            qf = qf + " submission_title^{}".format(2 * term_imp)
+            pf = pf + " submission_title^{}".format(2 * full_phrase_imp)
+            pf2 = pf2 + " submission_title^{}".format(2 * bigram_imp)
+            pf3 = pf3 + " submission_title^{}".format(2 * trigram_imp)
+
+        query_params = {
+            "q": phrase_query,
+            "defType": "edismax",
+            "qs": "100",
+            "ps": "100",
+            "bf": "log(reddit_score)",
+            "qf": qf,
+            "fl": "comment,submission_title,score,url,reddit_score,timestamp",
+            "pf": pf,
+            "pf2": pf2,
+            "pf3": pf3,
+            "fq": "timestamp:[{} TO {}]".format(start_month, end_month),
+            "rows": 3000
+        }
+        # print(url)
+        # print(query_params)
+        start_timer=time.time()
+        response = requests.get(f'{url}/select', params=query_params)
+        time_elapsed=time.time()-start_timer
+        # print (response.json())
+        search_results = response.json()['response']['docs']
+        # print(search_results)
+        return time_elapsed, search_results
+
 
 if __name__ == '__main__':
     # define solr endpoint
@@ -177,39 +377,33 @@ if __name__ == '__main__':
     collection_name = 'new_collection'
     # global headers definition
     headers = {'Content-type': 'application/json'}
-    # dummy data to be ingested into solr database
-    data = [
-            {'id': '1', 'title': 'Document 1', 'text': 'This is the first document'},
-            {'id': '2', 'title': 'Document 2', 'text': 'This is the second document'},
-            {'id': '3', 'title': 'Document 3', 'text': 'This is the third document'}
-        ]
+
     # query params
     # q - query
     # fl - fields to query
     # rows - max rows to query
     params = {
-            'q': 'text:document',
-            'fl': 'id,title',
-            'rows': 10
+            'q': 'comment:on',
+            'fl': 'comment_id,comment,score',
+            'rows': 2
         }
-    fields = [
-            {"name": "id", "type": "string"},
-            {"name": "title", "type": "text_en"},
-            {"name": "content", "type": "text_en"},
-            ]
-
     # define solr_ingest object
-    data_ingest = solr_ingest(solr_url,collection_name,headers,data)
+    data_ingest = solr_ingest(solr_url,collection_name,headers)
     # delete collection defined above
-    data_ingest.delete_collection('my_collection')
+    data_ingest.delete_collection(collection_name)
     # create new collection using same name
-    data_ingest.create_collection(collection_name,fields)
+    data_ingest.create_collection(collection_name,solr_var['data_schema'])
     # delete all data in the collection
     data_ingest.delete_data(collection_name)
+    # read and process to save as json data
+    data_dict = read_data("test3")
+    data = process_json(data_dict)
+    store_json(data,"text3_json")
+    data = read_json("test3_json")
     # push data to the collection
-    data_ingest.push_data(collection_name)
+    data_ingest.push_data(collection_name,data)
     # query data based on paramaters defined above
     search_data = data_ingest.query_data(params,collection_name)
     print(search_data)
-    # update data based on rules defined inside the function
-    data_ingest.update_data(collection_name)
+    # update data based on rules defined
+    # data_ingest.update_data(collection_name)

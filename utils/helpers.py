@@ -1,3 +1,4 @@
+from __future__ import annotations  # required for older python versions before 3.9
 import os
 import json
 import pickle
@@ -12,9 +13,9 @@ def store_raw_data(self, sub_data):
         pprint(sub_data, f)
 
 def store_data(sub_data,output_filename):
-    isExist = os.path.exists('./outputs')
+    isExist = os.path.exists('outputs')
     if not isExist:
-        os.makedirs('./outputs')
+        os.makedirs('outputs')
 
     with open("outputs/{}.txt".format(output_filename), "wb") as f:
         pickle.dump(sub_data, f)
@@ -34,9 +35,8 @@ def read_json(file_name):
     return data
 
 def store_json(data,file_name):
-    json_res = process_json(data)
     with open('outputs/{}.json'.format(file_name), 'w') as f:
-        json.dump(json_res , f)
+        json.dump(data , f)
 
 def convert_to_datetime(timestamp):
     dt_object = datetime.datetime.fromtimestamp(timestamp)
@@ -52,7 +52,7 @@ def process_json(data: list[Comment]):
                 "submission_title": comment.submission_title.decode('utf-8'),
                 "subreddit_id": comment.subreddit_id,
                 "subreddit_name": comment.subreddit_name,
-                "id": comment.id,
+                "comment_id": comment.id,
                 "comment": comment.comment.decode('utf-8'),
                 "timestamp": convert_to_datetime(comment.timestamp),
                 "url": comment.url,
@@ -60,6 +60,7 @@ def process_json(data: list[Comment]):
                 "redditor_id": comment.redditor_id
             }
         )
+    # @abhi: fix this part, not sure what to do
     # for key in data:
     #     new_dict = {'subreddit':key}
     #     for post_key in data[key]:
