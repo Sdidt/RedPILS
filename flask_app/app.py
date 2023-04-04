@@ -138,7 +138,7 @@ def query():
     
     
     if region!=None and region!="":      
-        query=query+" AND ("+ region+")"
+        query=query+" AND ( "+ region+" )"
     query=process_query(query)
     d1, d2=process_date(timeframe, sd, ed)
     print(d1, d2)

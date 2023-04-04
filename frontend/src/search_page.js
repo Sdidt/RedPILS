@@ -71,6 +71,7 @@ const SearchPage = () => {
   const [kValue, setKValue] = useState("10");
   const [titleValue, setTitleValue] = React.useState('');
   const [titleSelect, setTitleSelect] = useState(false);
+  const [allTimeSelect, setAllTimeSelect] = useState(false)
   const [expanded, setExpanded] = useState(false);
 
   // const [categories,setCategories] = useState([])
@@ -99,8 +100,24 @@ const SearchPage = () => {
       },
       {
         id: 4,
-        name: 'Bla'
-      }
+        name: 'Tharoor'
+      },
+      {
+        id: 5,
+        name: 'Punjab'
+      },
+      {
+        id: 6,
+        name: 'Government'
+      },
+      {
+        id: 7,
+        name: 'Education'
+      },
+      {
+        id: 8,
+        name: 'Modi'
+      },
     ]
 
   const top100Films = [
@@ -128,13 +145,50 @@ const SearchPage = () => {
   };
   
   const LocationNames = [
-    'Karnataka',
-    'Tamil Nadu',
-    'Kerala',
-    'Arunachal Pradesh',
-    'Andhra Pradesh',
-    'Telangana',
-    'Gujarat',
+    "Andaman and Nicobar",
+    "Andhra Pradesh",
+    "Arunachal Pradesh",
+    "Assam",
+    "Bihar",
+    "Chandigarh",
+    "Chhattisgarh",
+    "Dadra and Nagar Haveli and Daman and Diu",
+    "Delhi",
+    "Goa",
+    "Gujarat",
+    "Haryana",
+    "Himachal Pradesh",
+    "Jammu and Kashmir",
+    "Jharkhand",
+    "Karnataka",
+    "Kerala",
+    "Ladakh",
+    "Lakshadweep",
+    "Madhya Pradesh",
+    "Maharashtra",
+    "Manipur",
+    "Meghalaya",
+    "Mizoram",
+    "Nagaland",
+    "Odisha",
+    "Puducherry",
+    "Punjab",
+    "Rajasthan",
+    "Sikkim",
+    "Tamil Nadu",
+    "Telangana",
+    "Tripura",
+    "Union territory",
+    "Uttar Pradesh",
+    "Uttarakhand",
+    "West Bengal",
+    "India",
+    "China",
+    "Pakistan",
+    "Sri Lanka",
+    "Britain",
+    "Bangladesh",
+    "Afghanistan" 
   ];
 
   const timeDropDown = [
@@ -191,13 +245,13 @@ const SearchPage = () => {
     // console.log('Focused')
   }
 
-  const handleButtonSearch = async(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue) => {
+  const handleButtonSearch = async(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect) => {
     console.log(searchTerm)
     console.log(timeSelectConst)
     console.log(locationName)
     console.log(kValue)
     if(searchTerm!=""){
-      var dummy_data_store = await DATA.QueryData(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue)
+      var dummy_data_store = await DATA.QueryData(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect)
       console.log(dummy_data_store['topk'])
       setDataCollect(dummy_data_store['topk'])
       setFilterDataCollect(dummy_data_store['topk'])
@@ -249,7 +303,7 @@ const SearchPage = () => {
   console.log(barChartData)
 
   const handleKeywordSearch = async(searchTerm) => {
-    const dummy_data_store = await DATA.QueryData(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue)
+    const dummy_data_store = await DATA.QueryData(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect)
     if(dummy_data_store['topk'].length==0){
       const dummy_data_store = await DATA.QueryData('BJP')
     }
@@ -353,6 +407,10 @@ const SearchPage = () => {
 
   const handleTitleSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitleSelect(event.target.checked)
+  }
+
+  const handleAllTimeSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAllTimeSelect(event.target.checked)
   }
 
   const Accordion = styled((props: AccordionProps) => (
@@ -487,14 +545,17 @@ const SearchPage = () => {
                 <div className='datePickerDiv'>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DemoContainer components={['DateRangePicker']}>
-                      <DateRangePicker localeText={{ start: 'Start', end: 'End' }} value={timeSelect} onChange={handleDateChange}/>
+                      <DateRangePicker localeText={{ start: 'Start', end: 'End' }} value={timeSelect} onChange={handleDateChange} sx={{ m: 1,paddingBottom:"1.5%"}}/>
                     </DemoContainer>
                   </LocalizationProvider>
+                  <FormGroup sx={{width: "15%" , backgroundColor:'white', border: "1px solid rgb(184, 184, 184)" , borderRadius:"2px",paddingLeft:"1%"}}>
+                    <FormControlLabel control={<Checkbox defaultChecked />} label="All time" checked={allTimeSelect} onChange={handleAllTimeSelect}/>
+                  </FormGroup>
                 </div>
                 </AccordionDetails>
             </Accordion>
             </div>
-            <button className='SearchButton' onClick={()=>handleButtonSearch(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue)}>Search</button>
+            <button className='SearchButton' onClick={()=>handleButtonSearch(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect)}>Search</button>
           </div>
           <div className='filtersDiv'>
             <div className='toggleTabDiv'>

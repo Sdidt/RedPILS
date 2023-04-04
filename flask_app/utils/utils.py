@@ -15,13 +15,20 @@ from utils.constants import solr_var
 
 def process_query(query):
     operators = [" AND ", " OR ", " NOT "]
+    words=query.split()
+    
+    print(query)
     processed_query=query
     for op in operators:
         regex_pattern = re.compile(re.escape(op), re.IGNORECASE)
         processed_query = regex_pattern.sub(op, processed_query)
+    for word in words:
+        if word.upper() not in ["AND", "OR", "NOT", ")", "(", "~"]:
+            processed_query= processed_query.replace(word, word+"~3")
     return processed_query
     
-def search_db(query, K=10, d1="*", d2="*", intitle=""):
+def search_db(query, K=10, d1="*", d2="*", intitle=False):
+    intitle = intitle == "true"
     data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],solr_var['headers'])
     time_elapsed, search_results = data_ingest.phrase_query(solr_var['data_collection_name'], query, 5, 10, 20, 40, d1, d2, intitle,K)
     num_results=len(search_results)
@@ -32,7 +39,7 @@ def search_db(query, K=10, d1="*", d2="*", intitle=""):
         "reddit_score": doc["reddit_score"],
         "url": "https://www.reddit.com" + doc["url"],
         #replace label with actual label
-        "political_leaning": random.choice(["left", "left leaning", "neutral", "right_leaning", "right"])
+        "political_leaning": random.choice(["-2", "-1", "0", "1", "2"])
     } for doc in search_results]
     # [print("Score: {}\nComment: {}\nURL: {}".format(doc["score"], doc["comment"], doc["url"])) for doc in search_results]
     return time_elapsed, num_results, search_results
