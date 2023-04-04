@@ -301,6 +301,15 @@ class solr_ingest():
         else:
             print(f'Error querying documents')
         
+    def set_field(self, comment_id, collection_name):
+        url = self.solr_url+'/'+collection_name
+
+        query_params = {
+            "commit": "true"
+        }
+
+        response = requests.get(f'{url}/select', params=query_params)    
+    
     def compute_avg_tf_idf(self, term, collection_name):
         url = self.solr_url+'/'+collection_name
 
@@ -331,7 +340,7 @@ class solr_ingest():
 
         return search_results[:K]
 
-    def phrase_query(self, collection_name, phrase_query, term_imp, bigram_imp, trigram_imp, full_phrase_imp, start_month, end_month, intitle,  K):
+    def phrase_query(self, collection_name, phrase_query, term_imp, bigram_imp, trigram_imp, full_phrase_imp, start_month, end_month, intitle,  K, qs="100", ps="100"):
         url = self.solr_url+'/'+collection_name
 
         qf = "comment^{}".format(term_imp)
@@ -347,8 +356,8 @@ class solr_ingest():
         query_params = {
             "q": phrase_query,
             "defType": "edismax",
-            "qs": "100",
-            "ps": "100",
+            "qs": qs,
+            "ps": ps,
             "bf": "log(reddit_score)",
             "qf": qf,
             "fl": "comment,submission_title,score,url,reddit_score,timestamp",
@@ -356,7 +365,7 @@ class solr_ingest():
             "pf2": pf2,
             "pf3": pf3,
             "fq": "timestamp:[{} TO {}]".format(start_month, end_month),
-            "rows": 3000
+            "rows": 7000
         }
         # print(url)
         # print(query_params)
