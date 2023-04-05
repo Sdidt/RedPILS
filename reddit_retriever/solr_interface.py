@@ -359,7 +359,7 @@ class solr_ingest():
             "defType": "edismax",
             "qs": qs,
             "ps": ps,
-            "bf": "log(reddit_score)",
+            "bf": "log(reddit_score)^10",
             "qf": qf,
             "fl": "comment,submission_title,score,url,reddit_score,timestamp",
             "pf": pf,

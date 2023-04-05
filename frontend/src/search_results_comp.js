@@ -65,7 +65,7 @@ const SearchResultsComp = (props) => {
               <div className='reddit_embed' key={result.url}>
                 <iframe
                   id = {result.url}
-                  src={"https://www.redditmedia.com/"+(result.url).substring(23,((result.url).length-1))+"?limit=2/?ref\_source=embed\&amp;ref=share\&amp;embed=true&showtitle=%22true%22&theme=dark&limit=5"}
+                  src={"https://www.redditmedia.com/"+(result.url).substring(23,((result.url).length-1))+"?limit=2/?ref\_source=embed\&amp;ref=share\&amp;embed=true&showtitle=%22true%22&theme=dark&limit=0"}
                   sandbox="allow-scripts allow-same-origin allow-popups"
                   style={{border: "none", overflow: "auto" }}
                   height = '300px'
