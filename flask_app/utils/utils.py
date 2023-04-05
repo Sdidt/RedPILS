@@ -35,8 +35,11 @@ def process_query(query):
         regex_pattern = re.compile(re.escape(op), re.IGNORECASE)
         processed_query = regex_pattern.sub(op, processed_query)
     for word in words:
-        if word.upper() not in ["AND", "OR", "NOT", ")", "(", "~"]:
+        if word.upper() not in ["AND", "OR", "NOT", ")", "(", "~"] and len(word)>=7 and '~' not in word:
             processed_query= processed_query.replace(word, word+"~3")
+        elif word.upper() not in ["AND", "OR", "NOT", ")", "(", "~"] and len(word)>=5 and '~' not in word:
+            processed_query= processed_query.replace(word, word+"~2")
+        
     return processed_query
     
 def search_db(query, K=10, d1="*", d2="*", intitle=False):
@@ -105,18 +108,36 @@ def generate_wordclouds(search_results):
     # plt.show()
 
 def generate_df():
-    pass
-
-def generate_geoplot(df, key):
+    map_df=pd.read_csv('flask_app/outputs/map_data.csv')
+    for i,term in enumerate(map_df["state"]):
+        term=term.replace("&", "")
+        term=term.replace(" Pradesh", "")
+        term=process_query(term)
+        # term.replace("Uttar Pradesh", "UP")
+        time_elapsed, num_results, search_results=search_db(term)
+        
+        print(term, num_results)
+        reddit_avg, score_avg, polarity_avg= avg_scores(search_results)
+        map_df.loc[i, 'num_results'] = num_results
+        map_df.loc[i, 'reddit_score'] = reddit_avg
+        map_df.loc[i, 'polarity'] = polarity_avg
+        map_df.loc[i, 'score'] =score_avg
+        
+    map_df.to_csv("flask_app/outputs/map_data.csv", index=False)   
+    print(map_df)
     
+
+def generate_geoplot(key="num_results", colormap="Reds"):
+    map_df=pd.read_csv('flask_app/outputs/map_data.csv')
     fig = px.choropleth(
-    df,
+    map_df,
     geojson="https://gist.githubusercontent.com/jbrobst/56c13bbbf9d97d187fea01ca62ea5112/raw/e388c4cae20aa53cb5090210a42ebb9b765c0a36/india_states.geojson",
     featureidkey='properties.ST_NM',
     locations='state',
     color=key,
-    color_continuous_scale='Reds'
+    color_continuous_scale=colormap
     )
     
     fig.update_geos(fitbounds="locations", visible=False)
+    fig.show()
     return fig

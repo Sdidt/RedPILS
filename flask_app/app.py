@@ -5,6 +5,7 @@ import os
 import sys
 import wordcloud
 import matplotlib.pyplot as plt
+import plotly
 import plotly.express as px
 import pandas as pd
 
@@ -12,7 +13,7 @@ load_dotenv()
 print(os.environ.get("SYS_PATH"))
 sys.path.append(os.environ.get("SYS_PATH"))
 
-from flask_app.utils.utils import avg_scores, search_db, process_date, process_query, generate_wordclouds
+from flask_app.utils.utils import avg_scores, search_db, process_date, process_query, generate_wordclouds,generate_df, generate_geoplot
 
 app = Flask(__name__)
 CORS(app)
@@ -21,6 +22,7 @@ cors = CORS(app, resources={r"/*": {"origins":["*","http://localhost:8000"]}})
 #---------------------------------------------- TEST -------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/')
 def hello():
+    # generate_df()
     return "Hello World! This is a test app"
 
 top_kr=[{'comment': "Rahul Gandhi can never be Savarkar", 'url': "https://example.com"}, {'comment': "Pappu is UNFORTUNATELY an MP", 'url': "https://example.com"}, {'comment': "Congress should get rid of Gandhis", 'url': "https://example.com"}, {'comment': "Democracy is not a family Business", 'url': "https://example.com"}, {'comment': "Pappu becomes a joke again", 'url': "https://example.com"}]
@@ -68,9 +70,37 @@ def click_counter():
         return "click successfully updated"
     return "Error"
 
+@app.route('/api/geoplot', methods=["GET"])
+def map_plot():
+    """
+    /api/geoplot?key=num_results&colormap=Reds
+    key: num_results, reddit_score, score, polarity
+    colormap: Plotly color_continuous_scale field
+    Returns:
+        graphJSON object
+    """
+    if request.method=='GET':
+        args = request.args
+        try:
+            key=args.get("key")
+        except:
+            key="num_results"
+        try:
+            colormap=args.get("colormap")
+        except:
+            colormap="Reds"
+    fig=generate_geoplot(key=key, colormap=colormap)
+    # fig.show()
+    graphJSON = plotly.io.to_json(fig, pretty=True)
+    return graphJSON
 
 @app.route('/api/query_wordcloud', methods=["GET"])
 def query_wordcloud():
+    """Params same as query
+
+    Returns:
+        _type_: _description_
+    """
     #if request is of type GET
     if request.method=='GET':
         args = request.args
@@ -110,9 +140,9 @@ def query_wordcloud():
     fig_wordcloud=generate_wordclouds(search_results)
     plt.figure(figsize=(10,7), frameon=False)
     plt.imshow(fig_wordcloud)  
-    
+    plt.axis('off')
     # plt.title(title, fontsize=20 )
-    plt.savefig("flask_app/outputs/query_wordcloud.png")
+    plt.savefig("flask_app/outputs/query_wordcloud.png", bbox_inches='tight')
     return send_file("outputs/query_wordcloud.png")
     
     
