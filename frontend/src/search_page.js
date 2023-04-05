@@ -555,7 +555,7 @@ const SearchPage = () => {
                 </AccordionDetails>
             </Accordion>
             </div>
-            <button className='SearchButton' onClick={()=>handleButtonSearch(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue)}>Search</button>
+            <button className='SearchButton' onClick={()=>handleButtonSearch(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect)}>Search</button>
           </div>
           <div className='filtersDiv'>
             <div className='toggleTabDiv'>
