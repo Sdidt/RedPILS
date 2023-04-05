@@ -42,7 +42,7 @@ solr_var = {
     {"name": "url", "type": "text_en", "indexed": "true", "stored": "true"},
     {"name": "reddit_score", "type": "pint",'indexed': "true", "stored": "true"},
     {"name": "redditor_id", "type": "text_en",'indexed': "true", "stored": "true"},
-    {"name": "polarity", "type": "text_en", "indexed": "true", "stored": "true", "default": "netural"}
+    {"name": "polarity", "type": "pfloat", "indexed": "true", "stored": "true", "default": "0.0"}
     ],
     "tag_field_type": {
         "name": "tag",
