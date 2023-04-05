@@ -1,4 +1,3 @@
-import Iframe from 'react-iframe-click';
 import Typography from '@mui/material/Typography';
 import Slider from '@mui/material/Slider';
 import NoResultsImg from "./pic1.png";
@@ -64,14 +63,14 @@ const SearchResultsComp = (props) => {
             </div>
           {filterDataCollect.map((result,index) => 
               <div className='reddit_embed' key={result.url}>
-                <Iframe
+                <iframe
                   id = {result.url}
                   src={"https://www.redditmedia.com/"+(result.url).substring(23,((result.url).length-1))+"?limit=2/?ref\_source=embed\&amp;ref=share\&amp;embed=true&showtitle=%22true%22&theme=dark&limit=5"}
                   sandbox="allow-scripts allow-same-origin allow-popups"
                   style={{border: "none", overflow: "auto" }}
                   height = '300px'
                   width="100%"
-                ></Iframe>
+                ></iframe>
                 <div className="spaceDiv"></div>
                 <div className = " progressbarDiv" style={{width:"25%",backgroundColor:"white",padding:"2.2%"}}>
                   <Typography gutterBottom>Prediction class</Typography>
