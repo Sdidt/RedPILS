@@ -1,15 +1,18 @@
 from flask_cors import CORS
-from flask import Flask, request, url_for, jsonify
+from flask import Flask, request, url_for, jsonify, send_file
 from dotenv import load_dotenv
 import os
 import sys
-
+import wordcloud
+import matplotlib.pyplot as plt
+import plotly.express as px
+import pandas as pd
 
 load_dotenv()
 print(os.environ.get("SYS_PATH"))
 sys.path.append(os.environ.get("SYS_PATH"))
 
-from flask_app.utils.utils import avg_scores, search_db, process_date, process_query
+from flask_app.utils.utils import avg_scores, search_db, process_date, process_query, generate_wordclouds
 
 app = Flask(__name__)
 CORS(app)
@@ -66,6 +69,54 @@ def click_counter():
     return "Error"
 
 
+@app.route('/api/query_wordcloud', methods=["GET"])
+def query_wordcloud():
+    #if request is of type GET
+    if request.method=='GET':
+        args = request.args
+        query = args.get("query")
+        try:
+            region=args.get("region")
+        except:
+            region=None
+        try:
+            intitle=args.get("intitle")
+        except:
+            intitle=False
+        try:
+            timeframe=args.get("timeframe")
+        except:
+            timeframe=None
+        try:
+            K=int(args.get("k"))
+        except:
+            K=10
+        try:
+            sd=args.get("from")
+            ed=args.get("to")
+        except:
+            sd=None
+            ed=None
+    
+    
+    if region!=None and region!="":      
+        query=query+" AND ( "+ region+" )"
+    query=process_query(query)
+    d1, d2=process_date(timeframe, sd, ed)
+    print(d1, d2)
+    
+    time_elapsed, num_results, search_results=search_db(query, K, d1, d2, intitle)
+    search_results=search_results[:K]
+    fig_wordcloud=generate_wordclouds(search_results)
+    plt.figure(figsize=(10,7), frameon=False)
+    plt.imshow(fig_wordcloud)  
+    
+    # plt.title(title, fontsize=20 )
+    plt.savefig("flask_app/outputs/query_wordcloud.png")
+    return send_file("outputs/query_wordcloud.png")
+    
+    
+
 @app.route('/query', methods=["POST", "GET"])
 def query():
     """query function
@@ -100,7 +151,7 @@ def query():
         if body["intitle"]:
             intitle=body["intitle"]
         else: 
-            intitle=None
+            intitle=False
         if body["from"] and body["to"]:
             sd=body["from"]
             ed=body["to"]
@@ -120,7 +171,7 @@ def query():
         try:
             intitle=args.get("intitle")
         except:
-            intitle=None
+            intitle=False
         try:
             timeframe=args.get("timeframe")
         except:
@@ -144,9 +195,10 @@ def query():
     print(d1, d2)
     
     time_elapsed, num_results, search_results=search_db(query, K, d1, d2, intitle)
-    reddit_avg, score_avg=avg_scores(search_results)
+    search_results=search_results[:K]
+    reddit_avg, score_avg, polarity_avg=avg_scores(search_results)
     
-    response = jsonify({"search_time":time_elapsed, "query":query, "topk":search_results, "avg_reddit_score":reddit_avg, "avg_score":score_avg, "num_results":num_results})
+    response = jsonify({"search_time":time_elapsed, "query":query, "topk":search_results, "avg_reddit_score":reddit_avg, "avg_score":score_avg, "avg_polarity":polarity_avg, "num_results":num_results})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
