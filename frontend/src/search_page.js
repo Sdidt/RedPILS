@@ -54,6 +54,8 @@ const SearchPage = () => {
 
   const [dataCollect, setDataCollect] = useState([]);
   const [filterDataCollect, setFilterDataCollect] = useState([]);
+  const [wordCloudData, setWordCloudData] = useState([]);
+  const [geoPlotData, setGeoPlotData] = useState([]);
   const [numResults, setNumResults] = useState('');
   const [avgRedditScore, setAvgRedditScore] = useState('');
   const [avgScore, setAvgScore] = useState('');
@@ -71,7 +73,7 @@ const SearchPage = () => {
   const [kValue, setKValue] = useState("10");
   const [titleValue, setTitleValue] = React.useState('');
   const [titleSelect, setTitleSelect] = useState(false);
-  const [allTimeSelect, setAllTimeSelect] = useState(false)
+  const [allTimeSelect, setAllTimeSelect] = useState(true);
   const [expanded, setExpanded] = useState(false);
 
   // const [categories,setCategories] = useState([])
@@ -252,7 +254,10 @@ const SearchPage = () => {
     console.log(kValue)
     if(searchTerm!=""){
       var dummy_data_store = await DATA.QueryData(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect)
-      console.log(dummy_data_store['topk'])
+      var dummy_wordcloud_data = await DATA.QueryWordcloudData(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect)
+      var dummy_geoplot_data = await DATA.QueryGeoPlotData('num_results')
+      setGeoPlotData(dummy_geoplot_data)
+      setWordCloudData(dummy_wordcloud_data)
       setDataCollect(dummy_data_store['topk'])
       setFilterDataCollect(dummy_data_store['topk'])
       setNumResults(dummy_data_store['num_results'])
@@ -299,11 +304,12 @@ const SearchPage = () => {
       });
     }
   }
-
-  console.log(barChartData)
-
   const handleKeywordSearch = async(searchTerm) => {
     const dummy_data_store = await DATA.QueryData(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect)
+    var dummy_wordcloud_data = await DATA.QueryWordcloudData(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect)
+    var dummy_geoplot_data = await DATA.QueryGeoPlotData('num_results')
+    setGeoPlotData(dummy_geoplot_data)
+    setWordCloudData(dummy_wordcloud_data)
     if(dummy_data_store['topk'].length==0){
       const dummy_data_store = await DATA.QueryData('BJP')
     }
@@ -593,13 +599,15 @@ const SearchPage = () => {
             numResults = {numResults}/>
             ):(
             <InsightsComp
+            wordCloudData = {wordCloudData}
             barChartData = {barChartData}
             pieChartData = {pieChartData} 
             doughChartData = {doughChartData}
             statsCheck = {statsCheck}
             avgRedditScore = {avgRedditScore}
             avgScore = {avgScore}
-            searchTime = {searchTime}/>
+            searchTime = {searchTime}
+            geoPlotData = {geoPlotData}/>
             )
           }
         </div>

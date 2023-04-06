@@ -2,29 +2,6 @@ import Typography from '@mui/material/Typography';
 import Slider from '@mui/material/Slider';
 import NoResultsImg from "./pic1.png";
 
-// const marks = [
-//   {
-//     value: 0,
-//     label: 'LEFT',
-//   },
-//   {
-//     value: 25,
-//     label: '',
-//   },
-//   {
-//     value: 50,
-//     label: 'CENTER',
-//   },
-//   {
-//     value: 75,
-//     label: '',
-//   },
-//   {
-//     value: 100,
-//     label: 'RIGHT',
-//   },
-// ];
-
 const marks = [
   {
     value: -2,

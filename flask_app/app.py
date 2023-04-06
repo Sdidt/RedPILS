@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 import os
 import sys
 import wordcloud
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import plotly
 import plotly.express as px
@@ -143,7 +145,7 @@ def query_wordcloud():
     plt.axis('off')
     # plt.title(title, fontsize=20 )
     plt.savefig("flask_app/outputs/query_wordcloud.png", bbox_inches='tight')
-    return send_file("outputs/query_wordcloud.png")
+    return send_file("outputs/query_wordcloud.png","image/png")
     
     
 

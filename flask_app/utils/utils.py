@@ -139,5 +139,5 @@ def generate_geoplot(key="num_results", colormap="Reds"):
     )
     
     fig.update_geos(fitbounds="locations", visible=False)
-    fig.show()
+    # fig.show()
     return fig
