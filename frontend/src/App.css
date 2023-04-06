@@ -153,6 +153,14 @@
   justify-content: center; */
 }
 
+.SearchButton:hover {
+  background-color: #f99874;
+}
+
+.SearchButton:active {
+  transform: translateY(2px);
+}
+
 .reddit_embed{
   display: flex;
   flex-direction: row;
