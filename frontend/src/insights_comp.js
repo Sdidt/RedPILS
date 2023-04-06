@@ -60,8 +60,14 @@ const InsightsComp = (props) => {
 
     const handleGeoSelect = async(event: SelectChangeEvent) => {
         setGeoPlotSelect(event.target.value)
-        var dummy_geoplot_data = await DATA.QueryGeoPlotData(event.target.value)
-        setGeoPlotDataVar(dummy_geoplot_data)
+        if(event.target.value != 'num_results'){
+            var dummy_geoplot_data = await DATA.QueryGeoPlotData(event.target.value,'rdylbu')
+            setGeoPlotDataVar(dummy_geoplot_data)
+        }
+        else{
+            var dummy_geoplot_data = await DATA.QueryGeoPlotData(event.target.value,'Blues')
+            setGeoPlotDataVar(dummy_geoplot_data)
+        }
     }
 
     return (

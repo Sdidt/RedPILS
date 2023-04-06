@@ -255,7 +255,7 @@ const SearchPage = () => {
     if(searchTerm!=""){
       var dummy_data_store = await DATA.QueryData(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect)
       var dummy_wordcloud_data = await DATA.QueryWordcloudData(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect)
-      var dummy_geoplot_data = await DATA.QueryGeoPlotData('num_results')
+      var dummy_geoplot_data = await DATA.QueryGeoPlotData('num_results','Blues')
       setGeoPlotData(dummy_geoplot_data)
       setWordCloudData(dummy_wordcloud_data)
       setDataCollect(dummy_data_store['topk'])
