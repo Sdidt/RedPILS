@@ -89,12 +89,13 @@ def process_date(timeframe=None, sd=None, ed=None):
         return past_time.strftime("%Y-%m-%dT%H:%M:%SZ"), current_time.strftime("%Y-%m-%dT%H:%M:%SZ")
     
 def generate_wordclouds(search_results):
-    comments=[]
+    # comments=[]
     if len(search_results)!=0:
-        for item in search_results:
-            comments.append(item['comment'])
+        text = ' '.join(item['comment'] for item in search_results)
+        # for item in search_results:
+        #     comments.append(item['comment'])
     
-    text = ' '.join(comments)
+    # text = ' '.join(comments)
     stopwords = load_stopwords()
     fig_wordcloud = wordcloud.WordCloud(stopwords=stopwords,background_color='lightgrey',
                     colormap='viridis', width=800, height=600, collocations=False).generate(text)
@@ -129,11 +130,9 @@ def generate_df():
 
 def generate_geoplot(key="num_results", colormap="Reds"):
     map_df=pd.read_csv('flask_app/outputs/map_data.csv')
-    with open("flask_app/outputs/india_states.geojson") as f:
-        states = json.load(f)
     fig = px.choropleth(
     map_df,
-    geojson=states,
+    geojson="https://gist.githubusercontent.com/jbrobst/56c13bbbf9d97d187fea01ca62ea5112/raw/e388c4cae20aa53cb5090210a42ebb9b765c0a36/india_states.geojson",
     featureidkey='properties.ST_NM',
     locations='state',
     color=key,
