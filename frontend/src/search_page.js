@@ -509,7 +509,7 @@ const SearchPage = () => {
 
   useEffect(() => {
     console.log("inside use effect");
-  }, [dataCollect, filterDataCollect]);
+  }, [dataCollect, filterDataCollect, geoPlotData, wordCloudData]);
 
   return (
     <div className="SearchPageMain">
