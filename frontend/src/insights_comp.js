@@ -1,14 +1,24 @@
 import { Pie, Bar, Doughnut } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
-import SimpleWordcloud from './wordclouds';
 import React, { useEffect, useState } from 'react';
-import { defaultCallbacks } from 'react-wordcloud';
 import Typography from '@mui/material/Typography';
-import { NumericFormat } from 'react-number-format';
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Plot from 'react-plotly.js';
 import NoResultsImg from "./pic1.png";
+import wordCloudImg from "./query_wordcloud.png"
+import DATA from "./services/datalist"
 Chart.register(...registerables);
 
 const InsightsComp = (props) => {
+    const [polaritySelect, setPolaritySelect] = useState('All');
+    const [geoplotSelect, setGeoPlotSelect] = useState("num_results");
+    const [geoPlotDataVar, setGeoPlotDataVar] = useState(props.geoPlotData)
+
+    let wordCloudData = props.wordCloudData
     let barChartData = props.barChartData
     let pieChartData = props.pieChartData
     let doughChartData = props.doughChartData
@@ -16,8 +26,7 @@ const InsightsComp = (props) => {
     let avgRedditScore = props.avgRedditScore
     let avgScore = props.avgScore
     let searchTime = props.searchTime
-
-    console.log(barChartData)
+    let geoPlotData = props.geoPlotData
 
     const options= {
         scales: {
@@ -42,6 +51,24 @@ const InsightsComp = (props) => {
             }
         }
       };
+
+    const handleChange = (event: SelectChangeEvent) => {
+        setPolaritySelect(event.target.value)
+        let bla = wordCloudData+"&polarity="+polaritySelect
+        console.log(bla)
+    }
+
+    const handleGeoSelect = async(event: SelectChangeEvent) => {
+        setGeoPlotSelect(event.target.value)
+        if(event.target.value != 'num_results'){
+            var dummy_geoplot_data = await DATA.QueryGeoPlotData(event.target.value,'rdylbu')
+            setGeoPlotDataVar(dummy_geoplot_data)
+        }
+        else{
+            var dummy_geoplot_data = await DATA.QueryGeoPlotData(event.target.value,'Blues')
+            setGeoPlotDataVar(dummy_geoplot_data)
+        }
+    }
 
     return (
         <div>
@@ -80,17 +107,57 @@ const InsightsComp = (props) => {
                     <Bar data={barChartData} options={options} />
                     </div>
                 </div>
-                <div className='pie_chart_styles'>
+                {/* <div className='pie_chart_styles'>
                     <div style={{ height: '400px', width: '400px', alignItems: 'center',padding:"2%"}}>
                     <Pie data={pieChartData} options={options} />
                     </div>
                     <div style={{ height: '400px', width: '400px', alignItems: 'center',padding:"2%"}}>
                     <Doughnut data={doughChartData} options={options} />
                     </div>
-                </div>
-                {/* <div className='wordcloud_styles'>
-                    <SimpleWordcloud/>
                 </div> */}
+                <div className='wordcloud_styles'>
+                    <img src={wordCloudData} alt="wordcloud" />
+                    <FormControl fullWidth sx={{ m: 1, width:"100%"}}>
+                    <InputLabel id="demo-simple-select-label">Polarity</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={polaritySelect}
+                        label="Polarity"
+                        onChange={handleChange}
+                        sx={{ m: 1, backgroundColor:'white'}}
+                    >
+                        <MenuItem value={"All"}>All</MenuItem>
+                        <MenuItem value={"left"}>Left</MenuItem>
+                        <MenuItem value={"left_leaning"}>Center Left</MenuItem>
+                        <MenuItem value={"center"}>Center</MenuItem>
+                        <MenuItem value={"right_leaning"}>Center Right</MenuItem>
+                        <MenuItem value={"right"}>Right</MenuItem>
+                    </Select>
+                    </FormControl>
+                </div>
+                <br></br>
+                <div className="geoPlotDiv">
+                    <div>
+                        <Plot data={geoPlotDataVar.data} layout={geoPlotDataVar.layout}/>
+                    </div>
+                    <FormControl fullWidth sx={{ m: 1, width:"100%"}}>
+                    <InputLabel id="demo-simple-select-label">Type</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={geoplotSelect}
+                        label="Polarity"
+                        onChange={handleGeoSelect}
+                        sx={{ m: 1, backgroundColor:'white'}}
+                    >
+                        <MenuItem value={"num_results"}>Num Results</MenuItem>
+                        <MenuItem value={"reddit_score"}>Reddit Score</MenuItem>
+                        <MenuItem value={"score"}>Score</MenuItem>
+                        <MenuItem value={"polarity"}>Polarity</MenuItem>
+                    </Select>
+                    </FormControl>
+                </div>
             </div> ) : (
         <div>
         <div className='NoResultsDiv'>
