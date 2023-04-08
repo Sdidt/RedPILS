@@ -98,9 +98,10 @@ const QueryWordcloudData = async(searchTerm,fromTimeSelect,toTimeSelect,location
 
 }
 
-const QueryGeoPlotData = async(geoPlotKey) => {
+const QueryGeoPlotData = async(geoPlotKey,colormap) => {
     let res 
-    res = await axios.get("http://127.0.0.1:5000/api/geoplot?key="+geoPlotKey)
+    // console.log(colormap)
+    res = await axios.get("http://127.0.0.1:5000/api/geoplot?key="+geoPlotKey+"&colormap="+colormap)
 
     console.log(res)
     if (res == null){
