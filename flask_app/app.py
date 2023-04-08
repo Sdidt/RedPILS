@@ -138,7 +138,7 @@ def query_wordcloud():
     time_elapsed, num_results, search_results=search_db(query, K, d1, d2, intitle)
     search_results=search_results[:K]
     fig_wordcloud=generate_wordclouds(search_results)
-    plt.figure(figsize=(10,7), frameon=False)
+    plt.figure(figsize=(10,7))
     plt.imshow(fig_wordcloud)  
     plt.axis('off')
     # plt.title(title, fontsize=20 )
