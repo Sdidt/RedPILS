@@ -61,6 +61,9 @@ def search_db(query, K=10, d1="*", d2="*", intitle=False):
     return time_elapsed, num_results, search_results
 
 def polarity_filter_results(search_results, polarity):
+    if polarity.lower()=="all":
+        return search_results
+    
     filtered_results=[]
     if polarity.lower()=="left":
         polarity_key=-1

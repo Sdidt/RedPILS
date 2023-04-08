@@ -152,6 +152,10 @@ def query_wordcloud():
         except:
             sd=None
             ed=None
+        try:
+            polarity=args.get("polarity")
+        except:
+            polarity="all"
     
     
     if region!=None and region!="":      
@@ -161,6 +165,7 @@ def query_wordcloud():
     print(d1, d2)
     
     time_elapsed, num_results, search_results=search_db(query, K, d1, d2, intitle)
+    search_results=polarity_filter_results(search_results, polarity)
     search_results=search_results[:K]
     fig_wordcloud=generate_wordclouds(search_results)
     plt.figure(figsize=(10,7))
@@ -213,6 +218,10 @@ def query():
         else: 
             sd=None
             ed=None
+        if body["polarity"]:
+            polarity=body["intitle"]
+        else: 
+            polarity="all"
     
     
     #if request is of type GET
@@ -241,6 +250,10 @@ def query():
         except:
             sd=None
             ed=None
+        try:
+            polarity=args.get("polarity")
+        except:
+            polarity="all"
     
     
     if region!=None and region!="":      
@@ -250,6 +263,7 @@ def query():
     print(d1, d2)
     
     time_elapsed, num_results, search_results=search_db(query, K, d1, d2, intitle)
+    search_results=polarity_filter_results(search_results, polarity)
     search_results=search_results[:K]
     reddit_avg, score_avg, polarity_avg=avg_scores(search_results)
     
