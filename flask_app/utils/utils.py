@@ -22,7 +22,7 @@ def load_stopwords():
     with open('stopwords_nltk.txt','r') as st:
         st_content = st.read()
         stopwords = set(st_content.split())
-        print(stopwords)
+        print(len(stopwords))
     return(stopwords)
 
 def process_query(query):
@@ -53,12 +53,27 @@ def search_db(query, K=10, d1="*", d2="*", intitle=False):
         "comment": doc["comment"],
         "reddit_score": doc["reddit_score"],
         "url": "https://www.reddit.com" + doc["url"],
-        #replace label with actual label
-        "political_leaning": random.choice([-2, -1, 0, 1, 2])
+        #replace labels and scores with actual labels and scores
+        "political_leaning": random.choice([ -1, 0, 1])
     } for doc in search_results]
     
     # [print("Score: {}\nComment: {}\nURL: {}".format(doc["score"], doc["comment"], doc["url"])) for doc in search_results]
     return time_elapsed, num_results, search_results
+
+def polarity_filter_results(search_results, polarity):
+    filtered_results=[]
+    if polarity.lower()=="left":
+        polarity_key=-1
+    elif polarity.lower()=="right":
+        polarity_key=1
+    else:
+        polarity_key=0
+    if len(search_results)!=0:
+        for item in search_results:
+            if item["political_leaning"]==polarity_key:
+                filtered_results.append(item)
+    return filtered_results
+    
 
 def avg_scores(search_results):
     reddit_avg=0
@@ -96,8 +111,9 @@ def generate_wordclouds(search_results):
     
     text = ' '.join(comments)
     stopwords = load_stopwords()
-    fig_wordcloud = wordcloud.WordCloud(stopwords=stopwords,background_color='lightgrey',
-                    colormap='viridis', width=800, height=600, collocations=False).generate(text)
+    # background_color='lightgrey',
+    fig_wordcloud = wordcloud.WordCloud(stopwords=stopwords,
+                    colormap='RdBu', width=800, height=600, collocations=False).generate(text)
     
     return fig_wordcloud
     
@@ -131,15 +147,37 @@ def generate_geoplot(key="num_results", colormap="Reds"):
     map_df=pd.read_csv('flask_app/outputs/map_data.csv')
     with open("flask_app/outputs/india_states.geojson") as f:
         states = json.load(f)
-    fig = px.choropleth(
+    if key=="reddit_score" or key=="polarity":
+        mid=0
+        colormap="RdBu_r"
+    else:
+        mid=None
+    
+    
+    fig = px.choropleth_mapbox(
     map_df,
     geojson=states,
     featureidkey='properties.ST_NM',
     locations='state',
     color=key,
+    mapbox_style = 'carto-positron',
+    opacity=0.85,
+    center = dict(lat=22.5, lon=80),
+    zoom=3.6,
+    color_continuous_midpoint=mid,
+    hover_data=["num_results","reddit_score", "score",  "polarity"],
+    template="plotly_dark",
     color_continuous_scale=colormap
     )
     
-    fig.update_geos(fitbounds="locations", visible=False)
-    # fig.show()
+    # fig.update_geos(fitbounds="locations", visible=False)
+    # fig.update_layout(width=1000, height=1000, autosize=False, margin=dict(
+    #             l=0,
+    #             r=0,
+    #             b=0,
+    #             t=0,
+    #             pad=0,
+    #             autoexpand=True
+    #         ))
+    fig.show()
     return fig

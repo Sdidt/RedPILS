@@ -1,8 +1,10 @@
 from flask_cors import CORS
 from flask import Flask, request, url_for, jsonify, send_file
+
 from dotenv import load_dotenv
 import os
 import sys
+
 import wordcloud
 import matplotlib
 matplotlib.use('Agg')
@@ -15,7 +17,7 @@ load_dotenv()
 print(os.environ.get("SYS_PATH"))
 sys.path.append(os.environ.get("SYS_PATH"))
 
-from flask_app.utils.utils import avg_scores, search_db, process_date, process_query, generate_wordclouds,generate_df, generate_geoplot
+from flask_app.utils.utils import avg_scores, search_db, process_date, process_query, generate_wordclouds,generate_df, generate_geoplot, polarity_filter_results
 
 app = Flask(__name__)
 CORS(app)
@@ -24,7 +26,7 @@ cors = CORS(app, resources={r"/*": {"origins":["*","http://localhost:8000"]}})
 #---------------------------------------------- TEST -------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/')
 def hello():
-    # generate_df()
+    generate_df()
     return "Hello World! This is a test app"
 
 top_kr=[{'comment': "Rahul Gandhi can never be Savarkar", 'url': "https://example.com"}, {'comment': "Pappu is UNFORTUNATELY an MP", 'url': "https://example.com"}, {'comment': "Congress should get rid of Gandhis", 'url': "https://example.com"}, {'comment': "Democracy is not a family Business", 'url': "https://example.com"}, {'comment': "Pappu becomes a joke again", 'url': "https://example.com"}]
@@ -96,9 +98,30 @@ def map_plot():
     graphJSON = plotly.io.to_json(fig, pretty=True)
     return graphJSON
 
+@app.route('/api/polarity_wordcloud', methods=["GET"])
+def polarity_wordcloud():
+    if request.method=='GET':
+        args = request.args
+        polarity = args.get("polarity")
+    time_elapsed, num_results, search_results=search_db("*")
+    if polarity.lower()=="all":
+        fig_wordcloud=generate_wordclouds(search_results)
+    else:
+        filtered_results=polarity_filter_results(search_results, polarity)
+        fig_wordcloud=generate_wordclouds(filtered_results)
+        
+        
+    plt.figure(figsize=(10,7))
+    plt.imshow(fig_wordcloud)  
+    plt.axis('off')
+    # plt.title(title, fontsize=20 )
+    plt.savefig("flask_app/outputs/polarity_wordcloud_"+polarity+".png", bbox_inches='tight')
+    return send_file("outputs/polarity_wordcloud_"+polarity+".png","image/png")
+    pass
+
 @app.route('/api/query_wordcloud', methods=["GET"])
 def query_wordcloud():
-    """Params same as query
+    """ Params same as query
 
     Returns:
         _type_: _description_
