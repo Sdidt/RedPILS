@@ -104,12 +104,13 @@ def process_date(timeframe=None, sd=None, ed=None):
         return past_time.strftime("%Y-%m-%dT%H:%M:%SZ"), current_time.strftime("%Y-%m-%dT%H:%M:%SZ")
     
 def generate_wordclouds(search_results):
-    comments=[]
+    # comments=[]
     if len(search_results)!=0:
-        for item in search_results:
-            comments.append(item['comment'])
+        text = ' '.join(item['comment'] for item in search_results)
+        # for item in search_results:
+        #     comments.append(item['comment'])
     
-    text = ' '.join(comments)
+    # text = ' '.join(comments)
     stopwords = load_stopwords()
     # background_color='lightgrey',
     fig_wordcloud = wordcloud.WordCloud(stopwords=stopwords,
@@ -156,7 +157,7 @@ def generate_geoplot(key="num_results", colormap="Reds"):
     
     fig = px.choropleth_mapbox(
     map_df,
-    geojson=states,
+    geojson="https://gist.githubusercontent.com/jbrobst/56c13bbbf9d97d187fea01ca62ea5112/raw/e388c4cae20aa53cb5090210a42ebb9b765c0a36/india_states.geojson",
     featureidkey='properties.ST_NM',
     locations='state',
     color=key,
