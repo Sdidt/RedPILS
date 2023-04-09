@@ -45,9 +45,11 @@ def get_phrase_query_results(phrase_query):
         "score": doc["score"],
         "comment": doc["comment"],
         "url": "https://www.reddit.com" + doc["url"],
-        "timestamp": doc["timestamp"]
+        "timestamp": doc["timestamp"],
+        "political_leaning": doc["political_leaning"],
+        "polarity": doc["polarity"]
     } for doc in search_results]
-    [print("Score: {}\nComment: {}\nURL: {}\nPosted at: {}".format(doc["score"], doc["comment"], doc["url"], doc["timestamp"])) for doc in search_results]
+    [print("Score: {}\nComment: {}\nURL: {}\nPosted at: {}\nPolitical Leaning: {}\nPolarity: {}".format(doc["score"], doc["comment"], doc["url"], doc["timestamp"], doc["political_leaning"], doc["polarity"])) for doc in search_results]
 
 if __name__ == "__main__":
     data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],solr_var['headers'])
@@ -55,4 +57,4 @@ if __name__ == "__main__":
     # check_unique_words()
     # get_avg_length()
     # compute_query_term_score("INC")
-    get_phrase_query_results("islam NOT Congress")
+    get_phrase_query_results("BJP")

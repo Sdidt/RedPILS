@@ -54,7 +54,8 @@ def search_db(query, K=10, d1="*", d2="*", intitle=False):
         "reddit_score": doc["reddit_score"],
         "url": "https://www.reddit.com" + doc["url"],
         #replace labels and scores with actual labels and scores
-        "political_leaning": random.choice([ -1, 0, 1])
+        "political_leaning": doc["political_leaning"],
+        "polarity_score": doc["polarity"]
     } for doc in search_results]
     
     # [print("Score: {}\nComment: {}\nURL: {}".format(doc["score"], doc["comment"], doc["url"])) for doc in search_results]

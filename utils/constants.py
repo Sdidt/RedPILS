@@ -42,8 +42,8 @@ solr_var = {
     {"name": "url", "type": "text_en", "indexed": "true", "stored": "true"},
     {"name": "reddit_score", "type": "pint",'indexed': "true", "stored": "true"},
     {"name": "redditor_id", "type": "text_en",'indexed': "true", "stored": "true"},
-    {"name": "polarity", "type": "text_en", "indexed": "true", "stored": "true"},
-    {"name": "polarity_score", "type": "pfloat", "indexed": "true", "stored": "true"}
+    {"name": "polarity", "type": "pfloat", "indexed": "true", "stored": "true"},
+    {"name": "political_leaning", "type": "pfloat", "indexed": "true", "stored": "true"}
     ],
     "tag_field_type": {
         "name": "tag",
