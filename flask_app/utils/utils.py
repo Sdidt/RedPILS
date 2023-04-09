@@ -35,9 +35,9 @@ def process_query(query):
         regex_pattern = re.compile(re.escape(op), re.IGNORECASE)
         processed_query = regex_pattern.sub(op, processed_query)
     for word in words:
-        if word.upper() not in ["AND", "OR", "NOT", ")", "(", "~"] and len(word)>=7 and '~' not in word:
+        if word.upper() not in ["AND", "OR", "NOT", ")", "(", "~", "*"] and len(word)>=7 and '~' not in word:
             processed_query= processed_query.replace(word, word+"~3")
-        elif word.upper() not in ["AND", "OR", "NOT", ")", "(", "~"] and len(word)>=5 and '~' not in word:
+        elif word.upper() not in ["AND", "OR", "NOT", ")", "(", "~", "*"] and len(word)>=5 and '~' not in word:
             processed_query= processed_query.replace(word, word+"~2")
         
     return processed_query
@@ -84,6 +84,7 @@ def avg_scores(search_results):
     polarity_avg=0
     if len(search_results)!=0:
         for item in search_results:
+            print(item)
             reddit_avg+=item["reddit_score"]
             score_avg+=item["score"]
             polarity_avg+=item["political_leaning"]
@@ -127,7 +128,7 @@ def generate_wordclouds(search_results):
     # plt.title(title, fontsize=20 )
     # plt.show()
 
-def generate_df():
+def generate_geo_df():
     map_df=pd.read_csv('flask_app/outputs/map_data.csv')
     for i,term in enumerate(map_df["state"]):
         term=term.replace("&", "")
@@ -145,6 +146,25 @@ def generate_df():
         
     map_df.to_csv("flask_app/outputs/map_data.csv", index=False)   
     print(map_df)
+    
+def generate_time_df(query="*"):
+    time_df=pd.read_csv('flask_app/outputs/time_data.csv')
+    print(time_df)
+    for i in range(len(time_df)):
+        term=process_query(query)
+        d1, d2=process_date(None, str(time_df['sd'][i]), str(time_df['ed'][i]))
+        time_elapsed, num_results, search_results=search_db(term, d1=d1, d2=d2)
+        
+        print(term, num_results)
+        reddit_avg, score_avg, polarity_avg= avg_scores(search_results)
+        time_df.loc[i, 'num_results'] = num_results
+        time_df.loc[i, 'reddit_score'] = reddit_avg
+        time_df.loc[i, 'polarity'] = polarity_avg
+    if query=="*":
+        query="all"
+    time_df.to_csv("flask_app/outputs/time_data_"+query+".csv", index=False)   
+    # print(time_df)
+    return(time_df)
     
 
 def generate_geoplot(key="num_results", colormap="Reds"):
@@ -183,5 +203,5 @@ def generate_geoplot(key="num_results", colormap="Reds"):
     #             pad=0,
     #             autoexpand=True
     #         ))
-    # fig.show()
+    fig.show()
     return fig

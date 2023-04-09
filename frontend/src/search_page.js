@@ -54,7 +54,6 @@ const SearchPage = () => {
   const [dataCollect, setDataCollect] = useState([]);
   const [filterDataCollect, setFilterDataCollect] = useState([]);
   const [wordCloudData, setWordCloudData] = useState([]);
-  const [polarWordCloudData, setPolarWordCloudData] = useState([]);
   const [geoPlotData, setGeoPlotData] = useState([]);
   const [numResults, setNumResults] = useState("");
   const [avgRedditScore, setAvgRedditScore] = useState("");
@@ -74,7 +73,6 @@ const SearchPage = () => {
   const [titleValue, setTitleValue] = React.useState("");
   const [titleSelect, setTitleSelect] = useState(false);
   const [allTimeSelect, setAllTimeSelect] = useState(true);
-  const [polaritySelect, setPolaritySelect] = useState('All')
   const [expanded, setExpanded] = useState(false);
 
   // const [categories,setCategories] = useState([])
@@ -207,11 +205,11 @@ const SearchPage = () => {
     ],
   };
 
-  const redditdata = {
+  const data = {
     labels: [],
     datasets: [
       {
-        label: "Avg Reddit Score",
+        label: "Count",
         data: [],
         backgroundColor: [
           "#3e95cd",
@@ -226,29 +224,9 @@ const SearchPage = () => {
     ],
   };
 
-  const countdata = {
-    labels: [],
-    datasets: [
-      {
-        label: "Counts",
-        data: [],
-        backgroundColor: [
-          "#3e95cd",
-          "#8e5ea2",
-          "#3cba9f",
-          "#e8c3b9",
-          "#c45850",
-        ],
-        borderColor: "rgba(54, 162, 235, 1)",
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const [barChartDataCount, setBarChartDataCount] = useState(countdata);
-  const [barChartDataScore, setBarChartDataScore] = useState(redditdata);
-  const [pieChartData, setPieChartData] = useState(redditdata);
-  const [doughChartData, setDoughChartData] = useState(redditdata);
+  const [barChartData, setBarChartData] = useState(data);
+  const [pieChartData, setPieChartData] = useState(data);
+  const [doughChartData, setDoughChartData] = useState(data);
 
   const handleOnSearch = async (string, results) => {
     if (string != "") {
@@ -280,8 +258,7 @@ const SearchPage = () => {
     locationName,
     titleSelect,
     kValue,
-    allTimeSelect,
-    polaritySelect
+    allTimeSelect
   ) => {
     console.log(searchTerm);
     console.log(timeSelectConst);
@@ -295,8 +272,7 @@ const SearchPage = () => {
         locationName,
         titleSelect,
         kValue,
-        allTimeSelect,
-        polaritySelect
+        allTimeSelect
       );
       var dummy_wordcloud_data = await DATA.QueryWordcloudData(
         searchTerm,
@@ -305,75 +281,54 @@ const SearchPage = () => {
         locationName,
         titleSelect,
         kValue,
-        allTimeSelect,
-        polaritySelect
+        allTimeSelect
       );
       var dummy_geoplot_data = await DATA.QueryGeoPlotData(
         "num_results",
         "Blues"
       );
-      var dummy_polar_wordcloud = await DATA.QueryPolarWordCloud(
-        polaritySelect
-      );
       setGeoPlotData(dummy_geoplot_data);
       setWordCloudData(dummy_wordcloud_data);
-      setPolarWordCloudData(dummy_polar_wordcloud);
       setDataCollect(dummy_data_store["topk"]);
       setFilterDataCollect(dummy_data_store["topk"]);
       setNumResults(dummy_data_store["num_results"]);
       setAvgRedditScore(dummy_data_store["avg_reddit_score"]);
       setAvgScore(dummy_data_store["avg_score"]);
       setSearchTime(dummy_data_store["search_time"]);
-      var dataCounts = dummy_data_store["query_polarity_counts"];
-      var dataPolarScores = dummy_data_store["polarity_reddit_scores"];
-      var categories = dummy_data_store["x_label"];
-      console.log(categories)
-
-      console.log(dummy_data_store)
 
       var dummy_data_store = await DATA.QueryStatsData();
       setStatsCheck(dummy_data_store["x-val-num-fieldname"].length);
-      // var dataCounts = dummy_data_store["x-val-num-fieldname"];
-      // var categories = dummy_data_store["x-val-cat-fieldname"];
+      var dataCounts = dummy_data_store["x-val-num-fieldname"];
+      var categories = dummy_data_store["x-val-cat-fieldname"];
       console.log(dummy_data_store);
-      setBarChartDataScore({
-        ...redditdata,
+      setBarChartData({
+        ...data,
         labels: categories,
         datasets: [
           {
-            ...redditdata.datasets[0],
-            data: dataPolarScores,
-          },
-        ],
-      });
-      setBarChartDataCount({
-        ...countdata,
-        labels: categories,
-        datasets: [
-          {
-            ...countdata.datasets[0],
+            ...data.datasets[0],
             data: dataCounts,
           },
         ],
       });
 
       setPieChartData({
-        ...redditdata,
+        ...data,
         labels: categories,
         datasets: [
           {
-            ...redditdata.datasets[0],
+            ...data.datasets[0],
             data: dataCounts,
           },
         ],
       });
 
       setDoughChartData({
-        ...redditdata,
+        ...data,
         labels: categories,
         datasets: [
           {
-            ...redditdata.datasets[0],
+            ...data.datasets[0],
             data: dataCounts,
           },
         ],
@@ -388,8 +343,7 @@ const SearchPage = () => {
       locationName,
       titleSelect,
       kValue,
-      allTimeSelect,
-      polaritySelect
+      allTimeSelect
     );
     var dummy_wordcloud_data = await DATA.QueryWordcloudData(
       searchTerm,
@@ -398,19 +352,14 @@ const SearchPage = () => {
       locationName,
       titleSelect,
       kValue,
-      allTimeSelect,
-      polaritySelect
+      allTimeSelect
     );
-    var dummy_geoplot_data = await DATA.QueryGeoPlotData("num_results",'Blues');
-    var dummy_polar_wordcloud = await DATA.QueryPolarWordCloud(
-      polaritySelect
-    )
+    var dummy_geoplot_data = await DATA.QueryGeoPlotData("num_results");
     setGeoPlotData(dummy_geoplot_data);
     setWordCloudData(dummy_wordcloud_data);
     if (dummy_data_store["topk"].length == 0) {
       const dummy_data_store = await DATA.QueryData("BJP");
     }
-    setPolarWordCloudData(dummy_polar_wordcloud);
     setDataCollect(dummy_data_store["topk"]);
     setFilterDataCollect(dummy_data_store["topk"]);
   };
@@ -517,10 +466,6 @@ const SearchPage = () => {
   const handleAllTimeSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAllTimeSelect(event.target.checked);
   };
-
-  const handlePolaritySelect = (event: SelectChangeEvent) => {
-    setPolaritySelect(event.target.value)
-}
 
   const Accordion = styled((props: AccordionProps) => (
     <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -678,22 +623,6 @@ const SearchPage = () => {
                         setKValue(event.target.value);
                       }}
                     />
-                    <FormControl fullWidth sx={{ m: 1, width:"15%"}}>
-                    <InputLabel id="demo-simple-select-label">Polarity</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={polaritySelect}
-                        label="Polarity"
-                        onChange={handlePolaritySelect}
-                        sx={{ m: 1, backgroundColor:'white'}}
-                    >
-                        <MenuItem value={"All"}>All</MenuItem>
-                        <MenuItem value={"left"}>Left</MenuItem>
-                        <MenuItem value={"center"}>Center</MenuItem>
-                        <MenuItem value={"right"}>Right</MenuItem>
-                    </Select>
-                    </FormControl>
                   </div>
                   <div className="datePickerDiv">
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -736,8 +665,7 @@ const SearchPage = () => {
                   locationName,
                   titleSelect,
                   kValue,
-                  allTimeSelect,
-                  polaritySelect
+                  allTimeSelect
                 )
               }
             >
@@ -802,8 +730,7 @@ const SearchPage = () => {
           ) : (
             <InsightsComp
               wordCloudData={wordCloudData}
-              barChartDataCount={barChartDataCount}
-              barChartDataScore={barChartDataScore}
+              barChartData={barChartData}
               pieChartData={pieChartData}
               doughChartData={doughChartData}
               statsCheck={statsCheck}
@@ -811,7 +738,6 @@ const SearchPage = () => {
               avgScore={avgScore}
               searchTime={searchTime}
               geoPlotData={geoPlotData}
-              polarWordCloudData = {polarWordCloudData}
             />
           )}
         </div>

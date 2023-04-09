@@ -15,7 +15,7 @@ const QueryStatsData = async () => {
     return res_data;
 }
 
-const QueryData = async (searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect,polaritySelect) => {
+const QueryData = async (searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect) => {
     let res
     let toTimeSelectVar
     let fromTimeSelectVar
@@ -31,16 +31,16 @@ const QueryData = async (searchTerm,fromTimeSelect,toTimeSelect,locationName,tit
     console.log(concatenateLocationName)
     console.log(kValue)
     if(toTimeSelectVar!=null && fromTimeSelectVar!=null && concatenateLocationName!=[]){
-        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&from="+fromTimeSelect+"&to="+toTimeSelect+"&region="+concatenateLocationName+"&intitle="+titleSelect+"&k="+kValue+"&polarity="+polaritySelect)
+        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&from="+fromTimeSelect+"&to="+toTimeSelect+"&region="+concatenateLocationName+"&intitle="+titleSelect+"&k="+kValue)
     }
     else if(toTimeSelectVar!=null && fromTimeSelectVar!=null ){
-        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&from="+fromTimeSelect+"&to="+toTimeSelect+"&intitle="+titleSelect+"&k="+kValue+"&polarity="+polaritySelect)
+        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&from="+fromTimeSelect+"&to="+toTimeSelect+"&intitle="+titleSelect+"&k="+kValue)
     }
     else if(concatenateLocationName!=[]){
-        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&region="+concatenateLocationName+"&intitle="+titleSelect+"&k="+kValue+"&polarity="+polaritySelect)
+        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&region="+concatenateLocationName+"&intitle="+titleSelect+"&k="+kValue)
     }
     else{
-        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&intitle="+titleSelect+"&k="+kValue+"&polarity="+polaritySelect)
+        res = await axios.get("http://127.0.0.1:5000/query?query="+whitespaceRemoved+"&intitle="+titleSelect+"&k="+kValue)
     }
     console.log(res)
     if (res == null){
@@ -54,7 +54,7 @@ const QueryData = async (searchTerm,fromTimeSelect,toTimeSelect,locationName,tit
     return res_data;
 }
 
-const QueryWordcloudData = async(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect,polaritySelect) => {
+const QueryWordcloudData = async(searchTerm,fromTimeSelect,toTimeSelect,locationName,titleSelect,kValue,allTimeSelect) => {
     let res
     let res_link
     let toTimeSelectVar
@@ -71,20 +71,20 @@ const QueryWordcloudData = async(searchTerm,fromTimeSelect,toTimeSelect,location
     console.log(concatenateLocationName)
     console.log(kValue)
     if(toTimeSelectVar!=null && fromTimeSelectVar!=null && concatenateLocationName!=[]){
-        res_link = "http://127.0.0.1:5000/api/query_wordcloud?query="+whitespaceRemoved+"&from="+fromTimeSelect+"&to="+toTimeSelect+"&region="+concatenateLocationName+"&intitle="+titleSelect+"&k="+kValue+"&polarity="+polaritySelect
-        res = await axios.get("http://127.0.0.1:5000/api/query_wordcloud?query="+whitespaceRemoved+"&from="+fromTimeSelect+"&to="+toTimeSelect+"&region="+concatenateLocationName+"&intitle="+titleSelect+"&k="+kValue+"&polarity="+polaritySelect)
+        res_link = "http://127.0.0.1:5000/api/query_wordcloud?query="+whitespaceRemoved+"&from="+fromTimeSelect+"&to="+toTimeSelect+"&region="+concatenateLocationName+"&intitle="+titleSelect+"&k="+kValue
+        res = await axios.get("http://127.0.0.1:5000/api/query_wordcloud?query="+whitespaceRemoved+"&from="+fromTimeSelect+"&to="+toTimeSelect+"&region="+concatenateLocationName+"&intitle="+titleSelect+"&k="+kValue)
     }
     else if(toTimeSelectVar!=null && fromTimeSelectVar!=null ){
-        res_link = "http://127.0.0.1:5000/api/query_wordcloud?query="+whitespaceRemoved+"&from="+fromTimeSelect+"&to="+toTimeSelect+"&intitle="+titleSelect+"&k="+kValue+"&polarity="+polaritySelect
-        res = await axios.get("http://127.0.0.1:5000/api/query_wordcloud?query="+whitespaceRemoved+"&from="+fromTimeSelect+"&to="+toTimeSelect+"&intitle="+titleSelect+"&k="+kValue+"&polarity="+polaritySelect)
+        res_link = "http://127.0.0.1:5000/api/query_wordcloud?query="+whitespaceRemoved+"&from="+fromTimeSelect+"&to="+toTimeSelect+"&intitle="+titleSelect+"&k="+kValue
+        res = await axios.get("http://127.0.0.1:5000/api/query_wordcloud?query="+whitespaceRemoved+"&from="+fromTimeSelect+"&to="+toTimeSelect+"&intitle="+titleSelect+"&k="+kValue)
     }
     else if(concatenateLocationName!=[]){
-        res_link = "http://127.0.0.1:5000/api/query_wordcloud?query="+whitespaceRemoved+"&region="+concatenateLocationName+"&intitle="+titleSelect+"&k="+kValue+"&polarity="+polaritySelect
-        res = await axios.get("http://127.0.0.1:5000/api/query_wordcloud?query="+whitespaceRemoved+"&region="+concatenateLocationName+"&intitle="+titleSelect+"&k="+kValue+"&polarity="+polaritySelect)
+        res_link = "http://127.0.0.1:5000/api/query_wordcloud?query="+whitespaceRemoved+"&region="+concatenateLocationName+"&intitle="+titleSelect+"&k="+kValue
+        res = await axios.get("http://127.0.0.1:5000/api/query_wordcloud?query="+whitespaceRemoved+"&region="+concatenateLocationName+"&intitle="+titleSelect+"&k="+kValue)
     }
     else{
-        res_link = "http://127.0.0.1:5000/api/query_wordcloud?query="+whitespaceRemoved+"&intitle="+titleSelect+"&k="+kValue+"&polarity="+polaritySelect
-        res = await axios.get("http://127.0.0.1:5000/api/query_wordcloud?query="+whitespaceRemoved+"&intitle="+titleSelect+"&k="+kValue+"&polarity="+polaritySelect)
+        res_link = "http://127.0.0.1:5000/api/query_wordcloud?query="+whitespaceRemoved+"&intitle="+titleSelect+"&k="+kValue
+        res = await axios.get("http://127.0.0.1:5000/api/query_wordcloud?query="+whitespaceRemoved+"&intitle="+titleSelect+"&k="+kValue)
     }
     console.log(res)
     if (res == null){
@@ -116,29 +116,11 @@ const QueryGeoPlotData = async(geoPlotKey,colormap) => {
 
 }
 
-const QueryPolarWordCloud = async(polaritySelect)=>{
-    let res
-    let res_link
-
-    res_link = "http://127.0.0.1:5000/api/polarity_wordcloud?polarity="+polaritySelect
-    res = await axios.get("http://127.0.0.1:5000/api/polarity_wordcloud?polarity="+polaritySelect)
-    console.log(res)
-    if (res == null){
-        console.log("oops")
-        return;
-    }
-    else{
-        console.log(res.data)
-    }
-    return res_link
-}
-
 const export_const = {
     QueryData,
     QueryStatsData,
     QueryWordcloudData,
-    QueryGeoPlotData,
-    QueryPolarWordCloud
+    QueryGeoPlotData
 }
 
 export default export_const;
