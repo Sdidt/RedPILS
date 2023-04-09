@@ -157,9 +157,10 @@ def query_wordcloud():
         try:
             polarity=args.get("polarity")
         except:
-            polarity="all"
+            polarity=None
     
-    
+    if polarity==None:
+        polarity="all"
     if region!=None and region!="":      
         query=query+" AND ( "+ region+" )"
     query=process_query(query)
@@ -255,9 +256,11 @@ def query():
         try:
             polarity=args.get("polarity")
         except:
-            polarity="all"
-    
-    
+            polarity=None
+    if polarity==None:
+        polarity="all"
+    print(polarity)
+    print(K)
     if region!=None and region!="":      
         query=query+" AND ( "+ region+" )"
     query=process_query(query)
@@ -274,9 +277,9 @@ def query():
     neutral_results=polarity_filter_results(search_results, "neutral")
     query_polarity_counts=[len(left_results),  len(neutral_results), len(right_results)]
     left_reddit, _, _=avg_scores(left_results) 
-    right_reddit, _, _=avg_scores(left_results)
-    neutral_reddit, _, _=avg_scores(left_results)
-    polarity_reddit_scores=[left_reddit,  neutral_reddit, right_reddit,]
+    right_reddit, _, _=avg_scores(right_results)
+    neutral_reddit, _, _=avg_scores(neutral_results)
+    polarity_reddit_scores=[left_reddit,  neutral_reddit, right_reddit]
     x_label=["left", "neutral", "right"]
     response = jsonify({"search_time":time_elapsed, "query":query, "topk":search_results, "avg_reddit_score":reddit_avg, "avg_score":score_avg, "avg_polarity":polarity_avg, "num_results":num_results, "query_polarity_counts":query_polarity_counts,"polarity_reddit_scores": polarity_reddit_scores, "x_label":x_label})
     response.headers.add("Access-Control-Allow-Origin", "*")
