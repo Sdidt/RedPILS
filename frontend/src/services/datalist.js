@@ -116,11 +116,29 @@ const QueryGeoPlotData = async(geoPlotKey,colormap) => {
 
 }
 
+const QueryPolarWordCloud = async(polaritySelect)=>{
+    let res
+    let res_link
+
+    res_link = "http://127.0.0.1:5000/api/polarity_wordcloud?polarity="+polaritySelect
+    res = await axios.get("http://127.0.0.1:5000/api/polarity_wordcloud?polarity="+polaritySelect)
+    console.log(res)
+    if (res == null){
+        console.log("oops")
+        return;
+    }
+    else{
+        console.log(res.data)
+    }
+    return res_link
+}
+
 const export_const = {
     QueryData,
     QueryStatsData,
     QueryWordcloudData,
-    QueryGeoPlotData
+    QueryGeoPlotData,
+    QueryPolarWordCloud
 }
 
 export default export_const;

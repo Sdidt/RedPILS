@@ -183,5 +183,5 @@ def generate_geoplot(key="num_results", colormap="Reds"):
     #             pad=0,
     #             autoexpand=True
     #         ))
-    fig.show()
+    # fig.show()
     return fig
