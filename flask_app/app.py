@@ -17,7 +17,7 @@ load_dotenv()
 print(os.environ.get("SYS_PATH"))
 sys.path.append(os.environ.get("SYS_PATH"))
 
-from flask_app.utils.utils import avg_scores, search_db, process_date, process_query, generate_wordclouds,generate_df, generate_geoplot, polarity_filter_results
+from flask_app.utils.utils import avg_scores, search_db, process_date, process_query, generate_wordclouds,generate_geo_df, generate_geoplot, polarity_filter_results, generate_time_df
 
 app = Flask(__name__)
 CORS(app)
@@ -26,7 +26,8 @@ cors = CORS(app, resources={r"/*": {"origins":["*","http://localhost:8000"]}})
 #---------------------------------------------- TEST -------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/')
 def hello():
-    generate_df()
+    # generate_geo_df()
+    # print(generate_time_df("*"))
     return "Hello World! This is a test app"
 
 top_kr=[{'comment': "Rahul Gandhi can never be Savarkar", 'url': "https://example.com"}, {'comment': "Pappu is UNFORTUNATELY an MP", 'url': "https://example.com"}, {'comment': "Congress should get rid of Gandhis", 'url': "https://example.com"}, {'comment': "Democracy is not a family Business", 'url': "https://example.com"}, {'comment': "Pappu becomes a joke again", 'url': "https://example.com"}]
@@ -74,7 +75,13 @@ def click_counter():
     return "Error"
 
 #---------------------------------------------- APIs -------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+@app.route('/api/timedf', methods=["GET"])
+def timedf():
+    # time_df=generate_time_df("*")
+    time_df=pd.read_csv('flask_app/outputs/time_data_all.csv')
+    print(time_df)
+    return jsonify({"year":list(time_df["year"]), "month":list(time_df["month"]), "num_results":list(time_df["num_results"]), "polarity":list(time_df["polarity"]), "reddit_score":list(time_df["reddit_score"])})
+    
 
 @app.route('/api/geoplot', methods=["GET"])
 def map_plot():
