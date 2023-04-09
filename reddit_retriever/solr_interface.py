@@ -361,7 +361,7 @@ class solr_ingest():
             "ps": ps,
             "bf": "log(reddit_score)^10",
             "qf": qf,
-            "fl": "comment,submission_title,score,url,reddit_score,timestamp",
+            "fl": "comment,submission_title,score,url,reddit_score,timestamp,polarity,political_leaning",
             "pf": pf,
             "pf2": pf2,
             "pf3": pf3,
