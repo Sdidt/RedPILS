@@ -1,0 +1,313 @@
+.App {
+  text-align: center;
+  background-color: #282c34;
+  padding: 5%;
+  min-height: 80vh;
+  width: 90vw;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: absolute;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.navbar {
+  display: flex;
+  /* justify-content: space-between; */
+  /* justify-content: center; */
+  align-items: center;
+  background-color: #b6b6b6;
+  color: #ff4500;
+  padding: 0.5%;
+  padding-left: 3.2%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-logo {
+  font-size: 1.5rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-links {
+  display: flex;
+  list-style: none;
+}
+
+.navbar-item {
+  margin-left: 20px;
+}
+
+.navbar-item a {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #950000;
+  text-decoration: none;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-item a:hover {
+  color: #ccc;
+}
+
+.SearchPageResults{
+  display: flex;
+  flex-direction: row;
+}
+
+.SearchResults1{
+  width: 75%;
+  padding-right: 2%;
+}
+
+.SearchBar{
+  width: 90%;
+  padding-right: 1%;
+  border-radius: "8px";
+  position:relative;
+  z-index:999;
+}
+
+.SearchBarDiv {
+  padding : 1%;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border-top: 2px solid rgb(127, 127, 127);
+  border-bottom: 2px solid rgb(127, 127, 127);
+}
+
+.filtersDiv{
+  position:relative;
+  z-index: 1;
+  padding-top: 2%;
+  display: flex;
+  flex-direction: row;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.toggleTabDiv .Mui-selected{
+  color: #fff;
+  /* background-color: #034eaa !important; */
+  background-color: rgba(0, 86, 191, 0.5) !important;
+}
+
+.ToggleScoreDiv{
+  padding-left: 5%;
+}
+
+.ToggleScoreDiv .Mui-selected {
+  color: #fff;
+  /* background-color: #464646 !important; */
+  background-color: rgba(0, 86, 191, 0.5) !important;
+}
+
+.SearchButton {
+  color:#ffffff;
+  height: 40px;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  text-transform: uppercase;
+  text-align: center;
+  background: #ff4500;
+  /* display: flex;
+  align-items: center;
+  justify-content: center; */
+}
+
+.SearchButton:hover {
+  background-color: #f99874;
+}
+
+.SearchButton:active {
+  transform: translateY(2px);
+}
+
+.reddit_embed{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 3%;
+  /* height: 20vw; */
+  min-height: 200px;
+  /* max-height: 500px; */
+}
+
+.side-box {
+  background-color: #959595;
+  padding:2%;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  margin: 10px;
+  max-width: 15%;
+  height: 100%;
+}
+
+.buttons-start{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width:92%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.btn-orange {
+  color:#ff9301;
+  height: 20px;
+  font-weight: 700;
+  border: none;
+  border-radius: 35px;
+  display: block;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 5%;
+  background: rgb(47, 47, 47)
+}
+
+.bar_chart_styles{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pie_chart_styles{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.wordcloud_styles{
+  display: flex;
+  flex-direction: row;
+  /* align-items: center; */
+  justify-content: center;
+  padding: 2%;
+}
+
+.geoPlotDiv{
+  display: flex;
+  flex-direction: row;
+  /* align-items: center; */
+  justify-content: center;
+  padding: 2%;
+  padding-left: 4%;
+}
+
+.NoResultsDiv{
+  padding-top: 5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: large;
+  font-style: italic;
+  color: #61dafb;
+  padding-bottom: 5%;
+}
+
+.NoResultsImg{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 100%;
+  /* position: relative; */
+}
+
+.searchFiltersDiv{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  /* width: 20%; */
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
+.dropdowndiv{
+  height: 40px;
+  width:100%;
+}
+
+.dropdownindv{
+  border-radius: 8px;
+  height: 100%;
+  width: 100%;
+  color: #ff9301;
+}
+
+.vl {
+  /* border-left: 2px solid rgb(127, 127, 127); */
+  border-left: 2px solid rgb(184, 184, 184);
+  height: 10vh;
+}
+
+.numberMetricsDiv{
+  padding: 5%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.numericIndvDiv{
+  padding: 4%;
+  /* border-right: 2px solid rgb(127, 127, 127) ; */
+}
+
+.datePickerDiv{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 90%;
+  padding-left: 5%;
+}
+
+.progressBarDiv{
+  padding-left: 2%;
+}
+
+.spaceDiv{
+  padding : 2%;
+}

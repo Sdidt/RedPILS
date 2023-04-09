@@ -31,47 +31,21 @@ class Crawler:
         submission.comments.replace_more(limit=comment_limit)
         comments = submission.comments.list()
         submission_id = submission.id
-        # comments = [comment.body.encode('utf-8') for comment in submission.comments.list()]
         comments = self.filter_comments(comments)
-        # list_data = [
-        #     Comment(
-        #         submission_id=submission_id,
-        #         submission_title=submission.title.encode('utf-8'), 
-        #         subreddit_id=sub.id,
-        #         subreddit_name=sub.name,
-        #         id=comment.id, 
-        #         comment=comment.body.encode('utf-8'),
-        #         timestamp=comment.created_utc,
-        #         url=comment.permalink,
-        #         score=comment.score,
-        #         redditor_id=comment.author.id if hasattr(comment, 'author') and hasattr(comment.author, 'id') else -1
-        #         ) for comment in comments 
-        # ]
         list_data = []
         for comment in comments:
-            dict_obj = {'submission_id':submission_id,
-                        'submission_title':submission.title,
-                        'subreddit_id':sub.id,
-                        'subreddit_name':sub.name,
-                        'comment_id':comment.id,
-                        'comment':comment.body,
-                        'timestamp':convert_to_datetime(comment.created_utc),
-                        'url':comment.permalink,
-                        'score':comment.score,
-                        "redditor_id":comment.author.id if hasattr(comment, 'author') and hasattr(comment.author, 'id') else -1}
-            list_data.append(dict_obj)
-        # Alternative:
-        # dict_data = {
-        #     "title": submission.title.encode('utf-8'),
-        #     "comments": [Comment(
-        #         id=comment.id, 
-        #         comment=comment.body.encode('utf-8'),
-        #         timestamp=comment.created_utc,
-        #         url=comment.permalink,
-        #         score=comment.score,
-        #         redditor_id=comment.author.id if hasattr(comment, 'author') and hasattr(comment.author, 'id') else -1
-        #         ) for comment in comments] 
-        # }
+            if b"I am a bot, and this action was performed automatically." not in comment.body.encode('utf-8'):
+                dict_obj = {'submission_id':submission_id,
+                            'submission_title':submission.title,
+                            'subreddit_id':sub.id,
+                            'subreddit_name':sub.name,
+                            'comment_id':comment.id,
+                            'comment':comment.body,
+                            'timestamp':convert_to_datetime(comment.created_utc),
+                            'url':comment.permalink,
+                            'reddit_score':comment.score,
+                            "redditor_id":comment.author.id if hasattr(comment, 'author') and hasattr(comment.author, 'id') else -1}
+                list_data.append(dict_obj)
         return list_data
 
     def crawl_data(self,crawl_limit,submission_limit):
@@ -91,23 +65,36 @@ class Crawler:
         for subreddit in subreddits.keys():
             print("==========SUBREDDIT {}==========".format(subreddit))
             sub = self.reddit.subreddit(subreddit)
+            search_query = '(flair:Politics OR flair:Foreign) AND ('
+            first = True
             for keyword in dynamic_keywords:
-                for submission in sub.search('flair: "Politics"+{}'.format(keyword), limit=keyword_limit):
-                    # relies on overloaded __eq__
-                    # if submission.id not in sub_data:
-                    if not data_ingest.check_submission_exists(solr_var['data_collection_name'], submission.id):
-                        submission_result = self.process_submission(submission, sub, submission_limit)
-                        sub_data.extend(submission_result)
-                        print("extracted data")
-                        # self.store_raw_data(dict(sub_data))
-                        # the following 2 lines are for testing purposes; in the future they will be replaced by a call to add the documents to solr directly
-                        # json_sub_data = process_json(sub_data)
-                        # print("processed data as json")
-                        data_ingest.push_data(solr_var['data_collection_name'],submission_result)
-                        print("pushed data")
-                        store_json(sub_data, self.output_filename)
-                        store_data(sub_data, self.output_filename)
-                        print("storing data")
+                if first:
+                    first = False
+                    search_query += keyword
+                    continue
+                search_query += ' OR {}'.format(keyword)
+            search_query += ')'
+            print(search_query)
+            # for keyword in dynamic_keywords:
+            for submission in sub.search(search_query, sort="top", limit=keyword_limit):
+                # relies on overloaded __eq__
+                # if submission.id not in sub_data:
+                print(submission.id)
+                if not data_ingest.check_submission_exists(solr_var['data_collection_name'], submission.id):
+                    submission_result = self.process_submission(submission, sub, submission_limit)
+                    sub_data.extend(submission_result)
+                    print("extracted data")
+                    # self.store_raw_data(dict(sub_data))
+                    # the following 2 lines are for testing purposes; in the future they will be replaced by a call to add the documents to solr directly
+                    # json_sub_data = process_json(sub_data)
+                    # print("processed data as json")
+                    data_ingest.push_data(solr_var['data_collection_name'],submission_result)
+                    print("pushed data")
+                    store_json(sub_data, self.output_filename)
+                    store_data(sub_data, self.output_filename)
+                    print("storing data")
+            else: 
+                print("No results obtained!")
 
     def filter_comments(self, comments):
         # filtered_comments = [comment for comment in comments if (comment.body.encode('utf-8') != b'[removed]' and comment.body.encode('utf-8') != b'[deleted]' and (len(comment.body.encode('utf-8').split(b" ")) >= 30))]
