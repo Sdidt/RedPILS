@@ -55,8 +55,8 @@ const SearchResultsComp = (props) => {
                     aria-label="Custom marks"
                     defaultValue={[result['political_leaning'],0]}
                     step={0.1}
-                    min={-2}
-                    max={2}
+                    min={-1}
+                    max={1}
                     valueLabelDisplay="auto"
                     marks={marks}
                     disabled={true}

@@ -17,7 +17,7 @@ load_dotenv()
 print(os.environ.get("SYS_PATH"))
 sys.path.append(os.environ.get("SYS_PATH"))
 
-from flask_app.utils.utils import avg_scores, search_db, process_date, process_query, generate_wordclouds,generate_df, generate_geoplot, polarity_filter_results
+from flask_app.utils.utils import avg_scores, search_db, process_date, process_query, generate_wordclouds,generate_geo_df, generate_geoplot, polarity_filter_results, generate_time_df
 
 app = Flask(__name__)
 CORS(app)
@@ -26,7 +26,8 @@ cors = CORS(app, resources={r"/*": {"origins":["*","http://localhost:8000"]}})
 #---------------------------------------------- TEST -------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/')
 def hello():
-    generate_df()
+    # generate_geo_df()
+    # print(generate_time_df("*"))
     return "Hello World! This is a test app"
 
 top_kr=[{'comment': "Rahul Gandhi can never be Savarkar", 'url': "https://example.com"}, {'comment': "Pappu is UNFORTUNATELY an MP", 'url': "https://example.com"}, {'comment': "Congress should get rid of Gandhis", 'url': "https://example.com"}, {'comment': "Democracy is not a family Business", 'url': "https://example.com"}, {'comment': "Pappu becomes a joke again", 'url': "https://example.com"}]
@@ -61,7 +62,6 @@ def dummy_chart():
         response.headers.add("Access-Control-Allow-Origin", "*")
         return response
 
-#---------------------------------------------- APIs -------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/backend/click_counter', methods=["POST"])
 def click_counter():
     """
@@ -73,6 +73,15 @@ def click_counter():
         click_score=click_score+1 
         return "click successfully updated"
     return "Error"
+
+#---------------------------------------------- APIs -------------------------------------------------------------------------------------------------------------------------------------------------------------
+@app.route('/api/timedf', methods=["GET"])
+def timedf():
+    # time_df=generate_time_df("*")
+    time_df=pd.read_csv('flask_app/outputs/time_data_all.csv')
+    print(time_df)
+    return jsonify({"year":list(time_df["year"]), "month":list(time_df["month"]), "num_results":list(time_df["num_results"]), "polarity":list(time_df["polarity"]), "reddit_score":list(time_df["reddit_score"])})
+    
 
 @app.route('/api/geoplot', methods=["GET"])
 def map_plot():
@@ -152,8 +161,13 @@ def query_wordcloud():
         except:
             sd=None
             ed=None
+        try:
+            polarity=args.get("polarity")
+        except:
+            polarity=None
     
-    
+    if polarity==None:
+        polarity="all"
     if region!=None and region!="":      
         query=query+" AND ( "+ region+" )"
     query=process_query(query)
@@ -161,6 +175,7 @@ def query_wordcloud():
     print(d1, d2)
     
     time_elapsed, num_results, search_results=search_db(query, K, d1, d2, intitle)
+    search_results=polarity_filter_results(search_results, polarity)
     search_results=search_results[:K]
     fig_wordcloud=generate_wordclouds(search_results)
     plt.figure(figsize=(10,7))
@@ -213,6 +228,10 @@ def query():
         else: 
             sd=None
             ed=None
+        if body["polarity"]:
+            polarity=body["intitle"]
+        else: 
+            polarity="all"
     
     
     #if request is of type GET
@@ -241,8 +260,14 @@ def query():
         except:
             sd=None
             ed=None
-    
-    
+        try:
+            polarity=args.get("polarity")
+        except:
+            polarity=None
+    if polarity==None:
+        polarity="all"
+    print(polarity)
+    print(K)
     if region!=None and region!="":      
         query=query+" AND ( "+ region+" )"
     query=process_query(query)
@@ -250,10 +275,20 @@ def query():
     print(d1, d2)
     
     time_elapsed, num_results, search_results=search_db(query, K, d1, d2, intitle)
+    search_results=polarity_filter_results(search_results, polarity)
     search_results=search_results[:K]
     reddit_avg, score_avg, polarity_avg=avg_scores(search_results)
     
-    response = jsonify({"search_time":time_elapsed, "query":query, "topk":search_results, "avg_reddit_score":reddit_avg, "avg_score":score_avg, "avg_polarity":polarity_avg, "num_results":num_results})
+    left_results=polarity_filter_results(search_results, "left")
+    right_results=polarity_filter_results(search_results, "right")
+    neutral_results=polarity_filter_results(search_results, "neutral")
+    query_polarity_counts=[len(left_results),  len(neutral_results), len(right_results)]
+    left_reddit, _, _=avg_scores(left_results) 
+    right_reddit, _, _=avg_scores(right_results)
+    neutral_reddit, _, _=avg_scores(neutral_results)
+    polarity_reddit_scores=[left_reddit,  neutral_reddit, right_reddit]
+    x_label=["left", "neutral", "right"]
+    response = jsonify({"search_time":time_elapsed, "query":query, "topk":search_results, "avg_reddit_score":reddit_avg, "avg_score":score_avg, "avg_polarity":polarity_avg, "num_results":num_results, "query_polarity_counts":query_polarity_counts,"polarity_reddit_scores": polarity_reddit_scores, "x_label":x_label})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
