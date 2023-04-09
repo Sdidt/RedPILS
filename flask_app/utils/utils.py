@@ -108,13 +108,16 @@ def process_date(timeframe=None, sd=None, ed=None):
         return past_time.strftime("%Y-%m-%dT%H:%M:%SZ"), current_time.strftime("%Y-%m-%dT%H:%M:%SZ")
     
 def generate_wordclouds(search_results):
-    # comments=[]
+    comments=[]
+
     if len(search_results)!=0:
-        text = ' '.join(item['comment'] for item in search_results)
-        # for item in search_results:
-        #     comments.append(item['comment'])
+        # text = ' '.join(item['comment'] for item in search_results)
+        for item in search_results:
+            comments.append(item['comment'])
     
-    # text = ' '.join(comments)
+    text = ' '.join(comments)
+    if (text == ''):
+        text = 'Failed'
     stopwords = load_stopwords()
     # background_color='lightgrey',
     fig_wordcloud = wordcloud.WordCloud(stopwords=stopwords,
