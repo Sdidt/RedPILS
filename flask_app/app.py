@@ -26,7 +26,7 @@ cors = CORS(app, resources={r"/*": {"origins":["*","http://localhost:8000"]}})
 #---------------------------------------------- TEST -------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/')
 def hello():
-    # generate_df()
+    generate_df()
     return "Hello World! This is a test app"
 
 top_kr=[{'comment': "Rahul Gandhi can never be Savarkar", 'url': "https://example.com"}, {'comment': "Pappu is UNFORTUNATELY an MP", 'url': "https://example.com"}, {'comment': "Congress should get rid of Gandhis", 'url': "https://example.com"}, {'comment': "Democracy is not a family Business", 'url': "https://example.com"}, {'comment': "Pappu becomes a joke again", 'url': "https://example.com"}]
