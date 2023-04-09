@@ -4,17 +4,25 @@ import NoResultsImg from "./pic1.png";
 
 const marks = [
   {
-    value: -1,
+    value: -2,
     label: 'LEFT',
+  },
+  {
+    value: 25,
+    label: '',
   },
   {
     value: 0,
     label: 'CENTER',
   },
   {
-    value: 1,
+    value: 75,
+    label: '',
+  },
+  {
+    value: 2,
     label: 'RIGHT',
-  }
+  },
 ];
 
 const SearchResultsComp = (props) => {
@@ -47,8 +55,8 @@ const SearchResultsComp = (props) => {
                     aria-label="Custom marks"
                     defaultValue={[result['political_leaning'],0]}
                     step={0.1}
-                    min={-2}
-                    max={2}
+                    min={-1}
+                    max={1}
                     valueLabelDisplay="auto"
                     marks={marks}
                     disabled={true}

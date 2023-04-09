@@ -1,4 +1,4 @@
-import { Pie, Bar, Doughnut } from 'react-chartjs-2';
+import { Pie, Bar, Doughnut, Line } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
 import React, { useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
@@ -17,16 +17,24 @@ const InsightsComp = (props) => {
     const [polaritySelect, setPolaritySelect] = useState('All');
     const [geoplotSelect, setGeoPlotSelect] = useState("num_results");
     const [geoPlotDataVar, setGeoPlotDataVar] = useState(props.geoPlotData)
+    const [polarWordCloudDataLink, setPolarWordCloudDataLink] = useState(props.polarWordCloudData)
 
     let wordCloudData = props.wordCloudData
-    let barChartData = props.barChartData
+    let barChartDataScore = props.barChartDataScore
+    let barChartDataCount = props.barChartDataCount
     let pieChartData = props.pieChartData
     let doughChartData = props.doughChartData
+    let timeChartData = props.timeChartData
+    let timeNoResults = props.timeNoResults
+    let timePolarityData = props.timePolarityData
     let statsCheck = props.statsCheck
     let avgRedditScore = props.avgRedditScore
     let avgScore = props.avgScore
     let searchTime = props.searchTime
     let geoPlotData = props.geoPlotData
+    let polarWordCloudData = props.polarWordCloudData
+
+    console.log(timeChartData)
 
     const options= {
         scales: {
@@ -52,10 +60,39 @@ const InsightsComp = (props) => {
         }
       };
 
+    const timeoptions = {
+        responsive: true,
+        scales:{
+            x: {
+                ticks: {
+                    color: 'white', // change x axis label color here
+                  },
+              },
+            y: {
+                ticks: {
+                    color: 'white', // change x axis label color here
+                  },
+              }
+        },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+                color: 'white' // set legend labels color
+              }
+          },
+          title: {
+            display: true,
+            text: 'Time ',
+          },
+        },
+    };
+
     const handleChange = (event: SelectChangeEvent) => {
         setPolaritySelect(event.target.value)
-        let bla = wordCloudData+"&polarity="+polaritySelect
-        console.log(bla)
+        let polarWordCloudData = props.polarWordCloudData+"&polarity="+event.target.value
+        setPolarWordCloudDataLink(polarWordCloudData)
+        console.log(polarWordCloudData)
     }
 
     const handleGeoSelect = async(event: SelectChangeEvent) => {
@@ -69,6 +106,10 @@ const InsightsComp = (props) => {
             setGeoPlotDataVar(dummy_geoplot_data)
         }
     }
+
+    useEffect(() => {
+        setPolarWordCloudDataLink(polarWordCloudData)
+      }, [polarWordCloudData]);
 
     return (
         <div>
@@ -104,20 +145,19 @@ const InsightsComp = (props) => {
                 </div>
                 <div className='bar_chart_styles'>
                     <div style={{ height: '400px', width: '600px' ,color:"white"}}>
-                    <Bar data={barChartData} options={options} />
+                    <Bar data={barChartDataScore} options={options} />
+                    </div>
+                    <div style={{ height: '400px', width: '600px' ,color:"white"}}>
+                    <Bar data={barChartDataCount} options={options} />
                     </div>
                 </div>
-                {/* <div className='pie_chart_styles'>
-                    <div style={{ height: '400px', width: '400px', alignItems: 'center',padding:"2%"}}>
-                    <Pie data={pieChartData} options={options} />
-                    </div>
-                    <div style={{ height: '400px', width: '400px', alignItems: 'center',padding:"2%"}}>
-                    <Doughnut data={doughChartData} options={options} />
-                    </div>
-                </div> */}
+                <Typography variant="h3" gutterBottom style={{color:'Orange',height:"55px",width:"100%",backgroundColor:"black"}}>
+                    Query Specific Data Insights
+                </Typography>
+                <br></br>
                 <div className='wordcloud_styles'>
                     <img src={wordCloudData} alt="wordcloud" />
-                    <FormControl fullWidth sx={{ m: 1, width:"100%"}}>
+                    {/* <FormControl fullWidth sx={{ m: 1, width:"100%"}}>
                     <InputLabel id="demo-simple-select-label">Polarity</InputLabel>
                     <Select
                         labelId="demo-simple-select-label"
@@ -129,13 +169,15 @@ const InsightsComp = (props) => {
                     >
                         <MenuItem value={"All"}>All</MenuItem>
                         <MenuItem value={"left"}>Left</MenuItem>
-                        <MenuItem value={"left_leaning"}>Center Left</MenuItem>
                         <MenuItem value={"center"}>Center</MenuItem>
-                        <MenuItem value={"right_leaning"}>Center Right</MenuItem>
                         <MenuItem value={"right"}>Right</MenuItem>
                     </Select>
-                    </FormControl>
+                    </FormControl> */}
                 </div>
+                <br></br>
+                <Typography variant="h3" gutterBottom style={{color:'Orange',height:"55px",width:"100%",backgroundColor:"black"}}>
+                    Overall Data Insights
+                </Typography>
                 <br></br>
                 <div className="geoPlotDiv">
                     <div>
@@ -158,6 +200,29 @@ const InsightsComp = (props) => {
                     </Select>
                     </FormControl>
                 </div>
+                <br></br>
+                <div className='wordcloud_styles'>
+                    <img src={polarWordCloudDataLink} alt="wordcloud" />
+                    <FormControl fullWidth sx={{ m: 1, width:"100%"}}>
+                    <InputLabel id="demo-simple-select-label">Polarity</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={polaritySelect}
+                        label="Polarity"
+                        onChange={handleChange}
+                        sx={{ m: 1, backgroundColor:'white'}}
+                    >
+                        <MenuItem value={"All"}>All</MenuItem>
+                        <MenuItem value={"left"}>Left</MenuItem>
+                        <MenuItem value={"center"}>Center</MenuItem>
+                        <MenuItem value={"right"}>Right</MenuItem>
+                    </Select>
+                    </FormControl>
+                </div>
+                <Line data={timeNoResults} options={timeoptions}></Line>
+                <Line data={timePolarityData} options={timeoptions}></Line>
+                <Line data={timeChartData} options={timeoptions}></Line>
             </div> ) : (
         <div>
         <div className='NoResultsDiv'>
