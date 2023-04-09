@@ -4,25 +4,17 @@ import NoResultsImg from "./pic1.png";
 
 const marks = [
   {
-    value: -2,
+    value: -1,
     label: 'LEFT',
-  },
-  {
-    value: 25,
-    label: '',
   },
   {
     value: 0,
     label: 'CENTER',
   },
   {
-    value: 75,
-    label: '',
-  },
-  {
-    value: 2,
+    value: 1,
     label: 'RIGHT',
-  },
+  }
 ];
 
 const SearchResultsComp = (props) => {
