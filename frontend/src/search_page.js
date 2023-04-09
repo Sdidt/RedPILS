@@ -73,6 +73,7 @@ const SearchPage = () => {
   const [titleValue, setTitleValue] = React.useState("");
   const [titleSelect, setTitleSelect] = useState(false);
   const [allTimeSelect, setAllTimeSelect] = useState(true);
+  const [polaritySelect, setPolaritySelect] = useState('All')
   const [expanded, setExpanded] = useState(false);
 
   // const [categories,setCategories] = useState([])
@@ -258,7 +259,8 @@ const SearchPage = () => {
     locationName,
     titleSelect,
     kValue,
-    allTimeSelect
+    allTimeSelect,
+    polaritySelect
   ) => {
     console.log(searchTerm);
     console.log(timeSelectConst);
@@ -272,7 +274,8 @@ const SearchPage = () => {
         locationName,
         titleSelect,
         kValue,
-        allTimeSelect
+        allTimeSelect,
+        polaritySelect
       );
       var dummy_wordcloud_data = await DATA.QueryWordcloudData(
         searchTerm,
@@ -281,7 +284,8 @@ const SearchPage = () => {
         locationName,
         titleSelect,
         kValue,
-        allTimeSelect
+        allTimeSelect,
+        polaritySelect
       );
       var dummy_geoplot_data = await DATA.QueryGeoPlotData(
         "num_results",
@@ -343,7 +347,8 @@ const SearchPage = () => {
       locationName,
       titleSelect,
       kValue,
-      allTimeSelect
+      allTimeSelect,
+      polaritySelect
     );
     var dummy_wordcloud_data = await DATA.QueryWordcloudData(
       searchTerm,
@@ -466,6 +471,10 @@ const SearchPage = () => {
   const handleAllTimeSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAllTimeSelect(event.target.checked);
   };
+
+  const handlePolaritySelect = (event: SelectChangeEvent) => {
+    setPolaritySelect(event.target.value)
+}
 
   const Accordion = styled((props: AccordionProps) => (
     <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -623,6 +632,22 @@ const SearchPage = () => {
                         setKValue(event.target.value);
                       }}
                     />
+                    <FormControl fullWidth sx={{ m: 1, width:"15%"}}>
+                    <InputLabel id="demo-simple-select-label">Polarity</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={polaritySelect}
+                        label="Polarity"
+                        onChange={handlePolaritySelect}
+                        sx={{ m: 1, backgroundColor:'white'}}
+                    >
+                        <MenuItem value={"All"}>All</MenuItem>
+                        <MenuItem value={"left"}>Left</MenuItem>
+                        <MenuItem value={"center"}>Center</MenuItem>
+                        <MenuItem value={"right"}>Right</MenuItem>
+                    </Select>
+                    </FormControl>
                   </div>
                   <div className="datePickerDiv">
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -665,7 +690,8 @@ const SearchPage = () => {
                   locationName,
                   titleSelect,
                   kValue,
-                  allTimeSelect
+                  allTimeSelect,
+                  polaritySelect
                 )
               }
             >
