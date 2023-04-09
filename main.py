@@ -53,9 +53,9 @@ data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],
 
 #--------------------keyword extract--------------------#
 # crawler = Crawler(output_filename="solr_integration_test")
-# search_data = data_ingest.query_data({'q':'*:*','rows':1000000},solr_var['data_collection_name'])
+search_data = data_ingest.query_data({'q':'*:*','rows':1000000},solr_var['data_collection_name'])
 # store_json(search_data, "backup_before_reindex")
-# ner = NER()
+ner = NER()
 
 #--------------------Translation--------------------#
 # Uncomment to test translation; will not work at our scale since API request limit is hit
@@ -76,18 +76,20 @@ data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],
 # data_ingest.define_schema(solr_var["data_collection_name"], solr_var["posted_at_field"])
 # data_ingest.add_new_copy_field(solr_var["data_collection_name"], solr_var["copy_timestamp_field"])
 
-data_ingest.replace_schema(solr_var["data_collection_name"], solr_var["update_timestamp"])
+# data_ingest.replace_schema(solr_var["data_collection_name"], solr_var["update_timestamp"])
 
 #--------------------Keyword preprocess--------------------#
 # latest_level += 1
 # keywords[latest_level] = set()
-# for comment in search_data:
+keywords = set()
+for comment in search_data:
 #     # print(comment)
-#     new_keywords = ner.get_useful_keywords(comment["comment"])
-#     keywords[latest_level] = keywords[latest_level].union(new_keywords)
-#     print("Keywords: {}".format(new_keywords))
+    new_keywords = ner.get_useful_keywords(comment["comment"])
+    keywords = keywords.union(new_keywords)
+    if len(new_keywords):
+        print("Keywords: {}".format(new_keywords))
 
-# print("ALL Keywords: {}".format(keywords))
+print("ALL Keywords: {}".format(keywords))
 #-------------------------------------------------#
 
 #--------------------TFIDF tokenizer--------------------#

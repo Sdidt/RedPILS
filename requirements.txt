@@ -12,4 +12,6 @@ stanfordnlp
 keybert
 Flask
 Flask-Cors
+wordcloud
+plotly
 # python -m spacy download en_core_web_sm; to get the corpus for spacy NER
