@@ -5,7 +5,7 @@ from reddit_retriever.solr_interface import solr_ingest
 import pandas as pd
 
 def read_preds():
-    df = pd.read_csv('full_6k_preds.csv', header=0)
+    df = pd.read_csv('full_labelled_data.csv', header=0)
     labels = df.applymap(str).groupby('comment_id')["predicted_label"].apply(float).to_dict()
     scores = df.applymap(str).groupby('comment_id')["predicted_score"].apply(float).to_dict()
     # print(labels)
