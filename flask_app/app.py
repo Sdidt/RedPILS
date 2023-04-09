@@ -17,7 +17,7 @@ load_dotenv()
 print(os.environ.get("SYS_PATH"))
 sys.path.append(os.environ.get("SYS_PATH"))
 
-from flask_app.utils.utils import avg_scores, search_db, process_date, process_query, generate_wordclouds,generate_geo_df, generate_geoplot, polarity_filter_results, generate_time_df
+from flask_app.utils.utils import avg_scores, search_db, process_date, process_query, generate_wordclouds,generate_geo_df, generate_geoplot, polarity_filter_results, generate_time_df, load_stopwords
 
 app = Flask(__name__)
 CORS(app)
@@ -28,6 +28,7 @@ cors = CORS(app, resources={r"/*": {"origins":["*","http://localhost:8000"]}})
 def hello():
     # generate_geo_df()
     # print(generate_time_df("*"))
+    load_stopwords()
     return "Hello World! This is a test app"
 
 top_kr=[{'comment': "Rahul Gandhi can never be Savarkar", 'url': "https://example.com"}, {'comment': "Pappu is UNFORTUNATELY an MP", 'url': "https://example.com"}, {'comment': "Congress should get rid of Gandhis", 'url': "https://example.com"}, {'comment': "Democracy is not a family Business", 'url': "https://example.com"}, {'comment': "Pappu becomes a joke again", 'url': "https://example.com"}]

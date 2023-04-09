@@ -53,8 +53,8 @@ def get_phrase_query_results(phrase_query):
 
 if __name__ == "__main__":
     data_ingest = solr_ingest(solr_var["solr_url"],solr_var['data_collection_name'],solr_var['headers'])
-    # check_total_word_length()
-    # check_unique_words()
-    # get_avg_length()
+    check_total_word_length()
+    check_unique_words()
+    get_avg_length()
     # compute_query_term_score("INC")
-    get_phrase_query_results("BJP")
+    # get_phrase_query_results("BJP")

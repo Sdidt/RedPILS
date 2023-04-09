@@ -19,7 +19,7 @@ from reddit_retriever.solr_interface import solr_ingest
 from utils.constants import solr_var
 
 def load_stopwords():
-    with open('stopwords_nltk.txt','r') as st:
+    with open('flask_app/utils/stopwords_nltk.txt','r') as st:
         st_content = st.read()
         stopwords = set(st_content.split())
         print(len(stopwords))
