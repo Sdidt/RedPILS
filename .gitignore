@@ -9,6 +9,7 @@ backup.txt
 redpils
 venv
 node_modules
+frontend/node_modules
 configset_modified.zip
 modified_configset.zip
 flask_app/outputs/polarity_wordcloud_right.png

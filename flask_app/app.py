@@ -26,7 +26,7 @@ cors = CORS(app, resources={r"/*": {"origins":["*","http://localhost:8000"]}})
 #---------------------------------------------- TEST -------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/')
 def hello():
-    generate_df()
+    # generate_df()
     return "Hello World! This is a test app"
 
 top_kr=[{'comment': "Rahul Gandhi can never be Savarkar", 'url': "https://example.com"}, {'comment': "Pappu is UNFORTUNATELY an MP", 'url': "https://example.com"}, {'comment': "Congress should get rid of Gandhis", 'url': "https://example.com"}, {'comment': "Democracy is not a family Business", 'url': "https://example.com"}, {'comment': "Pappu becomes a joke again", 'url': "https://example.com"}]
@@ -61,7 +61,6 @@ def dummy_chart():
         response.headers.add("Access-Control-Allow-Origin", "*")
         return response
 
-#---------------------------------------------- APIs -------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/backend/click_counter', methods=["POST"])
 def click_counter():
     """
@@ -73,6 +72,9 @@ def click_counter():
         click_score=click_score+1 
         return "click successfully updated"
     return "Error"
+
+#---------------------------------------------- APIs -------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 @app.route('/api/geoplot', methods=["GET"])
 def map_plot():
@@ -267,7 +269,16 @@ def query():
     search_results=search_results[:K]
     reddit_avg, score_avg, polarity_avg=avg_scores(search_results)
     
-    response = jsonify({"search_time":time_elapsed, "query":query, "topk":search_results, "avg_reddit_score":reddit_avg, "avg_score":score_avg, "avg_polarity":polarity_avg, "num_results":num_results})
+    left_results=polarity_filter_results(search_results, "left")
+    right_results=polarity_filter_results(search_results, "right")
+    neutral_results=polarity_filter_results(search_results, "neutral")
+    query_polarity_counts=[len(left_results),  len(neutral_results), len(right_results)]
+    left_reddit, _, _=avg_scores(left_results) 
+    right_reddit, _, _=avg_scores(left_results)
+    neutral_reddit, _, _=avg_scores(left_results)
+    polarity_reddit_scores=[left_reddit,  neutral_reddit, right_reddit,]
+    x_label=["left", "neutral", "right"]
+    response = jsonify({"search_time":time_elapsed, "query":query, "topk":search_results, "avg_reddit_score":reddit_avg, "avg_score":score_avg, "avg_polarity":polarity_avg, "num_results":num_results, "query_polarity_counts":query_polarity_counts,"polarity_reddit_scores": polarity_reddit_scores, "x_label":x_label})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
