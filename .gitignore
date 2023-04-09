@@ -17,3 +17,4 @@ flask_app/outputs/query_wordcloud.png
 flask_app/outputs/polarity_wordcloud_left.png
 flask_app/outputs/polarity_wordcloud_all.png
 flask_app/outputs/polarity_wordcloud_neutral.png
+full_6k_preds
